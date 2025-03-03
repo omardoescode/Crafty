@@ -7,8 +7,12 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS True)
 # Set directory paths
 set(UI_DIR ${CMAKE_SOURCE_DIR}/src/ui)
 
+# Get opengl from system
+# TODO: Chagne to use FetchContent Instead too
 find_package(OpenGL REQUIRED)
 include(FetchContent)
+
+# Fetch SDL
 FetchContent_Declare(
   SDL2
   GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git"
@@ -17,6 +21,7 @@ FetchContent_Declare(
 message(STATUS "Fetching SDL ...")
 FetchContent_MakeAvailable(SDL2)
 
+# Fetch IMGUI, docking version
 FetchContent_Declare(
   imgui
   GIT_REPOSITORY "https://github.com/ocornut/imgui.git"
@@ -26,6 +31,14 @@ FetchContent_Declare(
 message(STATUS "Fetching imgui ...")
 FetchContent_MakeAvailable(imgui)
 
+# Fetch GTest
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
+)
+message(STATUS "Fetching GTest ...")
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
 
 # Building the ImGUI library
 add_library(imgui
@@ -56,7 +69,6 @@ add_library(ui
   ${UI_DIR}/MainMenuBar.cpp 
   ${UI_DIR}/BlockCategoryPanel.cpp 
 )
-
 target_link_libraries(ui PUBLIC imgui)
 # The executable
 add_executable(crafty src/main.cpp)
@@ -68,3 +80,12 @@ target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR})
 add_custom_command(TARGET crafty PRE_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory
                        ${CMAKE_SOURCE_DIR}/assets/ $<TARGET_FILE_DIR:crafty>/assets)
+
+# Testing
+enable_testing()
+
+add_executable(tests tests/hello_test.cpp)
+target_link_libraries(tests GTest::gtest_main)
+include(GoogleTest)
+gtest_discover_tests(tests)
+
