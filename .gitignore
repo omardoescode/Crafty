@@ -40,3 +40,6 @@ build/
 
 # cache
 .cache
+
+# drawio files
+*.bkp
