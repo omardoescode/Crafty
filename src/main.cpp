@@ -3,15 +3,16 @@
 #include <string>
 #include <vector>
 #include "backends/imgui_impl_opengl3.h"
-#include "backends/imgui_impl_sdl.h"
+#include "backends/imgui_impl_sdl2.h"
 #include "imgui.h"
+#include "ui/BlockCategoryPanel.h"
 #include "ui/MainMenuBar.h"
+
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <SDL_opengles2.h>
 #else
 #include <SDL_opengl.h>
 #endif
-// hello
 
 // Main code
 int main(int, char **) {
@@ -70,7 +71,7 @@ int main(int, char **) {
                         SDL_WINDOW_ALLOW_HIGHDPI);
   SDL_Window *window =
       SDL_CreateWindow("Crafty", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                       1280, 720, window_flags);
+                       1500, 1000, window_flags);
   if (window == nullptr) {
     printf("Error: SDL_CreateWindow(): %s\n", SDL_GetError());
     return -1;
@@ -96,10 +97,6 @@ int main(int, char **) {
       ImGuiConfigFlags_NavEnableGamepad;             // Enable Gamepad Controls
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;  // Enable Docking
 
-  // Setup Dear ImGui style
-  ImGui::StyleColorsDark();
-  // ImGui::StyleColorsLight();
-
   // Setup Platform/Renderer backends
   ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
   ImGui_ImplOpenGL3_Init(glsl_version);
@@ -114,6 +111,7 @@ int main(int, char **) {
   // Initialize widgets
   ui::UIOptions options;
   ui::MainMenuBar main_menu_bar(options);
+  ui::BlockCategoryPanel block_category_panel(options);
 
   // Main loop
   while (options.running()) {
@@ -125,7 +123,6 @@ int main(int, char **) {
       if (event.type == SDL_WINDOWEVENT &&
           event.window.event == SDL_WINDOWEVENT_CLOSE &&
           event.window.windowID == SDL_GetWindowID(window)) {
-        // done = true
       }
     }
     if (SDL_GetWindowFlags(window) & SDL_WINDOW_MINIMIZED) {
@@ -138,7 +135,9 @@ int main(int, char **) {
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
 
-    // ImGui::ShowDemoWindow();
+    // Use the demo
+    ImGui::ShowDemoWindow();
+
     // Get viewport information for full-window ImGui
     const ImGuiViewport *viewport = ImGui::GetMainViewport();
 
@@ -156,12 +155,15 @@ int main(int, char **) {
     // Begin a full-screen ImGui window
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-
     ImGui::Begin("CraftyMainWindow", NULL, window_flags);
     ImGui::PopStyleVar(2);
 
-    // Create a menu bar
     main_menu_bar.draw();
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 8));
+    block_category_panel.draw();
+    ImGui::SameLine();
+    ImGui::PopStyleVar(1);
+    ImGui::End();  // Main Application
 
     // Rendering
     ImGui::Render();

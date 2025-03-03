@@ -1,10 +1,9 @@
-
+#pragma once
 // Provide Settings for the UI
+#include <string>
+#include "imgui.h"
 namespace ui {
 class UIOptions {
-public:
-  typedef bool Option;
-
 public:
   /**
    * @brief Constructor
@@ -14,10 +13,20 @@ public:
    */
   UIOptions();
 
-  const Option& running() const;
+  // App State
+  const bool& running() const;
   void close();
 
+  // Block Editor state
+  const std::string current_category() const;
+  void set_current_category(const std::string&);
+
+  // Helpful stuff for colors
+  // Get the hover color by decreasing alpha by -.1f
+  ImVec4 get_hover_color(ImVec4);
+
 private:
-  Option _running;
+  bool _running;
+  std::string _current_cateogry;
 };
 }  // namespace ui
