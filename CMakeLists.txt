@@ -20,7 +20,7 @@ FetchContent_MakeAvailable(SDL2)
 FetchContent_Declare(
   imgui
   GIT_REPOSITORY "https://github.com/ocornut/imgui.git"
-  GIT_TAG cb8ead1f7198924f97e52973d115e1d4eaeda2f3
+  GIT_TAG docking
 )
 
 message(STATUS "Fetching imgui ...")
@@ -40,10 +40,10 @@ add_library(imgui
   ${imgui_SOURCE_DIR}/imstb_rectpack.h
   ${imgui_SOURCE_DIR}/imstb_textedit.h
   ${imgui_SOURCE_DIR}/imstb_truetype.h
-  ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl.h
-  ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl.cpp
-  ${imgui_SOURCE_DIR}/backends/imgui_impl_sdlrenderer.h
-  ${imgui_SOURCE_DIR}/backends/imgui_impl_sdlrenderer.cpp
+  ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl2.h
+  ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl2.cpp
+  ${imgui_SOURCE_DIR}/backends/imgui_impl_sdlrenderer2.h
+  ${imgui_SOURCE_DIR}/backends/imgui_impl_sdlrenderer2.cpp
   ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.h
   ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
 )
@@ -54,12 +54,14 @@ target_link_libraries(imgui PUBLIC SDL2::SDL2 OpenGL::GL)
 add_library(ui
   ${UI_DIR}/ui_options.cpp 
   ${UI_DIR}/MainMenuBar.cpp 
+  ${UI_DIR}/BlockCategoryPanel.cpp 
 )
 
+target_link_libraries(ui PUBLIC imgui)
 # The executable
 add_executable(crafty src/main.cpp)
 
-target_link_libraries(crafty PUBLIC imgui ui)
+target_link_libraries(crafty PUBLIC ui)
 target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR})
 
 # Copy assets
