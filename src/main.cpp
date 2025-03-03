@@ -105,7 +105,7 @@ int main(int, char **) {
   ImGui_ImplOpenGL3_Init(glsl_version);
 
   // Setup Fonts
-  io.Fonts->AddFontFromFileTTF("assets/fonts/ComicNeue-Regular.ttf", 18.0f);
+  io.Fonts->AddFontFromFileTTF("assets/fonts/Rubik.ttf", 18.0f);
 
   // App state
   ImVec4 clear_color = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);

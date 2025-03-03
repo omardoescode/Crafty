@@ -32,7 +32,7 @@
 *.app
 
 # Build files
-./build/
+build/
 
 # IDE-specific-folders
 .vscode/
