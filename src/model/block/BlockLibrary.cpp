@@ -101,5 +101,15 @@ const std::vector<std::string>& BlockLibrary::categories() const {
   assert(_initialized);
   return _categories;
 }
+
+std::vector<const BlockDefinition*> BlockLibrary::category_blocks(
+    const std::string& category) const {
+  std::vector<const BlockDefinition*> res;
+  for (const auto& [id, def] : _block_definitions) {
+    if (def.category == category) {
+      res.push_back(&def);
+    }
+  }
+  return res;
+}
 }  // namespace model
-//

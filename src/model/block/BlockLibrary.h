@@ -21,6 +21,8 @@ public:
   void reload();
 
   const std::vector<std::string>& categories() const;
+  std::vector<const BlockDefinition*> category_blocks(
+      const std::string& category) const;
 
 private:
   BlockLibrary();
@@ -33,6 +35,8 @@ private:
 private:
   bool _initialized;
   json _initfile;
+  // TODO: Optimize category block queries by changing this design layer when
+  // refactoring
   std::map<std::string, BlockDefinition> _block_definitions;
   std::vector<std::string> _categories;
 };

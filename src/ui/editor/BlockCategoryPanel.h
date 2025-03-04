@@ -1,8 +1,6 @@
 #pragma once
 
 #include <imgui.h>
-#include <map>
-#include <string>
 #include "ui_options.h"
 namespace ui {
 class BlockCategoryPanel {
