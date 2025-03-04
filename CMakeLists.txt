@@ -6,6 +6,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS True)
 
 # Set directory paths
 set(UI_DIR ${CMAKE_SOURCE_DIR}/src/ui)
+set(MODEL_DIR ${CMAKE_SOURCE_DIR}/src/model)
 
 # Get opengl from system
 # TODO: Chagne to use FetchContent Instead too
@@ -30,6 +31,11 @@ FetchContent_Declare(
 
 message(STATUS "Fetching imgui ...")
 FetchContent_MakeAvailable(imgui)
+# Fetching json reader
+FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
+
+message(STATUS "Fetching nlohmann/json ...")
+FetchContent_MakeAvailable(json)
 
 # Fetch GTest
 FetchContent_Declare(
@@ -39,6 +45,15 @@ FetchContent_Declare(
 message(STATUS "Fetching GTest ...")
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
+
+# Build a library for model
+add_library(model
+  ${MODEL_DIR}/block/BlockLibrary.cpp
+  ${MODEL_DIR}/utils/fs.cpp
+)
+
+target_link_libraries(model PUBLIC nlohmann_json::nlohmann_json)
+target_include_directories(model PRIVATE ${MODEL_DIR})
 
 # Building the ImGUI library
 add_library(imgui
@@ -70,22 +85,26 @@ add_library(ui
   ${UI_DIR}/BlockCategoryPanel.cpp 
 )
 target_link_libraries(ui PUBLIC imgui)
+target_include_directories(model PRIVATE ${UI_DIR})
 # The executable
 add_executable(crafty src/main.cpp)
 
-target_link_libraries(crafty PUBLIC ui)
-target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR})
+target_link_libraries(crafty PUBLIC ui model)
 
-# Copy assets
-add_custom_command(TARGET crafty PRE_BUILD
-                   COMMAND ${CMAKE_COMMAND} -E copy_directory
-                       ${CMAKE_SOURCE_DIR}/assets/ $<TARGET_FILE_DIR:crafty>/assets)
 
 # Testing
 enable_testing()
 
-add_executable(tests tests/hello_test.cpp)
-target_link_libraries(tests GTest::gtest_main)
+add_executable(tests tests/ModelLayerTests.cpp)
+target_link_libraries(tests GTest::gtest_main model)
+target_include_directories(tests PUBLIC 
+  ${MODEL_DIR}
+)
 include(GoogleTest)
 gtest_discover_tests(tests)
 
+# Copy assets
+message("Copying assets and data")
+file(COPY assets DESTINATION ${CMAKE_BINARY_DIR})
+file(COPY data DESTINATION ${CMAKE_BINARY_DIR})
+message("Finishing copying")

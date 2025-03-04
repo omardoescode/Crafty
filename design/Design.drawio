@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.0.9 Chrome/128.0.6613.186 Electron/32.3.1 Safari/537.36" version="26.0.9">
   <diagram name="Page-1" id="e56a1550-8fbb-45ad-956c-1786394a9013">
-    <mxGraphModel dx="1422" dy="855" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" background="none" math="0" shadow="0">
+    <mxGraphModel dx="1422" dy="855" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1100" pageHeight="850" background="none" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -29,13 +29,13 @@
           <mxGeometry x="450" y="120" width="60" height="80" as="geometry" />
         </mxCell>
         <mxCell id="Ndg02h9WD8qBhF1uvVEC-11" value="Lua Engine" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" parent="1" vertex="1">
-          <mxGeometry x="450" y="260" width="60" height="80" as="geometry" />
+          <mxGeometry x="590" y="240" width="60" height="80" as="geometry" />
         </mxCell>
         <mxCell id="Ndg02h9WD8qBhF1uvVEC-14" value="Serialization Engine&lt;span style=&quot;color: rgba(0, 0, 0, 0); font-family: monospace; font-size: 0px; text-align: start; text-wrap: nowrap;&quot;&gt;%3CmxGraphModel%3E%3Croot%3E%3CmxCell%20id%3D%220%22%2F%3E%3CmxCell%20id%3D%221%22%20parent%3D%220%22%2F%3E%3CmxCell%20id%3D%222%22%20value%3D%22Scripting%20Engine%22%20style%3D%22shape%3Dcylinder3%3BwhiteSpace%3Dwrap%3Bhtml%3D1%3BboundedLbl%3D1%3BbackgroundOutline%3D1%3Bsize%3D15%3B%22%20vertex%3D%221%22%20parent%3D%221%22%3E%3CmxGeometry%20x%3D%22450%22%20y%3D%22260%22%20width%3D%2260%22%20height%3D%2280%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%3C%2Froot%3E%3C%2FmxGraphModel%3E&lt;/span&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" parent="1" vertex="1">
           <mxGeometry x="810" y="120" width="75" height="80" as="geometry" />
         </mxCell>
         <mxCell id="Ndg02h9WD8qBhF1uvVEC-15" value="Project Manager" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" parent="1" vertex="1">
-          <mxGeometry x="575" y="120" width="60" height="80" as="geometry" />
+          <mxGeometry x="450" y="350" width="60" height="80" as="geometry" />
         </mxCell>
         <mxCell id="Ndg02h9WD8qBhF1uvVEC-17" value="&lt;font color=&quot;#ba0000&quot;&gt;Interpreter is used for the execution of the whole game&lt;/font&gt;" style="whiteSpace=wrap;html=1;shape=mxgraph.basic.document;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
           <mxGeometry x="400" y="500" width="100" height="100" as="geometry" />
@@ -50,7 +50,7 @@
           <mxGeometry x="770" y="530" width="100" height="120" as="geometry" />
         </mxCell>
         <mxCell id="Ndg02h9WD8qBhF1uvVEC-22" value="Block Editor" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" parent="1" vertex="1">
-          <mxGeometry x="80" y="110" width="60" height="80" as="geometry" />
+          <mxGeometry x="240" y="210" width="60" height="80" as="geometry" />
         </mxCell>
         <mxCell id="Ndg02h9WD8qBhF1uvVEC-23" value="Stage/Game" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" parent="1" vertex="1">
           <mxGeometry x="80" y="220" width="90" height="80" as="geometry" />
@@ -60,6 +60,45 @@
         </mxCell>
         <mxCell id="Ndg02h9WD8qBhF1uvVEC-25" value="Asset Manager" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" parent="1" vertex="1">
           <mxGeometry x="210" y="320" width="90" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="_iN82Q5z3ZRQG1YyzAqD-1" value="Block Library" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="1">
+          <mxGeometry x="940" y="120" width="75" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="_iN82Q5z3ZRQG1YyzAqD-2" value="&lt;font color=&quot;#ba0000&quot;&gt;Block Library is responsible for fetching block content from disk&lt;/font&gt;" style="whiteSpace=wrap;html=1;shape=mxgraph.basic.document;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="910" y="530" width="100" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="_iN82Q5z3ZRQG1YyzAqD-3" value="UI Controller" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="1">
+          <mxGeometry x="180" y="110" width="60" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="_iN82Q5z3ZRQG1YyzAqD-4" value="&lt;font color=&quot;#ba0000&quot;&gt;Add a modal somewhere&lt;/font&gt;" style="whiteSpace=wrap;html=1;shape=mxgraph.basic.document;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="50" y="490" width="100" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="_iN82Q5z3ZRQG1YyzAqD-5" value="Asset Manager" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="1">
+          <mxGeometry x="810" y="230" width="75" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="_iN82Q5z3ZRQG1YyzAqD-6" value="&lt;font color=&quot;#ba0000&quot;&gt;Responsible for loading Assets&lt;/font&gt;" style="whiteSpace=wrap;html=1;shape=mxgraph.basic.document;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="770" y="680" width="100" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="_iN82Q5z3ZRQG1YyzAqD-7" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1140" y="70" width="290" height="380" as="geometry" />
+        </mxCell>
+        <mxCell id="_iN82Q5z3ZRQG1YyzAqD-8" value="Filesystem" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1245" y="40" width="80" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="_iN82Q5z3ZRQG1YyzAqD-9" value="builtin spritse" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="1">
+          <mxGeometry x="1180" y="110" width="75" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="_iN82Q5z3ZRQG1YyzAqD-10" value="blocks" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="1">
+          <mxGeometry x="1310" y="110" width="75" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="_iN82Q5z3ZRQG1YyzAqD-11" value="builtin sfx [future]" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="1">
+          <mxGeometry x="1180" y="220" width="75" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="_iN82Q5z3ZRQG1YyzAqD-12" value="Resource Cache [future]" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="1">
+          <mxGeometry x="940" y="240" width="75" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="_iN82Q5z3ZRQG1YyzAqD-14" value="Code Generator" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="1">
+          <mxGeometry x="450" y="240" width="60" height="80" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

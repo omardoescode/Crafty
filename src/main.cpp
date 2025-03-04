@@ -1,7 +1,5 @@
 #include <SDL.h>
 #include <stdio.h>
-#include <string>
-#include <vector>
 #include "backends/imgui_impl_opengl3.h"
 #include "backends/imgui_impl_sdl2.h"
 #include "imgui.h"
