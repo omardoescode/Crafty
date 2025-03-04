@@ -1,20 +1,20 @@
 #include "BlockCategoryPanel.h"
 #include <imgui.h>
+#include <iostream>
+#include "block/BlockLibrary.h"
 
 namespace ui {
-BlockCategoryPanel::BlockCategoryPanel(UIOptions& options) : _options(options) {
-  categories = {{"Motion", {ImVec4(255, 0, 0, 1.0f), ImVec4(255, 0, 0, 0.5f)}}};
-}
+BlockCategoryPanel::BlockCategoryPanel(UIOptions& options)
+    : _options(options) {}
 
 void BlockCategoryPanel::draw() {
+  auto& lib = model::BlockLibrary::instance();
+  auto categories = lib.categories();
+
   ImGui::BeginChild("BlockCategoryPanel", ImVec2(0, 0),
                     ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_Border, true);
-  for (auto& [name, info] : categories) {
-    ImGui::PushStyleColor(ImGuiCol_Button, info.color);
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, info.color);
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, info.hover_color);
-    if (ImGui::Button(name)) _options.set_current_category(name);
-    ImGui::PopStyleColor(3);
+  for (auto& name : categories) {
+    if (ImGui::Button(name.c_str())) _options.set_current_category(name);
   }
   ImGui::EndChild();
 }

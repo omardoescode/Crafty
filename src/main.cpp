@@ -3,6 +3,7 @@
 #include "backends/imgui_impl_opengl3.h"
 #include "backends/imgui_impl_sdl2.h"
 #include "imgui.h"
+#include "model/block/BlockLibrary.h"
 #include "ui/BlockCategoryPanel.h"
 #include "ui/MainMenuBar.h"
 
@@ -110,6 +111,10 @@ int main(int, char **) {
   ui::UIOptions options;
   ui::MainMenuBar main_menu_bar(options);
   ui::BlockCategoryPanel block_category_panel(options);
+
+  // Initialize backend
+  auto &lib = model::BlockLibrary::instance();
+  lib.initialize();
 
   // Main loop
   while (options.running()) {

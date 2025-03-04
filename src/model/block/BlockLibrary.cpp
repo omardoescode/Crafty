@@ -1,7 +1,6 @@
 #include "BlockLibrary.h"
 #include <filesystem>
 #include <fstream>
-#include <iostream>
 #include <stdexcept>
 #include "block/BlockDefinition.h"
 #include "utils/fs.h"
@@ -48,6 +47,7 @@ void BlockLibrary::_load_blocks_json_data() {
   for (std::filesystem::path const& dir_entry :
        std::filesystem::directory_iterator{path}) {
     assert(std::filesystem::is_directory(dir_entry));
+    _categories.push_back(dir_entry.filename());
 
 #ifdef MODEL_LAYER_DEBUG
     std::cout << "Reading Directory " << dir_entry << std::endl;
@@ -96,4 +96,10 @@ BlockDefinition BlockLibrary::_parse_block(const json& js,
 
   return def;
 }
+
+const std::vector<std::string>& BlockLibrary::categories() const {
+  assert(_initialized);
+  return _categories;
+}
 }  // namespace model
+//

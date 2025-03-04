@@ -53,7 +53,7 @@ add_library(model
 )
 
 target_link_libraries(model PUBLIC nlohmann_json::nlohmann_json)
-target_include_directories(model PRIVATE ${MODEL_DIR})
+target_include_directories(model PUBLIC ${MODEL_DIR})
 
 # Building the ImGUI library
 add_library(imgui
@@ -84,12 +84,12 @@ add_library(ui
   ${UI_DIR}/MainMenuBar.cpp 
   ${UI_DIR}/BlockCategoryPanel.cpp 
 )
-target_link_libraries(ui PUBLIC imgui)
-target_include_directories(model PRIVATE ${UI_DIR})
+target_link_libraries(ui PUBLIC imgui model) # model for reading some data
+target_include_directories(ui PUBLIC ${UI_DIR} ${MODEL_DIR})
 # The executable
 add_executable(crafty src/main.cpp)
 
-target_link_libraries(crafty PUBLIC ui model)
+target_link_libraries(crafty PUBLIC ui)
 
 
 # Testing

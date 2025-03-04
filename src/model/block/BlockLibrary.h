@@ -20,6 +20,8 @@ public:
 
   void reload();
 
+  const std::vector<std::string>& categories() const;
+
 private:
   BlockLibrary();
 
@@ -32,5 +34,6 @@ private:
   bool _initialized;
   json _initfile;
   std::map<std::string, BlockDefinition> _block_definitions;
+  std::vector<std::string> _categories;
 };
 }  // namespace model
