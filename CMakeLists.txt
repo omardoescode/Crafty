@@ -82,7 +82,7 @@ target_link_libraries(imgui PUBLIC SDL2::SDL2 OpenGL::GL)
 add_library(ui
   ${UI_DIR}/ui_options.cpp 
   ${UI_DIR}/MainMenuBar.cpp 
-  ${UI_DIR}/BlockCategoryPanel.cpp 
+  ${UI_DIR}/editor/BlockCategoryPanel.cpp 
 )
 target_link_libraries(ui PUBLIC imgui model) # model for reading some data
 target_include_directories(ui PUBLIC ${UI_DIR} ${MODEL_DIR})

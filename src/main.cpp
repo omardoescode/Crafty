@@ -4,8 +4,8 @@
 #include "backends/imgui_impl_sdl2.h"
 #include "imgui.h"
 #include "model/block/BlockLibrary.h"
-#include "ui/BlockCategoryPanel.h"
 #include "ui/MainMenuBar.h"
+#include "ui/editor/BlockCategoryPanel.h"
 
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <SDL_opengles2.h>
