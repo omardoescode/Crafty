@@ -21,8 +21,11 @@ public:
   void reload();
 
   const std::vector<std::string>& categories() const;
-  std::vector<const BlockDefinition*> category_blocks(
+  std::vector<std::shared_ptr<const BlockDefinition>> category_blocks(
       const std::string& category) const;
+
+  std::shared_ptr<const BlockDefinition> get_block_definition_by_id(
+      const BlockDefinitionID&) const;
 
 private:
   BlockLibrary();
@@ -37,7 +40,10 @@ private:
   json _initfile;
   // TODO: Optimize category block queries by changing this design layer when
   // refactoring
-  std::map<std::string, BlockDefinition> _block_definitions;
+  // TODO: Figure out some way to handle ordering because map doesn't care about
+  // what folder was scanned first
+  std::map<std::string, std::shared_ptr<const BlockDefinition>>
+      _block_definitions;
   std::vector<std::string> _categories;
 };
 }  // namespace model

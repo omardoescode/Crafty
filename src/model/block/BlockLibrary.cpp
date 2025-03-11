@@ -1,10 +1,12 @@
 #include "BlockLibrary.h"
 #include <filesystem>
 #include <fstream>
+#include <iostream>
+#include <memory>
 #include <stdexcept>
 #include "block/BlockDefinition.h"
 #include "utils/fs.h"
-
+#define MODEL_LAYER_DEBUG
 namespace model {
 const char* BlockLibrary::block_folder_pathname = "./data/blocks";
 const char* BlockLibrary::block_initfile_pathname = "__init__.json";
@@ -50,13 +52,13 @@ void BlockLibrary::_load_blocks_json_data() {
     _categories.push_back(dir_entry.filename());
 
 #ifdef MODEL_LAYER_DEBUG
-    std::cout << "Reading Directory " << dir_entry << std::endl;
+    std::cout << "Reading Category " << dir_entry << std::endl;
 #endif
     for (std::filesystem::path const& block_definition :
          std::filesystem::directory_iterator(dir_entry)) {
       assert(std::filesystem::is_regular_file(block_definition));
 #ifdef MODEL_LAYER_DEBUG
-      std::cout << "Reading " << block_definition << std::endl;
+      std::cout << "Reading block " << block_definition << std::endl;
 #endif
 
       std::fstream file(block_definition);
@@ -64,9 +66,14 @@ void BlockLibrary::_load_blocks_json_data() {
       BlockDefinition def = _parse_block(block_def_json, dir_entry.filename());
       if (_block_definitions.count(def.id) != 0)
         throw std::runtime_error("Two blocks have the same ID");
-      _block_definitions[def.id] = def;
+      _block_definitions[def.id] = std::make_shared<BlockDefinition>(def);
     }
   }
+
+#ifdef MODEL_LAYER_DEBUG
+  std::cout << "Finished Reading " << _block_definitions.size()
+            << " builtin blocks" << std::endl;
+#endif
 }
 
 BlockDefinition BlockLibrary::_parse_block(const json& js,
@@ -102,14 +109,20 @@ const std::vector<std::string>& BlockLibrary::categories() const {
   return _categories;
 }
 
-std::vector<const BlockDefinition*> BlockLibrary::category_blocks(
-    const std::string& category) const {
-  std::vector<const BlockDefinition*> res;
+std::vector<std::shared_ptr<const BlockDefinition>>
+BlockLibrary::category_blocks(const std::string& category) const {
+  std::vector<std::shared_ptr<const BlockDefinition>> res;
   for (const auto& [id, def] : _block_definitions) {
-    if (def.category == category) {
-      res.push_back(&def);
-    }
+    if (def->category == category) res.push_back(def);
   }
+
   return res;
+}
+
+std::shared_ptr<const BlockDefinition> BlockLibrary::get_block_definition_by_id(
+    const BlockDefinitionID& id) const {
+  if (_block_definitions.count(id) == 0)
+    throw std::runtime_error("Invalid ID, or ID doesn't exist in library");
+  return _block_definitions.at(id);
 }
 }  // namespace model

@@ -16,10 +16,11 @@ struct OutputSlot {
   SlotType type;
 };
 
+typedef std::string BlockDefinitionID;
 // Holds information about the block definitions retrieved from the filesystem
 // via BlockLibrary
 struct BlockDefinition {
-  std::string id;
+  BlockDefinitionID id;
   std::string name;
   std::string category;
   OutputSlot output;
