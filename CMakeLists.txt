@@ -9,15 +9,19 @@ set(UI_DIR ${CMAKE_SOURCE_DIR}/src/ui)
 set(MODEL_DIR ${CMAKE_SOURCE_DIR}/src/model)
 
 # Get opengl from system
-# TODO: Chagne to use FetchContent Instead too
+# TODO: Change to use FetchContent Instead too
 find_package(OpenGL REQUIRED)
+
+# Import FetchContent
 include(FetchContent)
+Set(FETCHCONTENT_QUIET FALSE)
 
 # Fetch SDL
 FetchContent_Declare(
   SDL2
   GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git"
   GIT_TAG release-2.0.22
+  GIT_PROGRESS TRUE
 )
 message(STATUS "Fetching SDL ...")
 FetchContent_MakeAvailable(SDL2)
@@ -27,12 +31,17 @@ FetchContent_Declare(
   imgui
   GIT_REPOSITORY "https://github.com/ocornut/imgui.git"
   GIT_TAG docking
+  GIT_PROGRESS TRUE
 )
 
 message(STATUS "Fetching imgui ...")
 FetchContent_MakeAvailable(imgui)
 # Fetching json reader
-FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
+FetchContent_Declare(
+  json 
+  URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
+  GIT_PROGRESS TRUE
+)
 
 message(STATUS "Fetching nlohmann/json ...")
 FetchContent_MakeAvailable(json)
@@ -49,6 +58,7 @@ FetchContent_MakeAvailable(googletest)
 # Build a library for model
 add_library(model
   ${MODEL_DIR}/block/BlockLibrary.cpp
+  ${MODEL_DIR}/block/BlockInstance.cpp
   ${MODEL_DIR}/utils/fs.cpp
 )
 
@@ -56,7 +66,7 @@ target_link_libraries(model PUBLIC nlohmann_json::nlohmann_json)
 target_include_directories(model PUBLIC ${MODEL_DIR})
 
 # Building the ImGUI library
-add_library(imgui
+add_library(imgui_sdl
   ${imgui_SOURCE_DIR}/imgui.cpp
   ${imgui_SOURCE_DIR}/imgui.h
   ${imgui_SOURCE_DIR}/imconfig.h
@@ -75,22 +85,23 @@ add_library(imgui
   ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.h
   ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
 )
-target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR})
-target_link_libraries(imgui PUBLIC SDL2::SDL2 OpenGL::GL)
+target_include_directories(imgui_sdl PUBLIC ${imgui_SOURCE_DIR})
+target_link_libraries(imgui_sdl PUBLIC SDL2::SDL2 OpenGL::GL)
 
 # Build a library for ui
 add_library(ui
   ${UI_DIR}/ui_options.cpp 
   ${UI_DIR}/MainMenuBar.cpp 
   ${UI_DIR}/editor/BlockCategoryPanel.cpp 
+  ${UI_DIR}/editor/BlockPicker.cpp 
+  ${UI_DIR}/views/BlockView.cpp 
 )
-target_link_libraries(ui PUBLIC imgui model) # model for reading some data
+target_link_libraries(ui PUBLIC imgui_sdl model) # model for reading some data
 target_include_directories(ui PUBLIC ${UI_DIR} ${MODEL_DIR})
+
 # The executable
 add_executable(crafty src/main.cpp)
-
 target_link_libraries(crafty PUBLIC ui)
-
 
 # Testing
 enable_testing()

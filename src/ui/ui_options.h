@@ -21,12 +21,8 @@ public:
   const std::string current_category() const;
   void set_current_category(const std::string&);
 
-  // Helpful stuff for colors
-  // Get the hover color by decreasing alpha by -.1f
-  ImVec4 get_hover_color(ImVec4);
-
 private:
   bool _running;
-  std::string _current_cateogry;
+  std::string _current_cateogry = "Motion";  // WARN: for debugging for now
 };
 }  // namespace ui

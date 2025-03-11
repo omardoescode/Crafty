@@ -33,6 +33,7 @@
 
 # Build files
 build/
+cmake-build-debug
 
 # IDE-specific-folders
 .vscode/

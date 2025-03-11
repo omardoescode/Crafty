@@ -10,8 +10,4 @@ const std::string UIOptions::current_category() const {
 void UIOptions::set_current_category(const std::string& value) {
   _current_cateogry = value;
 }
-ImVec4 UIOptions::get_hover_color(ImVec4 color) {
-  color.z -= 0.6f;
-  return color;
-}
 }  // namespace ui

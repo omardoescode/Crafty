@@ -1,6 +1,5 @@
 #include "BlockCategoryPanel.h"
 #include <imgui.h>
-#include <iostream>
 #include "block/BlockLibrary.h"
 
 namespace ui {
@@ -18,7 +17,9 @@ void BlockCategoryPanel::draw() {
   if (ImGui::BeginTable("table", 2)) {
     for (auto& name : categories) {
       ImGui::TableNextColumn();
-      ImGui::Button(name.c_str(), ImVec2(80, 0));
+      if (ImGui::Button(name.c_str(), ImVec2(80, 0))) {
+        _options.set_current_category(name);
+      }
     }
     ImGui::EndTable();
   }
