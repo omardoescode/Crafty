@@ -60,6 +60,7 @@ add_library(model
   ${MODEL_DIR}/block/BlockLibrary.cpp
   ${MODEL_DIR}/block/BlockInstance.cpp
   ${MODEL_DIR}/utils/fs.cpp
+  ${MODEL_DIR}/utils/json.cpp
 )
 
 target_link_libraries(model PUBLIC nlohmann_json::nlohmann_json)
@@ -94,7 +95,8 @@ add_library(ui
   ${UI_DIR}/MainMenuBar.cpp 
   ${UI_DIR}/editor/BlockCategoryPanel.cpp 
   ${UI_DIR}/editor/BlockPicker.cpp 
-  ${UI_DIR}/views/BlockView.cpp 
+  ${UI_DIR}/editor/BlockCanvas.cpp 
+  ${UI_DIR}/editor/BlockView.cpp 
 )
 target_link_libraries(ui PUBLIC imgui_sdl model) # model for reading some data
 target_include_directories(ui PUBLIC ${UI_DIR} ${MODEL_DIR})

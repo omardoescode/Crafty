@@ -11,6 +11,7 @@ BlockView::BlockView(UIOptions& options,
     : _options(options), _block_instance(instance) {}
 
 void BlockView::draw() {
+  static int n = 3;
   const ImU32 color = IM_COL32(77, 166, 255, 255);
   const ImU32 hovered_color = IM_COL32(107, 186, 255, 255);  // Lighter blue
   const char* text = _block_instance->definition_id.c_str();
@@ -23,6 +24,17 @@ void BlockView::draw() {
   bool is_hovered = ImGui::IsItemHovered();
   auto btn_color = is_hovered ? hovered_color : color;
   if (is_hovered) ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+
+  ImGui::PushStyleVar(ImGuiStyleVar_PopupBorderSize, 0);
+  ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+  if (ImGui::BeginDragDropSource()) {
+    ImGui::SetDragDropPayload("BlockInstance", &_block_instance,
+                              sizeof(_block_instance));
+    draw();  // draw the same thing over, bro this is genius xD
+    ImGui::EndDragDropSource();
+  }
+  ImGui::PopStyleVar();
+  ImGui::PopStyleVar();
 
   // Draw over the reserved space
   ImVec2 rect_min = ImGui::GetItemRectMin();

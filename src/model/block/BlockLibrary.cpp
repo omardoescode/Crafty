@@ -35,8 +35,8 @@ void BlockLibrary::_load_blocks_initfile() {
   auto path = construct_path(block_folder_pathname, block_initfile_pathname);
 
   // Read the file
-  std::fstream file(path);
-  _initfile = json::parse(file);
+  std::cout << "Successl" << std::endl;
+  _initfile = parse_json(path);
 }
 void BlockLibrary::_load_blocks_json_data() {
   // Clear first

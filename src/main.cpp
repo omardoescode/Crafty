@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "backends/imgui_impl_opengl3.h"
 #include "backends/imgui_impl_sdl2.h"
+#include "editor/BlockCanvas.h"
 #include "editor/BlockPicker.h"
 #include "imgui.h"
 #include "model/block/BlockLibrary.h"
@@ -116,6 +117,7 @@ int main(int, char **) {
   ui::MainMenuBar main_menu_bar(options);
   ui::BlockCategoryPanel block_category_panel(options);
   ui::BlockPicker picker(options);
+  ui::BlockCanvas canvas(options);
 
   // Main loop
   while (options.running()) {
@@ -163,8 +165,12 @@ int main(int, char **) {
     ImGui::PopStyleVar(2);
 
     main_menu_bar.draw();
+    ImGui::BeginChild(1, ImVec2(250, 0));
     block_category_panel.draw();
     picker.draw();
+    ImGui::EndChild();
+    ImGui::SameLine();
+    canvas.draw();
     ImGui::End();  // Main Application
 
     // Rendering

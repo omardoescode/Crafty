@@ -2,8 +2,8 @@
 
 #include <map>
 #include <vector>
+#include "BlockView.h"
 #include "ui_options.h"
-#include "views/BlockView.h"
 
 namespace ui {
 class BlockPicker {

@@ -1,0 +1,15 @@
+{
+  "id": "hello",
+  "name": "move %1 steps",
+  "has_body": false,
+  "inputs": [
+    {
+      "label": "steps",
+      "type": "Number",
+      "default_value": "1"
+    }
+  ],
+  "output": {
+    "type": "Exec"
+  }
+}

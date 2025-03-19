@@ -18,7 +18,6 @@ namespace ui {
 class BlockView {
 public:
   BlockView(UIOptions&, std::shared_ptr<model::BlockInstance>);
-
   void draw();
 
 private:

@@ -2,4 +2,12 @@
   "data_directory": "data",
   "luacode_directory": "luacode",
   "category_initfile_name": "__init__.json",
+  "categories": [
+    {
+      "name": "Motion"
+    },
+    {
+      "name": "Control"
+    }
+  ]
 }
