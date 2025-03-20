@@ -3,11 +3,11 @@
 #include <list>
 #include <string>
 #include <vector>
-#include "block/BlockDefinition.h"
+#include "block/block_definition.h"
+#include "script.h"
 namespace model {
 // For IDS, define 0 as a special ID that stands for NULL IDs.
 typedef std::string BlockInstanceID;
-typedef std::string ScriptID;
 constexpr std::string DUMMY_INSTANCE_ID = "";
 
 /**
@@ -20,7 +20,8 @@ struct BlockInstance {
   BlockDefinitionID definition_id;
   float x, y;
   std::vector<BlockInstanceID> inputs;
-  ScriptID body;
+  Script::ScriptID
+      body;  // TODO: Handle this ID, where to store the actual scripts?
 };
 
 /**
@@ -29,7 +30,7 @@ struct BlockInstance {
  * identified by an ID, and and a character
  */
 struct script {
-  ScriptID id;
+  Script::ScriptID id;
   std::list<BlockInstanceID> blocks;
   // Character character;
 };
@@ -39,5 +40,4 @@ struct script {
 BlockInstance create_dummy_instance(BlockDefinitionID);
 
 bool is_dummy_instance(BlockInstance);
-
 }  // namespace model

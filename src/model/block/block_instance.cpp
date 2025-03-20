@@ -1,4 +1,4 @@
-#include "BlockInstance.h"
+#include "block_instance.h"
 namespace model {
 BlockInstance create_dummy_instance(BlockDefinitionID def) {
   return BlockInstance{

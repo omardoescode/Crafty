@@ -1,6 +1,6 @@
 #include "BlockCategoryPanel.h"
 #include <imgui.h>
-#include "block/BlockLibrary.h"
+#include "public/block_library.h"
 
 namespace ui {
 BlockCategoryPanel::BlockCategoryPanel(UIOptions& options)

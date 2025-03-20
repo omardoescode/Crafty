@@ -1,10 +1,10 @@
-#include "BlockLibrary.h"
+#include "block_library.h"
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <memory>
 #include <stdexcept>
-#include "block/BlockDefinition.h"
+#include "block/block_definition.h"
 #include "utils/fs.h"
 #define MODEL_LAYER_DEBUG
 namespace model {

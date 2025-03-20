@@ -1,5 +1,5 @@
 #pragma once
-#include "BlockDefinition.h"
+#include "block/block_definition.h"
 #include "utils/json.h"
 namespace model {
 class BlockLibrary {

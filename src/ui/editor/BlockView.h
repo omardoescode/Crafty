@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include "block/BlockInstance.h"
+#include "block/block_instance.h"
 #include "imgui.h"
 #include "ui_options.h"
 namespace ui {

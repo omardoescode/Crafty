@@ -1,9 +1,9 @@
 #include "BlockPicker.h"
 #include <iostream>
 #include <ostream>
-#include "block/BlockInstance.h"
-#include "block/BlockLibrary.h"
+#include "block/block_instance.h"
 #include "imgui.h"
+#include "public/block_library.h"
 #include "ui_options.h"
 
 namespace ui {
