@@ -1,29 +1,28 @@
-#include <SDL.h>
+#include <SDL3/SDL.h>
 #include <stdio.h>
+#include "SDL3/SDL_events.h"
+#include "SDL3/SDL_video.h"
 #include "backends/imgui_impl_opengl3.h"
-#include "backends/imgui_impl_sdl2.h"
+#include "backends/imgui_impl_sdl3.h"
 #include "editor/BlockCanvas.h"
 #include "editor/BlockPicker.h"
 #include "imgui.h"
-#include "model/block/BlockLibrary.h"
+#include "model/public/block_library.h"
 #include "ui/MainMenuBar.h"
 #include "ui/editor/BlockCategoryPanel.h"
 
 #if defined(IMGUI_IMPL_OPENGL_ES2)
-#include <SDL_opengles2.h>
+#include <SDL3/SDL_opengles2.h>
 #else
-#include <SDL_opengl.h>
+#include <SDL3/SDL_opengl.h>
 #endif
 
-// Main code
 int main(int, char **) {
-  // Setup SDL
-  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) !=
-      0) {
-    printf("Error: %s\n", SDL_GetError());
+  // Initialize SDL3
+  if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD)) {
+    printf(" %s\n", SDL_GetError());
     return -1;
   }
-
   // Decide GL+GLSL versions
 #if defined(IMGUI_IMPL_OPENGL_ES2)
   // GL ES 2.0 + GLSL 100 (WebGL 1.0)
@@ -57,62 +56,51 @@ int main(int, char **) {
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 #endif
 
-  // From 2.0.18: Enable native IME.
-#ifdef SDL_HINT_IME_SHOW_UI
-  SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
-#endif
-
-  // Create window with graphics context
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
   SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-  SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
-  SDL_WindowFlags window_flags =
-      (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE |
-                        SDL_WINDOW_ALLOW_HIGHDPI);
-  SDL_Window *window =
-      SDL_CreateWindow("Crafty", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                       1500, 1000, window_flags);
+  SDL_Window *window = SDL_CreateWindow(
+      "Crafty", 1500, 1000, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
   if (window == nullptr) {
-    printf("Error: SDL_CreateWindow(): %s\n", SDL_GetError());
+    printf(" SDL_CreateWindow(): %s\n", SDL_GetError());
+    SDL_Quit();
     return -1;
   }
+  SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 
   SDL_GLContext gl_context = SDL_GL_CreateContext(window);
   if (gl_context == nullptr) {
-    printf("Error: SDL_GL_CreateContext(): %s\n", SDL_GetError());
+    printf(" SDL_GL_CreateContext(): %s\n", SDL_GetError());
+    SDL_DestroyWindow(window);
+    SDL_Quit();
     return -1;
   }
 
   SDL_GL_MakeCurrent(window, gl_context);
   SDL_GL_SetSwapInterval(1);  // Enable vsync
+  SDL_ShowWindow(window);
 
   // Setup Dear ImGui context
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImGuiIO &io = ImGui::GetIO();
-  (void)io;
-  io.ConfigFlags |=
-      ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
-  io.ConfigFlags |=
-      ImGuiConfigFlags_NavEnableGamepad;             // Enable Gamepad Controls
-  io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;  // Enable Docking
+  io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard |
+                    ImGuiConfigFlags_NavEnableGamepad |
+                    ImGuiConfigFlags_DockingEnable;
 
-  // Setup Platform/Renderer backends
-  ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
-  ImGui_ImplOpenGL3_Init(glsl_version);
+  // Initialize ImGui backends for SDL3 + OpenGL3
+  ImGui_ImplSDL3_InitForOpenGL(window, gl_context);
+  ImGui_ImplOpenGL3_Init("#version 130");
 
-  // Setup Fonts
+  // Load fonts (make sure the file exists in the specified path)
   io.Fonts->AddFontFromFileTTF("assets/fonts/Rubik.ttf", 18.0f);
-
-  // App state
   ImVec4 clear_color = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
 
-  // Initialize backend
+  // Initialize your application backend (e.g., block library)
   auto &lib = model::BlockLibrary::instance();
   lib.initialize();
 
-  // Initialize widgets
+  // Initialize UI components
   ui::UIOptions options;
   ui::MainMenuBar main_menu_bar(options);
   ui::BlockCategoryPanel block_category_panel(options);
@@ -121,49 +109,47 @@ int main(int, char **) {
 
   // Main loop
   while (options.running()) {
-    // Poll and handle events (inputs, window resize, etc.)
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
-      ImGui_ImplSDL2_ProcessEvent(&event);
-      if (event.type == SDL_QUIT) options.close();
-      if (event.type == SDL_WINDOWEVENT &&
-          event.window.event == SDL_WINDOWEVENT_CLOSE &&
-          event.window.windowID == SDL_GetWindowID(window)) {
+      ImGui_ImplSDL3_ProcessEvent(&event);
+
+      // Process quit events: SDL_EVENT_QUIT or window close events
+      if (event.type == SDL_EVENT_QUIT) {
+        options.close();
       }
+      // TODO: Handle Resize later
     }
+
+    // If the window is minimized, delay and continue
     if (SDL_GetWindowFlags(window) & SDL_WINDOW_MINIMIZED) {
       SDL_Delay(10);
       continue;
     }
 
-    // Start the Dear ImGui frame
+    // Start ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplSDL2_NewFrame();
+    ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
 
-    // Use the demo
+    // Show demo window for testing purposes
     ImGui::ShowDemoWindow();
 
-    // Get viewport information for full-window ImGui
+    // Create a full-viewport window
     const ImGuiViewport *viewport = ImGui::GetMainViewport();
-
-    // Create a full-viewport window without typical window decorations
     ImGui::SetNextWindowPos(viewport->WorkPos);
     ImGui::SetNextWindowSize(viewport->WorkSize);
     ImGui::SetNextWindowViewport(viewport->ID);
 
-    // Window flags to make it act like a full application window
     ImGuiWindowFlags window_flags =
         ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove |
         ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings |
         ImGuiWindowFlags_NoBringToFrontOnFocus;
-
-    // Begin a full-screen ImGui window
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
     ImGui::Begin("CraftyMainWindow", NULL, window_flags);
     ImGui::PopStyleVar(2);
 
+    // Draw UI components
     main_menu_bar.draw();
     ImGui::BeginChild(1, ImVec2(250, 0));
     block_category_panel.draw();
@@ -171,7 +157,7 @@ int main(int, char **) {
     ImGui::EndChild();
     ImGui::SameLine();
     canvas.draw();
-    ImGui::End();  // Main Application
+    ImGui::End();
 
     // Rendering
     ImGui::Render();
@@ -184,10 +170,9 @@ int main(int, char **) {
 
   // Cleanup
   ImGui_ImplOpenGL3_Shutdown();
-  ImGui_ImplSDL2_Shutdown();
+  ImGui_ImplSDL3_Shutdown();
   ImGui::DestroyContext();
-
-  SDL_GL_DeleteContext(gl_context);
+  SDL_GL_DestroyContext(gl_context);
   SDL_DestroyWindow(window);
   SDL_Quit();
 

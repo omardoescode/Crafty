@@ -18,13 +18,13 @@ Set(FETCHCONTENT_QUIET FALSE)
 
 # Fetch SDL
 FetchContent_Declare(
-  SDL2
+  SDL3
   GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git"
-  GIT_TAG release-2.0.22
+  GIT_TAG main
   GIT_PROGRESS TRUE
 )
 message(STATUS "Fetching SDL ...")
-FetchContent_MakeAvailable(SDL2)
+FetchContent_MakeAvailable(SDL3)
 
 # Fetch IMGUI, docking version
 FetchContent_Declare(
@@ -57,10 +57,20 @@ FetchContent_MakeAvailable(googletest)
 
 # Build a library for model
 add_library(model
-  ${MODEL_DIR}/block/BlockLibrary.cpp
-  ${MODEL_DIR}/block/BlockInstance.cpp
+  ${MODEL_DIR}/public/block_library.cpp
+  ${MODEL_DIR}/public/project_api.cpp
+
+  ${MODEL_DIR}/block/block_instance.cpp
+
   ${MODEL_DIR}/utils/fs.cpp
   ${MODEL_DIR}/utils/json.cpp
+
+  ${MODEL_DIR}/project.cpp
+  ${MODEL_DIR}/project_manager.cpp
+  ${MODEL_DIR}/asset.cpp
+  ${MODEL_DIR}/script.cpp
+  ${MODEL_DIR}/character.cpp
+
 )
 
 target_link_libraries(model PUBLIC nlohmann_json::nlohmann_json)
@@ -79,15 +89,15 @@ add_library(imgui_sdl
   ${imgui_SOURCE_DIR}/imstb_rectpack.h
   ${imgui_SOURCE_DIR}/imstb_textedit.h
   ${imgui_SOURCE_DIR}/imstb_truetype.h
-  ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl2.h
-  ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl2.cpp
-  ${imgui_SOURCE_DIR}/backends/imgui_impl_sdlrenderer2.h
-  ${imgui_SOURCE_DIR}/backends/imgui_impl_sdlrenderer2.cpp
+  ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl3.h
+  ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl3.cpp
+  ${imgui_SOURCE_DIR}/backends/imgui_impl_sdlrenderer3.h
+  ${imgui_SOURCE_DIR}/backends/imgui_impl_sdlrenderer3.cpp
   ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.h
   ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
 )
 target_include_directories(imgui_sdl PUBLIC ${imgui_SOURCE_DIR})
-target_link_libraries(imgui_sdl PUBLIC SDL2::SDL2 OpenGL::GL)
+target_link_libraries(imgui_sdl PUBLIC SDL3::SDL3 OpenGL::GL)
 
 # Build a library for ui
 add_library(ui
