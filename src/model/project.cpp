@@ -2,10 +2,8 @@
 #include <cassert>
 
 namespace model {
-Project::Project(const ProjectID& id, const std::string& title)
-    : _id(id), _title(title) {}
-Project::Project(const ProjectID& id, std::string&& title)
-    : _id(id), _title(std::move(title)) {}
+Project::Project(const std::string& title) : _title(title) {}
+Project::Project(std::string&& title) : _title(std::move(title)) {}
 
 void Project::add_character(std::shared_ptr<Character> character) {
   assert(character && "Character is nullptr");
@@ -22,6 +20,4 @@ const std::map<Character::CharacterID, std::shared_ptr<Character>>&
 Project::characters() {
   return _characters;
 }
-
-const Project::ProjectID& Project::id() const { return _id; }
 }  // namespace model
