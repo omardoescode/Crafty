@@ -1,40 +1,38 @@
 #pragma once
-#include <map>
-#include <memory>
 #include <vector>
-#include "asset.h"
 #include "script.h"
+#include "utils/ID_manager.h"
+#include "utils/serializable.h"
 namespace model {
 class BlockInstance;
-class Character {
-public:
-  typedef std::string CharacterID;
 
+class Character : public Serializable {
 public:
-  Character(const std::string& id);
-  void add_texture(std::shared_ptr<Asset>, int pos = -1);
-  void remove_texture(int);
-  bool no_textures() const;
+  Character(const IDManager::IDType& id, Project& project);
 
-  void add_script(std::shared_ptr<Script>);
-  void remove_script(const Script::ScriptID& id);
+  void add_texture(const IDManager::IDType& id, int pos = -1);
+  void remove_texture(const IDManager::IDType& id);
+  bool has_textures() const;
+
+  void add_script(const IDManager::IDType& id, int pos = -1);
+  void remove_script(const IDManager::IDType& id);
+  bool has_scripts() const;
+
   std::pair<float, float> pos() const;
   void set_pos(std::pair<float, float>);
 
   unsigned current_texture_idx() const;
-  std::shared_ptr<Asset> current_texture() const;
-  void set_current_texture_idx(int i);
+  const IDManager::IDType& current_texture() const;
+  void set_current_texture_idx(size_t);
   void next_texture();
 
-  const std::string& id() const;
-
-  const std::map<Script::ScriptID, std::shared_ptr<Script>>& scripts() const;
+  const std::vector<IDManager::IDType>& scripts() const;
+  const std::vector<IDManager::IDType>& textures() const;
 
 private:
-  std::vector<std::shared_ptr<Asset>> _textures;
-  std::map<Script::ScriptID, std::shared_ptr<Script>> _scripts;
+  std::vector<IDManager::IDType> _textures;
+  std::vector<IDManager::IDType> _scripts;
   std::pair<float, float> _pos;
-  unsigned _current_texture_idx;
-  CharacterID _id;
+  size_t _current_texture_idx;
 };
 }  // namespace model

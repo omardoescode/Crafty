@@ -1,34 +1,23 @@
 #pragma once
-#include <memory>
 #include <vector>
+#include "utils/ID_manager.h"
+#include "utils/serializable.h"
+
 namespace model {
-class Character;
+class Project;
 class BlockInstance;
 
-class Script {
+class Script : Serializable {
 public:
-  typedef std::string ScriptID;
+  Script(const IDManager::IDType& id, Project& project);
 
-public:
-  /**
-   * @brief A constructor with the the initial block for the script and the
-   * character to create
-   */
+  void add_block_instance(const IDManager::IDType& id, int pos = -1);
+  void remove_block_instance(const IDManager::IDType& id);
+  bool has_block_instances() const;
 
-  Script(const ScriptID& id, std::shared_ptr<Character>,
-         std::shared_ptr<BlockInstance>);
-
-  void add_block(std::shared_ptr<BlockInstance>, int pos = -1);
-  void remove_block(int pos);
-  bool empty_script() const;
-
-  const ScriptID& id() const;
-  const std::vector<std::shared_ptr<BlockInstance>>& blocks() const;
-  std::shared_ptr<Character> character();
+  const std::vector<IDManager::IDType>& blocks() const;
 
 private:
-  std::vector<std::shared_ptr<BlockInstance>> _blocks;
-  std::shared_ptr<Character> _character;
-  ScriptID _id;
+  std::vector<IDManager::IDType> _blocks;
 };
 }  // namespace model

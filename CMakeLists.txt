@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.18)
 project(crafty)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -20,7 +20,7 @@ Set(FETCHCONTENT_QUIET FALSE)
 FetchContent_Declare(
   SDL3
   GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git"
-  GIT_TAG main
+  GIT_TAG release-3.2.8
   GIT_PROGRESS TRUE
 )
 message(STATUS "Fetching SDL ...")
@@ -57,24 +57,26 @@ FetchContent_MakeAvailable(googletest)
 
 # Build a library for model
 add_library(model
-  ${MODEL_DIR}/public/block_library.cpp
   ${MODEL_DIR}/public/project_api.cpp
-
-  ${MODEL_DIR}/block/block_instance.cpp
+  ${MODEL_DIR}/public/block/block_library.cpp
+  ${MODEL_DIR}/public/block/block_instance.cpp
+  ${MODEL_DIR}/public/block/block_definition.cpp
 
   ${MODEL_DIR}/utils/fs.cpp
   ${MODEL_DIR}/utils/json.cpp
+  ${MODEL_DIR}/utils/serializable.cpp
+  ${MODEL_DIR}/utils/ID_manager.cpp
 
   ${MODEL_DIR}/project.cpp
   ${MODEL_DIR}/project_manager.cpp
   ${MODEL_DIR}/asset.cpp
   ${MODEL_DIR}/script.cpp
   ${MODEL_DIR}/character.cpp
-
 )
 
 target_link_libraries(model PUBLIC nlohmann_json::nlohmann_json)
-target_include_directories(model PUBLIC ${MODEL_DIR})
+target_include_directories(model PUBLIC ${MODEL_DIR}/public ) # encapsulate model dir but only the public interface
+target_include_directories(model PRIVATE ${MODEL_DIR})
 
 # Building the ImGUI library
 add_library(imgui_sdl
@@ -109,7 +111,7 @@ add_library(ui
   ${UI_DIR}/editor/BlockView.cpp 
 )
 target_link_libraries(ui PUBLIC imgui_sdl model) # model for reading some data
-target_include_directories(ui PUBLIC ${UI_DIR} ${MODEL_DIR})
+target_include_directories(ui PUBLIC ${UI_DIR})
 
 # The executable
 add_executable(crafty src/main.cpp)
@@ -120,7 +122,7 @@ enable_testing()
 
 add_executable(tests tests/ModelLayerTests.cpp)
 target_link_libraries(tests GTest::gtest_main model)
-target_include_directories(tests PUBLIC 
+target_include_directories(tests PRIVATE 
   ${MODEL_DIR}
 )
 include(GoogleTest)

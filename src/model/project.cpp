@@ -2,22 +2,42 @@
 #include <cassert>
 
 namespace model {
-Project::Project(const std::string& title) : _title(title) {}
-Project::Project(std::string&& title) : _title(std::move(title)) {}
-
-void Project::add_character(std::shared_ptr<Character> character) {
-  assert(character && "Character is nullptr");
-  assert(_characters.count(character->id()) == 0 && "Character already exists");
-  _characters[character->id()] = character;
+Project::Project(const std::string& title,
+                 std::unique_ptr<Store<Character>> char_store,
+                 std::unique_ptr<Store<Script>> script_store,
+                 std::unique_ptr<Store<Asset>> asset_store,
+                 std::unique_ptr<Store<BlockInstance>> instances_store)
+    : _title(title),
+      _char_store(std::move(char_store)),
+      _script_store(std::move(script_store)),
+      _asset_store(std::move(asset_store)),
+      _instances_store(std::move(instances_store)) {
+  assert(_char_store);
+  assert(_script_store);
+  assert(_asset_store);
+  assert(_instances_store);
 }
 
-void Project::remove_character(const Character::CharacterID& id) {
-  assert(_characters.count(id) == 1 && "Character doesn't exist");
-  _characters.erase(id);
+Project::Project(std::string&& title,
+                 std::unique_ptr<Store<Character>> char_store,
+                 std::unique_ptr<Store<Script>> script_store,
+                 std::unique_ptr<Store<Asset>> asset_store,
+                 std::unique_ptr<Store<BlockInstance>> instances_store)
+    : _title(std::move(title)),
+      _char_store(std::move(char_store)),
+      _script_store(std::move(script_store)),
+      _asset_store(std::move(asset_store)),
+      _instances_store(std::move(instances_store)) {
+  assert(_char_store);
+  assert(_script_store);
+  assert(_asset_store);
+  assert(_instances_store);
 }
 
-const std::map<Character::CharacterID, std::shared_ptr<Character>>&
-Project::characters() {
-  return _characters;
+const Store<Character>& Project::char_store() const { return *_char_store; }
+const Store<Script>& Project::script_store() const { return *_script_store; }
+const Store<Asset>& Project::asset_store() const { return *_asset_store; }
+const Store<BlockInstance>& Project::instances_store() const {
+  return *_instances_store;
 }
 }  // namespace model

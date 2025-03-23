@@ -1,13 +1,14 @@
-#include "block_library.h"
 #include <filesystem>
 #include <fstream>
-#include <iostream>
 #include <memory>
 #include <stdexcept>
 #include "block/block_definition.h"
+#include "block/block_instance.h"
 #include "utils/fs.h"
-#define MODEL_LAYER_DEBUG
+#include "utils/json.h"
 namespace model {
+BlockDefinition _parse_block(const json& js, const std::string& category);
+
 const char* BlockLibrary::block_folder_pathname = "./data/blocks";
 const char* BlockLibrary::block_initfile_pathname = "__init__.json";
 
@@ -27,23 +28,21 @@ void BlockLibrary::initialize() {
 void BlockLibrary::reload() { _load_blocks(); }
 
 void BlockLibrary::_load_blocks() {
-  _load_blocks_initfile();
-  _load_blocks_json_data();
-}
+  auto initfile_path =
+      construct_path(block_folder_pathname, block_initfile_pathname);
 
-void BlockLibrary::_load_blocks_initfile() {
-  auto path = construct_path(block_folder_pathname, block_initfile_pathname);
+  // Read _initfile
+  json initfile = parse_json(initfile_path);
 
-  // Read the file
-  std::cout << "Successl" << std::endl;
-  _initfile = parse_json(path);
-}
-void BlockLibrary::_load_blocks_json_data() {
+#ifdef MODEL_LAYER_DEBUG
+  std::cout << "Successlly initiated initfile" << std::endl;
+#endif
+
   // Clear first
   _block_definitions.clear();
 
   // Start reading
-  std::string data_directory = _initfile.at("data_directory");
+  std::string data_directory = initfile.at("data_directory");
   auto path = construct_path(block_folder_pathname, data_directory.c_str());
 
   for (std::filesystem::path const& dir_entry :
@@ -64,9 +63,9 @@ void BlockLibrary::_load_blocks_json_data() {
       std::fstream file(block_definition);
       json block_def_json = json::parse(file);
       BlockDefinition def = _parse_block(block_def_json, dir_entry.filename());
-      if (_block_definitions.count(def.id) != 0)
+      if (_block_definitions.count(def.id()) != 0)
         throw std::runtime_error("Two blocks have the same ID");
-      _block_definitions[def.id] = std::make_shared<BlockDefinition>(def);
+      _block_definitions[def.id()] = std::make_shared<BlockDefinition>(def);
     }
   }
 
@@ -76,31 +75,31 @@ void BlockLibrary::_load_blocks_json_data() {
 #endif
 }
 
-BlockDefinition BlockLibrary::_parse_block(const json& js,
-                                           const std::string& category) {
-  BlockDefinition def;
-  js.at("id").get_to(def.id);
-  js.at("name").get_to(def.name);
-  js.at("has_body").get_to(def.has_body);
-  def.category = category;
-
-  static const std::unordered_map<std::string, SlotType> typeMap = {
-      {"Number", SlotType::Number},
-      {"Exec", SlotType::Exec},
-      {"Boolean", SlotType::Boolean},
-      {"String", SlotType::String},
-      {"Any", SlotType::Any}};
+BlockDefinition _parse_block(const json& js, const std::string& category) {
+  static const std::unordered_map<std::string, BlockDefinition::SlotType>
+      typeMap = {{"Number", BlockDefinition::SlotType::Number},
+                 {"Exec", BlockDefinition::SlotType::Exec},
+                 {"Boolean", BlockDefinition::SlotType::Boolean},
+                 {"String", BlockDefinition::SlotType::String},
+                 {"Any", BlockDefinition::SlotType::Any}};
   // Parse input slots
+  std::vector<BlockDefinition::InputSlot> input_slots;
   for (auto& slot : js.at("inputs")) {
-    InputSlot parsed_slot;
+    BlockDefinition::InputSlot parsed_slot;
     parsed_slot.type = typeMap.at(slot.at("type"));
     parsed_slot.label = slot.at("label");
     parsed_slot.default_value = slot["default_value"];
+    input_slots.push_back(parsed_slot);
   }
 
-  // Parse input slot type
-  def.output.type = typeMap.at((std::string)js.at("output").at("type"));
+  decltype(BlockDefinition::OutputSlot::type) output =
+      typeMap.at((std::string)js.at("output").at("type"));
 
+  int options = 0;
+  if (js.at("has_body")) options |= BlockDefinition::BLOCKDEF_HASBODY;
+
+  BlockDefinition def(js.at("id"), js.at("name"), category,
+                      std::move(input_slots), {.type = output}, options);
   return def;
 }
 
@@ -112,17 +111,25 @@ const std::vector<std::string>& BlockLibrary::categories() const {
 std::vector<std::shared_ptr<const BlockDefinition>>
 BlockLibrary::category_blocks(const std::string& category) const {
   std::vector<std::shared_ptr<const BlockDefinition>> res;
-  for (const auto& [id, def] : _block_definitions) {
-    if (def->category == category) res.push_back(def);
-  }
+  for (const auto& [id, def] : _block_definitions)
+    if (def->category() == category) res.push_back(def);
 
   return res;
 }
 
 std::shared_ptr<const BlockDefinition> BlockLibrary::get_block_definition_by_id(
-    const BlockDefinitionID& id) const {
+    const BlockLibrary::BlockDefIDType& id) const {
   if (_block_definitions.count(id) == 0)
     throw std::runtime_error("Invalid ID, or ID doesn't exist in library");
   return _block_definitions.at(id);
+}
+
+std::shared_ptr<BlockInstance> BlockLibrary::create_dummy_instance(
+    const BlockDefIDType& id) {
+  assert(_project && "Project doesn't exist");
+  auto itr = _block_definitions.find(id);
+  assert(itr != _block_definitions.end() && "ID not found in lib");
+  return std::make_shared<BlockInstance>(BlockInstance::DUMMY_INSTANCE_ID,
+                                         *_project, itr->second, -1, -1);
 }
 }  // namespace model
