@@ -57,10 +57,9 @@ FetchContent_MakeAvailable(googletest)
 
 # Build a library for model
 add_library(model
-  ${MODEL_DIR}/public/project_api.cpp
-  ${MODEL_DIR}/public/block/block_library.cpp
-  ${MODEL_DIR}/public/block/block_instance.cpp
-  ${MODEL_DIR}/public/block/block_definition.cpp
+  ${MODEL_DIR}/block/block_library.cpp
+  ${MODEL_DIR}/block/block_instance.cpp
+  ${MODEL_DIR}/block/block_definition.cpp
 
   ${MODEL_DIR}/utils/fs.cpp
   ${MODEL_DIR}/utils/json.cpp
@@ -75,8 +74,7 @@ add_library(model
 )
 
 target_link_libraries(model PUBLIC nlohmann_json::nlohmann_json)
-target_include_directories(model PUBLIC ${MODEL_DIR}/public ) # encapsulate model dir but only the public interface
-target_include_directories(model PRIVATE ${MODEL_DIR})
+target_include_directories(model PUBLIC ${MODEL_DIR}) # encapsulate model dir but only the public interface
 
 # Building the ImGUI library
 add_library(imgui_sdl

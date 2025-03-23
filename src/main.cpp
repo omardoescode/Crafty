@@ -4,10 +4,12 @@
 #include "SDL3/SDL_video.h"
 #include "backends/imgui_impl_opengl3.h"
 #include "backends/imgui_impl_sdl3.h"
+#include "block/block_library.h"
 #include "editor/BlockCanvas.h"
 #include "editor/BlockPicker.h"
 #include "imgui.h"
-#include "model/public/block_library.h"
+#include "project.h"
+#include "project_manager.h"
 #include "ui/MainMenuBar.h"
 #include "ui/editor/BlockCategoryPanel.h"
 
@@ -19,7 +21,7 @@
 
 int main(int, char **) {
   // Initialize SDL3
-  if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD)) {
+  if (!SDL_Init(SDL_INIT_VIDEO)) {
     printf(" %s\n", SDL_GetError());
     return -1;
   }
@@ -96,9 +98,15 @@ int main(int, char **) {
   io.Fonts->AddFontFromFileTTF("assets/fonts/Rubik.ttf", 18.0f);
   ImVec4 clear_color = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
 
+  // Initialize the project
+  auto &prj_mgr = model::ProjectManager::instance();
+  prj_mgr.create();
+  auto prj = prj_mgr.project();
+
   // Initialize your application backend (e.g., block library)
   auto &lib = model::BlockLibrary::instance();
   lib.initialize();
+  lib.load_project(prj);
 
   // Initialize UI components
   ui::UIOptions options;

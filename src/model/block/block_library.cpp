@@ -1,3 +1,4 @@
+#include "block/block_library.h"
 #include <filesystem>
 #include <fstream>
 #include <memory>
@@ -25,6 +26,10 @@ void BlockLibrary::initialize() {
   _initialized = true;
 }
 
+void BlockLibrary::load_project(std::shared_ptr<Project> proj) {
+  assert(proj);
+  _project = proj;
+}
 void BlockLibrary::reload() { _load_blocks(); }
 
 void BlockLibrary::_load_blocks() {

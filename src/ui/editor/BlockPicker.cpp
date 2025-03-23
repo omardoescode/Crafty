@@ -2,8 +2,8 @@
 #include <iostream>
 #include <ostream>
 #include "block/block_instance.h"
+#include "block/block_library.h"
 #include "imgui.h"
-#include "public/block_library.h"
 #include "ui_options.h"
 
 namespace ui {
@@ -16,8 +16,7 @@ void BlockPicker::fetch_category_instances(const std::string& category_name) {
             << category_name << std::endl;
 
   for (auto& block_def : blocks_definitions) {
-    BlockView view(_options, std::make_shared<model::BlockInstance>(
-                                 model::create_dummy_instance(block_def->id)));
+    BlockView view(_options, lib.create_dummy_instance(block_def->id()));
     _views_per_category[category_name].push_back(view);
   }
 }

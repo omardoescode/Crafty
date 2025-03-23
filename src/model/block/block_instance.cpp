@@ -17,4 +17,11 @@ BlockInstance::BlockInstance(IDManager::IDType&& id, Project& project,
 bool BlockInstance::is_dummy_instance() const {
   return DUMMY_INSTANCE_ID == id();
 }
+
+std::shared_ptr<const BlockDefinition> BlockInstance::def() const {
+  return _def;
+}
+float BlockInstance::x() const { return _x; }
+float BlockInstance::y() const { return _y; }
+
 }  // namespace model

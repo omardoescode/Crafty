@@ -14,7 +14,7 @@ void BlockView::draw() {
   static int n = 3;
   const ImU32 color = IM_COL32(77, 166, 255, 255);
   const ImU32 hovered_color = IM_COL32(107, 186, 255, 255);  // Lighter blue
-  const char* text = _block_instance->definition_id.c_str();
+  const char* text = _block_instance->def()->id().c_str();
   ImVec2 text_size = ImGui::CalcTextSize(text);
   ImVec2 total_size =
       ImVec2(text_size.x + 2 * PADDING.x, text_size.y + 2 * PADDING.y);

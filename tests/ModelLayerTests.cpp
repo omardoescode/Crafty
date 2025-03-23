@@ -1,9 +1,9 @@
 #include <filesystem>
 #include <limits>
+#include "block/block_definition.h"
+#include "block/block_instance.h"
+#include "block/block_library.h"
 #include "gtest/gtest.h"
-#include "public/block/block_definition.h"
-#include "public/block/block_instance.h"
-#include "public/block/block_library.h"
 #include "utils/ID_manager.h"
 #include "utils/fs.h"
 #include "utils/store.h"

@@ -1,7 +1,8 @@
 #pragma once
 // Provide Settings for the UI
+#include <memory>
 #include <string>
-#include "imgui.h"
+#include "project.h"
 namespace ui {
 class UIOptions {
 public:
