@@ -107,6 +107,7 @@ add_library(ui
   ${UI_DIR}/editor/BlockPicker.cpp 
   ${UI_DIR}/editor/BlockCanvas.cpp 
   ${UI_DIR}/editor/BlockView.cpp 
+  ${UI_DIR}/stage/Stage.cpp 
 )
 target_link_libraries(ui PUBLIC imgui_sdl model) # model for reading some data
 target_include_directories(ui PUBLIC ${UI_DIR})

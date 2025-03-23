@@ -1,17 +1,19 @@
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_main.h>
 #include <stdio.h>
-#include "SDL3/SDL_events.h"
-#include "SDL3/SDL_video.h"
 #include "backends/imgui_impl_opengl3.h"
 #include "backends/imgui_impl_sdl3.h"
 #include "block/block_library.h"
 #include "editor/BlockCanvas.h"
 #include "editor/BlockPicker.h"
 #include "imgui.h"
-#include "project.h"
 #include "project_manager.h"
+#include "stage/Stage.h"
 #include "ui/MainMenuBar.h"
 #include "ui/editor/BlockCategoryPanel.h"
+
+#define right_sidebar_width 400.0f
+#define left_sidebar_width 250.0f
 
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <SDL3/SDL_opengles2.h>
@@ -61,10 +63,12 @@ int main(int, char **) {
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
   SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-  SDL_Window *window = SDL_CreateWindow(
-      "Crafty", 1500, 1000, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
-  if (window == nullptr) {
-    printf(" SDL_CreateWindow(): %s\n", SDL_GetError());
+  SDL_Renderer *renderer;
+  SDL_Window *window;
+  if (!SDL_CreateWindowAndRenderer("Crafty", 1500, 1000,
+                                   SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE,
+                                   &window, &renderer)) {
+    printf(" SDL_CreateWindowAndRenderer(): %s\n", SDL_GetError());
     SDL_Quit();
     return -1;
   }
@@ -114,6 +118,7 @@ int main(int, char **) {
   ui::BlockCategoryPanel block_category_panel(options);
   ui::BlockPicker picker(options);
   ui::BlockCanvas canvas(options);
+  ui::Stage stage(options, renderer);
 
   // Main loop
   while (options.running()) {
@@ -159,12 +164,42 @@ int main(int, char **) {
 
     // Draw UI components
     main_menu_bar.draw();
-    ImGui::BeginChild(1, ImVec2(250, 0));
-    block_category_panel.draw();
-    picker.draw();
-    ImGui::EndChild();
+
+    // Left Sidebar
+    if (ImGui::BeginChild("Left Sidebar", ImVec2(left_sidebar_width, 0))) {
+      // Categorises Panel
+      ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 3.0f);
+      if (ImGui::BeginChild("BlockCategoryPanel", ImVec2(0, 0),
+                            ImGuiChildFlags_AutoResizeX |
+                                ImGuiChildFlags_AutoResizeY |
+                                ImGuiChildFlags_Border)) {
+        block_category_panel.draw();
+        ImGui::EndChild();
+      }
+      ImGui::PopStyleVar();
+
+      if (ImGui::BeginChild("BlockPicker")) {
+        picker.draw();
+        ImGui::EndChild();
+      }
+
+      ImGui::EndChild();
+    }
     ImGui::SameLine();
-    canvas.draw();
+    if (ImGui::BeginChild("Canvas", ImVec2(ImGui::GetContentRegionAvail().x -
+                                               right_sidebar_width,
+                                           -1))) {
+      canvas.draw();
+      ImGui::EndChild();
+    }
+
+    ImGui::SameLine();
+
+    ImGui::BeginChild("Right Sidebar", ImVec2(right_sidebar_width - 8, 0));
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 8));
+    stage.draw();
+    ImGui::PopStyleVar();
+    ImGui::EndChild();
     ImGui::End();
 
     // Rendering
