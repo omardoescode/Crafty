@@ -5,8 +5,9 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_EXPORT_COMPILE_COMMANDS True)
 
 # Set directory paths
-set(UI_DIR ${CMAKE_SOURCE_DIR}/src/ui)
+set(UI_DIR ${CMAKE_SOURCE_DIR}/src/ui) 
 set(MODEL_DIR ${CMAKE_SOURCE_DIR}/src/model)
+set(THIRDPARTY_DIR ${CMAKE_SOURCE_DIR}/src/thirdparty) 
 
 # Get opengl from system
 # TODO: Change to use FetchContent Instead too
@@ -103,15 +104,21 @@ target_link_libraries(imgui_sdl PUBLIC SDL3::SDL3 OpenGL::GL)
 add_library(ui
   ${UI_DIR}/ui_options.cpp 
   ${UI_DIR}/MainMenuBar.cpp 
+
   ${UI_DIR}/editor/BlockCategoryPanel.cpp 
   ${UI_DIR}/editor/BlockPicker.cpp 
   ${UI_DIR}/editor/BlockCanvas.cpp 
   ${UI_DIR}/editor/BlockView.cpp 
+
   ${UI_DIR}/stage/Stage.cpp 
+
+  ${UI_DIR}/character_manager/CharacterManager.cpp 
+
+  ${UI_DIR}/utils/images.cpp
 )
 target_link_libraries(ui PUBLIC imgui_sdl model) # model for reading some data
+target_include_directories(ui PUBLIC ${UI_DIR} ${THIRDPARTY_DIR})
 target_include_directories(ui PUBLIC ${UI_DIR})
-
 # The executable
 add_executable(crafty src/main.cpp)
 target_link_libraries(crafty PUBLIC ui)
