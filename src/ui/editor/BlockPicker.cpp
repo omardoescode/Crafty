@@ -20,6 +20,7 @@ void BlockPicker::fetch_category_instances(const std::string& category_name) {
     _views_per_category[category_name].push_back(view);
   }
 }
+
 void BlockPicker::draw() {
   auto& cur_category = _options.current_category();
   // Ensure we have the category instances
@@ -30,7 +31,6 @@ void BlockPicker::draw() {
   // Draw
   auto& views = _views_per_category[cur_category];
   if (ImGui::BeginTable("Block Views", 1)) {
-    ImGui::TableSetupColumn("Block Picker");
     ImGui::TableHeadersRow();
     for (int row = 0; row < views.size(); row++) {
       ImGui::TableNextRow();

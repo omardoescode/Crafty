@@ -4,6 +4,7 @@
 #include "backends/imgui_impl_opengl3.h"
 #include "backends/imgui_impl_sdl3.h"
 #include "block/block_library.h"
+#include "character_manager/CharacterManager.h"
 #include "editor/BlockCanvas.h"
 #include "editor/BlockPicker.h"
 #include "imgui.h"
@@ -12,9 +13,6 @@
 #include "ui/MainMenuBar.h"
 #include "ui/editor/BlockCategoryPanel.h"
 
-#define right_sidebar_width 400.0f
-#define left_sidebar_width 250.0f
-
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <SDL3/SDL_opengles2.h>
 #else
@@ -22,6 +20,8 @@
 #endif
 
 int main(int, char **) {
+  ui::UIOptions options;
+
   // Initialize SDL3
   if (!SDL_Init(SDL_INIT_VIDEO)) {
     printf(" %s\n", SDL_GetError());
@@ -113,12 +113,12 @@ int main(int, char **) {
   lib.load_project(prj);
 
   // Initialize UI components
-  ui::UIOptions options;
   ui::MainMenuBar main_menu_bar(options);
   ui::BlockCategoryPanel block_category_panel(options);
   ui::BlockPicker picker(options);
   ui::BlockCanvas canvas(options);
   ui::Stage stage(options, renderer);
+  ui::CharacterManager character_mgr(options);
 
   // Main loop
   while (options.running()) {
@@ -166,7 +166,8 @@ int main(int, char **) {
     main_menu_bar.draw();
 
     // Left Sidebar
-    if (ImGui::BeginChild("Left Sidebar", ImVec2(left_sidebar_width, 0))) {
+    if (ImGui::BeginChild("Left Sidebar",
+                          ImVec2(options.LEFT_SIDEBAR_WIDTH, 0))) {
       // Categorises Panel
       ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 3.0f);
       if (ImGui::BeginChild("BlockCategoryPanel", ImVec2(0, 0),
@@ -187,7 +188,7 @@ int main(int, char **) {
     }
     ImGui::SameLine();
     if (ImGui::BeginChild("Canvas", ImVec2(ImGui::GetContentRegionAvail().x -
-                                               right_sidebar_width,
+                                               options.RIGHT_SIDEBAR_WIDTH,
                                            -1))) {
       canvas.draw();
       ImGui::EndChild();
@@ -195,10 +196,12 @@ int main(int, char **) {
 
     ImGui::SameLine();
 
-    ImGui::BeginChild("Right Sidebar", ImVec2(right_sidebar_width - 8, 0));
+    ImGui::BeginChild("RightSidebar",
+                      ImVec2(options.RIGHT_SIDEBAR_WIDTH - 8, 0));
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 8));
-    stage.draw();
+    stage.draw();  // Find some way to specify the size
     ImGui::PopStyleVar();
+    character_mgr.draw();
     ImGui::EndChild();
     ImGui::End();
 

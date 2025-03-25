@@ -11,11 +11,10 @@ Stage::Stage(UIOptions& options, SDL_Renderer* renderer)
   // Create render target texture
   _gameTexture =
       SDL_CreateTexture(_sdlRenderer, SDL_PIXELFORMAT_RGBA32,
-                        SDL_TEXTUREACCESS_TARGET, _texWidth, _texHeight);
+                        SDL_TEXTUREACCESS_TARGET, _options.RIGHT_SIDEBAR_WIDTH,
+                        _options.RIGHT_SIDEBAR_WIDTH / _options.STAGE_ASPECT);
 
-  if (!_gameTexture) {
-    std::cerr << "Failed to create game texture: " << SDL_GetError() << "\n";
-  }
+  assert(_gameTexture && "Failed to create game texture");
 }
 
 Stage::~Stage() {
@@ -36,7 +35,9 @@ void Stage::draw() {
   SDL_SetRenderTarget(_sdlRenderer, nullptr);
 
   // 3. Display in ImGui
-  if (ImGui::BeginChild("Game View")) {
+  if (ImGui::BeginChild("Game View", ImVec2(_options.RIGHT_SIDEBAR_WIDTH,
+                                            _options.RIGHT_SIDEBAR_WIDTH /
+                                                _options.STAGE_ASPECT))) {
     // Get texture properties
     SDL_PropertiesID props = SDL_GetTextureProperties(_gameTexture);
 
@@ -53,6 +54,7 @@ void Stage::draw() {
     ImVec2 availSize = ImGui::GetContentRegionAvail();
     float aspect = static_cast<float>(texWidth) / static_cast<float>(texHeight);
     ImVec2 displaySize(availSize.x, availSize.x / aspect);
+    std::cout << (availSize.x) << " " << (availSize.x / aspect) << std::endl;
 
     if (displaySize.y > availSize.y) {
       displaySize.y = availSize.y;

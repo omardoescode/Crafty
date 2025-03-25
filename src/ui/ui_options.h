@@ -1,10 +1,13 @@
 #pragma once
 // Provide Settings for the UI
-#include <memory>
 #include <string>
-#include "project.h"
 namespace ui {
 class UIOptions {
+public:
+  const float RIGHT_SIDEBAR_WIDTH = 450.0f;
+  const float LEFT_SIDEBAR_WIDTH = 200.0f;
+  const float STAGE_ASPECT = 1.5f;
+
 public:
   /**
    * @brief Constructor
