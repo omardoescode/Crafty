@@ -1,5 +1,4 @@
 #pragma once
-// Provide Settings for the UI
 #include <imgui.h>
 #include <map>
 #include <string>
@@ -34,7 +33,13 @@ public:
   const std::string current_category() const;
   void set_current_category(const std::string&);
 
-  void initialize_font(Font, const char*, unsigned);
+  template <typename... T>
+  void initialize_font(UIOptions::Font font, T&&... args) {
+    ImGuiIO& io = ImGui::GetIO();
+    assert(!_fonts.count(font) && "Font initialized already");
+    _fonts[font] =
+        io.Fonts->AddFontFromFileTTF(std::forward<decltype(args)>(args)...);
+  }
   ImFont* get_font(Font);
 
 private:

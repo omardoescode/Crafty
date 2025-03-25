@@ -12,6 +12,7 @@
 #include "stage/Stage.h"
 #include "ui/MainMenuBar.h"
 #include "ui/editor/BlockCategoryPanel.h"
+#include "utils/MaterialSymbols.h"
 
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <SDL3/SDL_opengles2.h>
@@ -101,8 +102,15 @@ int main(int, char **) {
   // Load fonts (make sure the file exists in the specified path)
   options.initialize_font(options.DEFAULT_FONT, "assets/fonts/Rubik.ttf",
                           18.0f);
-  options.initialize_font(options.ICONS_FONT_SMALL,
-                          "assets/fonts/MaterialIcons-Regular.ttf", 18.0f);
+  ImFontConfig config;
+  config.MergeMode =
+      true;  // Merge with the default font, no need to load it explictly
+  config.PixelSnapH = true;
+  config.GlyphOffset.y += 3;
+  static const ImWchar icon_ranges[] = {ICON_MIN_MD, ICON_MAX_MD, 0};
+  options.initialize_font(options.ICONS_FONT_MEDIUM,
+                          "assets/fonts/MaterialIcons-Regular.ttf", 20.0f,
+                          &config, icon_ranges);
   ImVec4 clear_color = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
 
   // Initialize the project

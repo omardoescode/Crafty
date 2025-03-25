@@ -10,16 +10,10 @@ const std::string UIOptions::current_category() const {
 void UIOptions::set_current_category(const std::string& value) {
   _current_cateogry = value;
 }
-void UIOptions::initialize_font(UIOptions::Font font, const char* path,
-                                unsigned size) {
-  ImGuiIO& io = ImGui::GetIO();
-  assert(!_fonts.count(font) && "Font initialized already");
-  _fonts[font] = io.Fonts->AddFontFromFileTTF(path, size);
-}
 
 ImFont* UIOptions::get_font(UIOptions::Font font) {
   auto itr = _fonts.find(font);
-  assert(itr == _fonts.end() && "Font is not initialized");
+  assert(itr != _fonts.end() && "Font is not initialized");
   return itr->second;
 }
 }  // namespace ui

@@ -1,6 +1,5 @@
 #include "Stage.h"
 #include <SDL3/SDL_render.h>
-#include <iostream>
 #include "SDL3/SDL_opengl.h"
 #include "imgui.h"
 
@@ -54,7 +53,6 @@ void Stage::draw() {
     ImVec2 availSize = ImGui::GetContentRegionAvail();
     float aspect = static_cast<float>(texWidth) / static_cast<float>(texHeight);
     ImVec2 displaySize(availSize.x, availSize.x / aspect);
-    std::cout << (availSize.x) << " " << (availSize.x / aspect) << std::endl;
 
     if (displaySize.y > availSize.y) {
       displaySize.y = availSize.y;
