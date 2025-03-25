@@ -99,7 +99,10 @@ int main(int, char **) {
   ImGui_ImplOpenGL3_Init("#version 130");
 
   // Load fonts (make sure the file exists in the specified path)
-  io.Fonts->AddFontFromFileTTF("assets/fonts/Rubik.ttf", 18.0f);
+  options.initialize_font(options.DEFAULT_FONT, "assets/fonts/Rubik.ttf",
+                          18.0f);
+  options.initialize_font(options.ICONS_FONT_SMALL,
+                          "assets/fonts/MaterialIcons-Regular.ttf", 18.0f);
   ImVec4 clear_color = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
 
   // Initialize the project
@@ -170,10 +173,9 @@ int main(int, char **) {
                           ImVec2(options.LEFT_SIDEBAR_WIDTH, 0))) {
       // Categorises Panel
       ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 3.0f);
-      if (ImGui::BeginChild("BlockCategoryPanel", ImVec2(0, 0),
-                            ImGuiChildFlags_AutoResizeX |
-                                ImGuiChildFlags_AutoResizeY |
-                                ImGuiChildFlags_Border)) {
+      if (ImGui::BeginChild(
+              "BlockCategoryPanel", ImVec2(0, 0),
+              ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY)) {
         block_category_panel.draw();
         ImGui::EndChild();
       }
@@ -201,7 +203,9 @@ int main(int, char **) {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 8));
     stage.draw();  // Find some way to specify the size
     ImGui::PopStyleVar();
+    ImGui::BeginChild("CharacterManager");
     character_mgr.draw();
+    ImGui::EndChild();
     ImGui::EndChild();
     ImGui::End();
 
