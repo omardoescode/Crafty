@@ -11,10 +11,15 @@ public:
   void draw();
 
 private:
-  constexpr static float sz_x = 80;
-  constexpr static float sz_y = 80;
+  constexpr static float sz_x = 70;
+  constexpr static float sz_y = 70;
 
 private:
+  /**
+   * Load the texture
+   *
+   * NOTE: This must be called in a non-detached thread
+   */
   void load_texture_once();
 
 private:
