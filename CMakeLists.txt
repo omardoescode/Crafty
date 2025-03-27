@@ -135,10 +135,13 @@ target_link_libraries(ui PUBLIC imgui_sdl model nfd)
 target_include_directories(ui PUBLIC ${UI_DIR} ${THIRDPARTY_DIR})
 target_include_directories(ui PUBLIC ${UI_DIR})
 # The executable
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
 add_executable(crafty src/main.cpp)
 target_link_libraries(crafty PUBLIC ui)
 
 # Testing
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}) # Back to normal
 enable_testing()
 
 add_executable(tests tests/ModelLayerTests.cpp)
@@ -151,6 +154,7 @@ gtest_discover_tests(tests)
 
 # Copy assets
 message("Copying assets and data")
-file(COPY assets DESTINATION ${CMAKE_BINARY_DIR})
-file(COPY data DESTINATION ${CMAKE_BINARY_DIR})
+file(COPY assets DESTINATION ${CMAKE_BINARY_DIR}/bin)
+file(COPY data DESTINATION ${CMAKE_BINARY_DIR}/bin)
+file(COPY builtin DESTINATION ${CMAKE_BINARY_DIR}/bin)
 message("Finishing copying")
