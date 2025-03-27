@@ -128,7 +128,7 @@ add_library(ui
   ${UI_DIR}/character_manager/CharacterManager.cpp 
 
   ${UI_DIR}/utils/images.cpp
-  ${UI_DIR}/utils/upload_file.cpp
+  ${UI_DIR}/utils/file_utils.cpp
   ${UI_DIR}/utils/platform.cpp
 )
 target_link_libraries(ui PUBLIC imgui_sdl model nfd)

@@ -1,14 +1,12 @@
 #include "CharacterManager.h"
 #include <imgui.h>
 #include <cassert>
-#include <experimental/filesystem>
 #include <iostream>
 #include <thread>
 #include "project_manager.h"
 #include "utils/MaterialSymbols.h"
+#include "utils/file_utils.h"
 #include "utils/images.h"
-#include "utils/platform.h"
-#include "utils/upload_file.h"
 
 namespace ui {
 CharacterManager::CharacterManager(UIOptions& options) : _options(options) {}
@@ -49,8 +47,8 @@ void CharacterManager::upload_char(std::filesystem::path path) {
   auto asset_folder = _options.asset_dest_folder();
   std::thread([this, path, asset_folder]() {
     auto& mgr = model::ProjectManager::instance();
-    mgr.add_character(path, asset_folder);
-    std::cout << "Uploaded" << std::endl;
+    auto new_char = mgr.add_character(path, asset_folder);
+    // TODO: Create a character view
   }).detach();
 }
 

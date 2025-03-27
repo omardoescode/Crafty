@@ -4,6 +4,7 @@
 #include <memory>
 #include "character.h"
 #include "utils/ID_manager.h"
+#include "utils/fs.h"
 
 namespace fs = std::filesystem;
 
@@ -67,7 +68,7 @@ std::string getCurrentTimestamp() {
 }
 std::shared_ptr<Asset> ProjectManager::add_asset(fs::path file_path,
                                                  fs::path copy_folder) {
-  assert(_current_project && "There's no current projecj");
+  assert(_current_project && "There's no current project");
   assert(fs::exists(file_path) && "File path doesn't exist");
   assert(fs::exists(copy_folder) && "Copy folder doesn't exist");
   assert(fs::is_regular_file(file_path) && "File path is not a file");
@@ -75,20 +76,26 @@ std::shared_ptr<Asset> ProjectManager::add_asset(fs::path file_path,
 
   // copy the file
   std::string extension = file_path.extension();
-  auto destination =
-      copy_folder / (getCurrentTimestamp() + extension);  // TODO: Refactor
+  fs::path destination = copy_folder / generate_unique_filename(extension);
   fs::copy(file_path, destination);
 
   // Create a new entity
-  auto new_asset = _current_project->asset_store().create_entity(
-      *_current_project, destination.string());
+  std::shared_ptr<Asset> new_asset =
+      _current_project->asset_store().create_entity(*_current_project,
+                                                    destination.string());
   return new_asset;
 }
 
 std::shared_ptr<Character> ProjectManager::add_character(
     std::filesystem::path file_path, std::filesystem::path copy_folder) {
-  auto new_asset = add_asset(file_path, copy_folder);
-  auto new_char =
+  assert(_current_project && "There's no current project");
+  assert(fs::exists(file_path) && "File path doesn't exist");
+  assert(fs::exists(copy_folder) && "Copy folder doesn't exist");
+  assert(fs::is_regular_file(file_path) && "File path is not a file");
+  assert(fs::is_directory(copy_folder) && "Copy folder is not a directory");
+
+  std::shared_ptr<Asset> new_asset = add_asset(file_path, copy_folder);
+  std::shared_ptr<Character> new_char =
       _current_project->char_store().create_entity(*_current_project);
   new_char->add_sprite(new_asset->id());
   return new_char;
