@@ -8,7 +8,7 @@ class BlockInstance;
 
 class Character : public Serializable {
 public:
-  Character(const IDManager::IDType& id, Project& project);
+  Character(const IDManager::IDType& id, Project& project, float x, float y);
 
   void add_sprite(const IDManager::IDType& id, int pos = -1);
   void remove_sprite(const IDManager::IDType& id);

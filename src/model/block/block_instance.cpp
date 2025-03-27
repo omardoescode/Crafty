@@ -7,12 +7,12 @@ namespace model {
 BlockInstance::BlockInstance(const IDManager::IDType& id, Project& project,
                              std::shared_ptr<const BlockDefinition> def,
                              float x, float y)
-    : Serializable(id, project), _def(def), _x(x), _y(y) {}
+    : Serializable(id, project), _def(def), _pos(x, y) {}
 
 BlockInstance::BlockInstance(IDManager::IDType&& id, Project& project,
                              std::shared_ptr<const BlockDefinition> def,
                              float x, float y)
-    : Serializable(id, project), _def(def), _x(x), _y(y) {}
+    : Serializable(id, project), _def(def), _pos(x, y) {}
 
 bool BlockInstance::is_dummy_instance() const {
   return DUMMY_INSTANCE_ID == id();
@@ -21,7 +21,7 @@ bool BlockInstance::is_dummy_instance() const {
 std::shared_ptr<const BlockDefinition> BlockInstance::def() const {
   return _def;
 }
-float BlockInstance::x() const { return _x; }
-float BlockInstance::y() const { return _y; }
+float BlockInstance::x() const { return _pos.first; }
+float BlockInstance::y() const { return _pos.second; }
 
 }  // namespace model

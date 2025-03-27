@@ -2,11 +2,13 @@
 #include <cassert>
 #include <filesystem>
 #include <memory>
+#include <random>
 #include "character.h"
 #include "utils/ID_manager.h"
 #include "utils/fs.h"
 
 namespace fs = std::filesystem;
+std::default_random_engine gen;
 
 namespace model {
 
@@ -94,9 +96,16 @@ std::shared_ptr<Character> ProjectManager::add_character(
   assert(fs::is_regular_file(file_path) && "File path is not a file");
   assert(fs::is_directory(copy_folder) && "Copy folder is not a directory");
 
+  // Get random coordinates
+  static std::uniform_int_distribution<int> x_pos_gen(0,
+                                                      _world_resolution.first);
+  static std::uniform_int_distribution<int> y_pos_gen(0,
+                                                      _world_resolution.first);
+
   std::shared_ptr<Asset> new_asset = add_asset(file_path, copy_folder);
   std::shared_ptr<Character> new_char =
-      _current_project->char_store().create_entity(*_current_project);
+      _current_project->char_store().create_entity(
+          *_current_project, x_pos_gen(gen), y_pos_gen(gen));
   new_char->add_sprite(new_asset->id());
   return new_char;
 }

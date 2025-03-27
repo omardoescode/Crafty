@@ -7,8 +7,8 @@
 
 namespace model {
 
-Character::Character(const std::string& id, Project& project)
-    : Serializable(id, project) {}
+Character::Character(const std::string& id, Project& project, float x, float y)
+    : Serializable(id, project), _pos(x, y) {}
 void Character::add_sprite(const IDManager::IDType& id, int pos) {
   assert(project_.asset_store().has_entity(id) &&
          "Asset store doesn't have this ID");

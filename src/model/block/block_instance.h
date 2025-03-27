@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 #include "block/block_definition.h"
 #include "block/block_library.h"
@@ -34,7 +35,7 @@ public:
   // TODO: Add metthod to control input slots
 private:
   std::shared_ptr<const BlockDefinition> _def;
-  float _x, _y;
+  std::pair<float, float> _pos;
   std::vector<IDManager::IDType> _inputs;
   // TODO: handle script body
   IDManager::IDType body;
