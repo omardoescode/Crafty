@@ -5,5 +5,6 @@
 
 // Example icons
 #define ICON_MD_HOME "\uE88A"
-#define ICON_MD_SETTINGS u8"\uE8B8"
-#define ICON_MD_DELETE u8"\uE872"
+#define ICON_MD_SETTINGS "\uE8B8"
+#define ICON_MD_ADD "\ue145"
+#define ICON_MD_DELETE "\uE872"
