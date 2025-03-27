@@ -101,12 +101,15 @@ void CharacterMiniView::draw_context_menu() {
     }
 
     if (ImGui::MenuItem("Rename")) {
+      // Use the action deferrer to rename
     }
 
     if (ImGui::MenuItem("Duplicate")) {
+      // Use the action deferrer to duplciate
     }
 
     if (ImGui::MenuItem("Delete")) {
+      // Use the action deferrer to delete
     }
     ImGui::EndPopup();
   }

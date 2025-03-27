@@ -116,6 +116,7 @@ target_link_libraries(imgui_sdl PUBLIC SDL3::SDL3 OpenGL::GL)
 add_library(ui
   ${UI_DIR}/ui_options.cpp 
   ${UI_DIR}/main_menu_bar.cpp 
+  ${UI_DIR}/action_deferrer.cpp 
 
   ${UI_DIR}/editor/block_category_panel.cpp 
   ${UI_DIR}/editor/block_picker.cpp 
