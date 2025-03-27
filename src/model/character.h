@@ -29,10 +29,15 @@ public:
   const std::vector<IDManager::IDType>& scripts() const;
   const std::vector<IDManager::IDType>& textures() const;
 
+  const std::string name() const;
+  void set_name(const std::string& name);
+  void set_name(std::string&& name);
+
 private:
   std::vector<IDManager::IDType> _sprites;
   std::vector<IDManager::IDType> _scripts;
   std::pair<float, float> _pos;
   size_t _current_texture_idx;
+  std::string _name;
 };
 }  // namespace model

@@ -8,7 +8,11 @@
 namespace model {
 
 Character::Character(const std::string& id, Project& project, float x, float y)
-    : Serializable(id, project), _pos(x, y), _current_texture_idx(0) {}
+    : Serializable(id, project),
+      _pos(x, y),
+      _current_texture_idx(0),
+      _name(id) {}
+
 void Character::add_sprite(const IDManager::IDType& id, int pos) {
   assert(project_.asset_store().has_entity(id) &&
          "Asset store doesn't have this ID");
@@ -67,4 +71,7 @@ const std::vector<IDManager::IDType>& Character::scripts() const {
 const std::vector<IDManager::IDType>& Character::textures() const {
   return _sprites;
 }
+const std::string Character::name() const { return _name; }
+void Character::set_name(const std::string& name) { _name = name; }
+void Character::set_name(std::string&& name) { _name = std::move(name); }
 }  // namespace model
