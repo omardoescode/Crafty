@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <map>
 #include <string>
+#include "character.h"
 namespace ui {
 class UIOptions {
 public:
@@ -34,6 +35,9 @@ public:
   const std::string current_category() const;
   void set_current_category(const std::string&);
 
+  const std::shared_ptr<model::Character> current_character() const;
+  void set_current_character(std::shared_ptr<model::Character>);
+
   template <typename... T>
   void initialize_font(UIOptions::Font font, T&&... args) {
     ImGuiIO& io = ImGui::GetIO();
@@ -59,5 +63,6 @@ private:
   int _args;
   char** _argv;
   std::filesystem::path _path_name;
+  std::shared_ptr<model::Character> _current_character;
 };
 }  // namespace ui

@@ -31,4 +31,12 @@ std::filesystem::path UIOptions::asset_dest_folder() {
   std::filesystem::create_directory(res);  // create if doesn't exist
   return res;
 }
+
+const std::shared_ptr<model::Character> UIOptions::current_character() const {
+  return _current_character;
+}
+void UIOptions::set_current_character(
+    std::shared_ptr<model::Character> character) {
+  _current_character = character;
+}
 }  // namespace ui

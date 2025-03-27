@@ -26,6 +26,7 @@ void CharacterMiniView::draw() {
   // Style parameters
   const float rounding = 3.0f;
   const ImU32 color = IM_COL32(128, 128, 128, 255);
+  const ImU32 active_color = IM_COL32(255, 200, 100, 255);
   const ImU32 hovered_color = IM_COL32(192, 192, 192, 255);
 
   ImGui::PushID(_character->id().c_str());  // Ensure unique ID
@@ -41,9 +42,15 @@ void CharacterMiniView::draw() {
   ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
   // Draw rounded rectangle background
-  draw_list->AddRectFilled(
-      min, max, ImGui::GetColorU32(is_hovered ? hovered_color : color),
-      rounding);
+  ImU32 col;
+  if (is_hovered)
+    col = hovered_color;
+  else if (_options.current_character() == _character)
+    col = active_color;
+  else
+    col = color;
+
+  draw_list->AddRectFilled(min, max, ImGui::GetColorU32(col), rounding);
 
   // Position the image centered horizontally at the top with padding
   const ImVec2 image_top_left(min.x + (CARD_WIDTH - IMAGE_X) / 2.0f,
@@ -66,7 +73,7 @@ void CharacterMiniView::draw() {
 
   // Handle click
   if (is_clicked) {
-    std::cout << "Clicked on character: " << _character->name() << std::endl;
+    _options.set_current_character(_character);
   }
 
   ImGui::SetCursorScreenPos(
