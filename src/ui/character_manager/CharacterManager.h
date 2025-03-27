@@ -1,5 +1,6 @@
 #pragma once
 
+#include <filesystem>
 #include "ui_options.h"
 namespace ui {
 class CharacterManager {
@@ -11,7 +12,7 @@ public:
   void draw();
 
 private:
-  void upload_char();
+  void upload_char(std::filesystem::path);
 
 private:
   UIOptions& _options;

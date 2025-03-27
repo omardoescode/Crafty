@@ -35,6 +35,21 @@ public:
    */
   void clear();
 
+  /**
+   * @brief Add a character, whose initial sprite is given in `file_path`, by
+   * creating an asset and putting it to `copy_folder`, and then attaching this
+   * asset to the newly created character
+   */
+  std::shared_ptr<Character> add_character(std::filesystem::path file_path,
+                                           std::filesystem::path copy_folder);
+
+  /**
+   * @brief Copy an asset from `file_path` to folder `copy_folder` and then
+   * initiate this asset to asset_store
+   */
+  std::shared_ptr<Asset> add_asset(std::filesystem::path file_path,
+                                   std::filesystem::path copy_folder);
+
   bool has_project() const;
   std::shared_ptr<Project> project() const;
 

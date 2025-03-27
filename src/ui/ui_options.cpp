@@ -1,7 +1,11 @@
 #include "ui_options.h"
+#include <filesystem>
+#include "utils/platform.h"
 namespace ui {
 UIOptions::UIOptions(int args, char** argv)
-    : _running{true}, _args(args), _argv(argv) {}
+    : _running{true}, _args(args), _argv(argv) {
+  _path_name = get_executable_path().parent_path();
+}
 const bool& UIOptions::running() const { return _running; }
 void UIOptions::close() { _running = false; }
 
@@ -16,5 +20,15 @@ ImFont* UIOptions::get_font(UIOptions::Font font) {
   auto itr = _fonts.find(font);
   assert(itr != _fonts.end() && "Font is not initialized");
   return itr->second;
+}
+
+std::filesystem::path UIOptions::executable_path() { return _path_name; }
+
+std::filesystem::path UIOptions::asset_dest_folder() {
+  auto res =
+      _path_name /
+      "asset_dest";  // TODO: Create some UIConfig json to setup all of these
+  std::filesystem::create_directory(res);  // create if doesn't exist
+  return res;
 }
 }  // namespace ui

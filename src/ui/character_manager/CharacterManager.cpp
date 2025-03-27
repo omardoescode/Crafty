@@ -4,6 +4,7 @@
 #include <experimental/filesystem>
 #include <iostream>
 #include <thread>
+#include "project_manager.h"
 #include "utils/MaterialSymbols.h"
 #include "utils/images.h"
 #include "utils/platform.h"
@@ -24,13 +25,13 @@ void CharacterManager::draw() {
 
     ImGui::PushFont(_options.get_font(_options.ICONS_FONT_MEDIUM));
     if (ImGui::Button(ICON_MD_ADD)) {
-      auto default_path = get_executable_path().parent_path() / "builtin";
+      auto default_path = _options.executable_path() / "builtin";
       assert(std::filesystem::exists(default_path) &&
              "Default path for uploading characters doesn't exist");
       auto path = upload_file("Image Files", "png,jpg,jpeg,gif,bmp,webppng",
                               default_path.c_str());
       if (!path.empty()) {
-        upload_char();
+        upload_char(path);
       }
     }
     ImGui::PopFont();
@@ -44,9 +45,12 @@ void CharacterManager::draw() {
   ImGui::PopStyleVar();
 }
 
-void CharacterManager::upload_char() {
-  std::thread([]() {
-    // TODO: Upload Character
+void CharacterManager::upload_char(std::filesystem::path path) {
+  auto asset_folder = _options.asset_dest_folder();
+  std::thread([this, path, asset_folder]() {
+    auto& mgr = model::ProjectManager::instance();
+    mgr.add_character(path, asset_folder);
+    std::cout << "Uploaded" << std::endl;
   }).detach();
 }
 

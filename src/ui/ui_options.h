@@ -1,5 +1,6 @@
 #pragma once
 #include <imgui.h>
+#include <filesystem>
 #include <map>
 #include <string>
 namespace ui {
@@ -42,8 +43,14 @@ public:
   }
   ImFont* get_font(Font);
 
-  // Args, and argv
-  const char* get_path_name();
+  // Get Directories
+  /**
+   * Get the folder where all assets are copied to
+   *
+   * NOTE: Must be called on the main thread or a non-detached thread
+   */
+  std::filesystem::path executable_path();
+  std::filesystem::path asset_dest_folder();
 
 private:
   bool _running;
@@ -51,5 +58,6 @@ private:
   std::map<Font, ImFont*> _fonts;
   int _args;
   char** _argv;
+  std::filesystem::path _path_name;
 };
 }  // namespace ui

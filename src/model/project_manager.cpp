@@ -1,7 +1,11 @@
 #include "project_manager.h"
 #include <cassert>
+#include <filesystem>
 #include <memory>
+#include "character.h"
 #include "utils/ID_manager.h"
+
+namespace fs = std::filesystem;
 
 namespace model {
 
@@ -37,7 +41,7 @@ void ProjectManager::save() {
   // TODO: implement a serialization engine and use it here
 }
 
-void ProjectManager::load(const std::filesystem::path& path) {
+void ProjectManager::load(const fs::path& path) {
   assert(!_current_project && "There is a project already");
   assert(path.extension() == "crafty");
   // TODO: implement a serialization engine and use it here
@@ -53,5 +57,40 @@ bool ProjectManager::has_project() const { return !!_current_project; }
 std::shared_ptr<Project> ProjectManager::project() const {
   return _current_project;
 }
+std::string getCurrentTimestamp() {
+  auto now = std::chrono::system_clock::now();
+  std::time_t now_c = std::chrono::system_clock::to_time_t(now);
 
+  std::stringstream ss;
+  ss << std::put_time(std::localtime(&now_c), "%Y%m%d%H%M%S");
+  return ss.str();
+}
+std::shared_ptr<Asset> ProjectManager::add_asset(fs::path file_path,
+                                                 fs::path copy_folder) {
+  assert(_current_project && "There's no current projecj");
+  assert(fs::exists(file_path) && "File path doesn't exist");
+  assert(fs::exists(copy_folder) && "Copy folder doesn't exist");
+  assert(fs::is_regular_file(file_path) && "File path is not a file");
+  assert(fs::is_directory(copy_folder) && "Copy folder is not a directory");
+
+  // copy the file
+  std::string extension = file_path.extension();
+  auto destination =
+      copy_folder / (getCurrentTimestamp() + extension);  // TODO: Refactor
+  fs::copy(file_path, destination);
+
+  // Create a new entity
+  auto new_asset = _current_project->asset_store().create_entity(
+      *_current_project, destination.string());
+  return new_asset;
+}
+
+std::shared_ptr<Character> ProjectManager::add_character(
+    std::filesystem::path file_path, std::filesystem::path copy_folder) {
+  auto new_asset = add_asset(file_path, copy_folder);
+  auto new_char =
+      _current_project->char_store().create_entity(*_current_project);
+  new_char->add_sprite(new_asset->id());
+  return new_char;
+}
 }  // namespace model

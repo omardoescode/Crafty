@@ -18,10 +18,10 @@ public:
           std::unique_ptr<Store<Script>>, std::unique_ptr<Store<Asset>>,
           std::unique_ptr<Store<BlockInstance>>);
 
-  const Store<Character>& char_store() const;
-  const Store<Script>& script_store() const;
-  const Store<Asset>& asset_store() const;
-  const Store<BlockInstance>& instances_store() const;
+  Store<Character>& char_store() const;
+  Store<Script>& script_store() const;
+  Store<Asset>& asset_store() const;
+  Store<BlockInstance>& instances_store() const;
 
 private:
   std::string _title;

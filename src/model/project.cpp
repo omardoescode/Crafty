@@ -34,10 +34,10 @@ Project::Project(std::string&& title,
   assert(_instances_store);
 }
 
-const Store<Character>& Project::char_store() const { return *_char_store; }
-const Store<Script>& Project::script_store() const { return *_script_store; }
-const Store<Asset>& Project::asset_store() const { return *_asset_store; }
-const Store<BlockInstance>& Project::instances_store() const {
+Store<Character>& Project::char_store() const { return *_char_store; }
+Store<Script>& Project::script_store() const { return *_script_store; }
+Store<Asset>& Project::asset_store() const { return *_asset_store; }
+Store<BlockInstance>& Project::instances_store() const {
   return *_instances_store;
 }
 }  // namespace model
