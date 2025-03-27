@@ -24,6 +24,8 @@ private:
    */
   void load_texture_once();
 
+  void draw_context_menu();
+
 private:
   UIOptions& _options;
   std::shared_ptr<model::Character> _character;

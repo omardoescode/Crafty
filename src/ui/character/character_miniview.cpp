@@ -1,6 +1,5 @@
 #include "character_miniview.h"
 #include <cassert>
-#include <iostream>
 #include "SDL3/SDL_opengl.h"
 #include "imgui.h"
 #include "project_manager.h"
@@ -35,6 +34,14 @@ void CharacterMiniView::draw() {
   ImGui::InvisibleButton("character_card", ImVec2(CARD_WIDTH, CARD_HEIGHT));
   const bool is_hovered = ImGui::IsItemHovered();
   const bool is_clicked = ImGui::IsItemClicked();
+
+  // Handle click
+  if (is_clicked) {
+    _options.set_current_character(_character);
+  }
+
+  // Create a context menu
+  draw_context_menu();
 
   // Get the position and size of the invisible button
   const ImVec2 min = ImGui::GetItemRectMin();
@@ -71,11 +78,6 @@ void CharacterMiniView::draw() {
   ImGui::SetCursorScreenPos(text_pos);
   ImGui::TextWrapped("%s", name.c_str());
 
-  // Handle click
-  if (is_clicked) {
-    _options.set_current_character(_character);
-  }
-
   ImGui::SetCursorScreenPos(
       ImVec2(image_top_left.x + CARD_WIDTH, image_top_left.y + CARD_HEIGHT));
   ImGui::PopID();
@@ -90,5 +92,23 @@ void CharacterMiniView::load_texture_once() {
                                  &out_width, &out_height);
 
   assert(res && "Failed to load texture");
+}
+
+void CharacterMiniView::draw_context_menu() {
+  if (ImGui::BeginPopupContextItem()) {
+    if (ImGui::MenuItem("Set as Current")) {
+      _options.set_current_character(_character);
+    }
+
+    if (ImGui::MenuItem("Rename")) {
+    }
+
+    if (ImGui::MenuItem("Duplicate")) {
+    }
+
+    if (ImGui::MenuItem("Delete")) {
+    }
+    ImGui::EndPopup();
+  }
 }
 }  // namespace ui
