@@ -8,6 +8,7 @@
 #include "editor/BlockCanvas.h"
 #include "editor/BlockPicker.h"
 #include "imgui.h"
+#include "nfd.h"
 #include "project_manager.h"
 #include "stage/Stage.h"
 #include "ui/MainMenuBar.h"
@@ -20,8 +21,8 @@
 #include <SDL3/SDL_opengl.h>
 #endif
 
-int main(int, char **) {
-  ui::UIOptions options;
+int main(int args, char **argv) {
+  ui::UIOptions options(args, argv);
 
   // Initialize SDL3
   if (!SDL_Init(SDL_INIT_VIDEO)) {
@@ -103,10 +104,8 @@ int main(int, char **) {
   options.initialize_font(options.DEFAULT_FONT, "assets/fonts/Rubik.ttf",
                           18.0f);
   ImFontConfig config;
-  config.MergeMode =
-      true;  // Merge with the default font, no need to load it explictly
   config.PixelSnapH = true;
-  config.GlyphOffset.y += 3;
+  config.GlyphOffset.y += 1;
   static const ImWchar icon_ranges[] = {ICON_MIN_MD, ICON_MAX_MD, 0};
   options.initialize_font(options.ICONS_FONT_MEDIUM,
                           "assets/fonts/MaterialIcons-Regular.ttf", 20.0f,

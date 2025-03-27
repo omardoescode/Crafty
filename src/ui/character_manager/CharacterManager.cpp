@@ -1,8 +1,12 @@
 #include "CharacterManager.h"
 #include <imgui.h>
 #include <cassert>
+#include <iostream>
+#include <thread>
 #include "utils/MaterialSymbols.h"
 #include "utils/images.h"
+#include "utils/platform.h"
+#include "utils/upload_file.h"
 
 namespace ui {
 CharacterManager::CharacterManager(UIOptions& options) : _options(options) {}
@@ -11,21 +15,26 @@ void CharacterManager::draw() {
   ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(40, 40, 40, 255));
 
   if (ImGui::BeginChild("RoundedContainer", ImVec2(0, 0), true)) {
-    ImGui::Columns(2, "##SplitColumns", false);
-    ImGui::SetColumnWidth(0, LEFT_SECTION_WIDTH);
+    ImGui::BeginGroup();
 
-    // Left Section
-    ImGui::BeginChild("FixedSection");
-    draw_button();
-    ImGui::EndChild();
+    ImGui::AlignTextToFramePadding();
+    ImGui::Text("New Sprite: ");
+    ImGui::SameLine();
 
-    // Draw Separator
-    ImGui::NextColumn();
-
-    // Right Section
-    ImGui::BeginChild("StretchedSection");
-    ImGui::Text("Stretched Content");
-    ImGui::EndChild();
+    ImGui::PushFont(_options.get_font(_options.ICONS_FONT_MEDIUM));
+    if (ImGui::Button(ICON_MD_ADD)) {
+      auto default_path = get_executable_path().parent_path() / "builtin";
+      assert(std::filesystem::exists(default_path) &&
+             "Default path for uploading characters doesn't exist");
+      auto path = upload_file("Image Files", "png,jpg,jpeg,gif,bmp,webppng",
+                              default_path.c_str());
+      if (!path.empty()) {
+        upload_char();
+      }
+    }
+    ImGui::PopFont();
+    ImGui::EndGroup();
+    ImGui::Separator();
   }
   ImGui::EndChild();
 
@@ -34,9 +43,10 @@ void CharacterManager::draw() {
   ImGui::PopStyleVar();
 }
 
-void CharacterManager::draw_button() {
-  ImGui::PushFont(_options.get_font(_options.ICONS_FONT_MEDIUM));
-  ImGui::Button(ICON_MD_HOME, ImVec2(ImGui::GetContentRegionAvail().x, 0));
-  ImGui::PopFont();
+void CharacterManager::upload_char() {
+  std::thread([]() {
+    // TODO: Upload Character
+  }).detach();
 }
+
 }  // namespace ui

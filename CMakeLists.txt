@@ -41,11 +41,24 @@ FetchContent_MakeAvailable(imgui)
 FetchContent_Declare(
   json 
   URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
+  GIT_TAG master
   GIT_PROGRESS TRUE
 )
 
 message(STATUS "Fetching nlohmann/json ...")
 FetchContent_MakeAvailable(json)
+
+# Fetching json reader
+FetchContent_Declare(
+  nfd
+  GIT_REPOSITORY https://github.com/btzy/nativefiledialog-extended
+  GIT_TAG        master  
+)
+
+message(STATUS "Fetching nativefiledialong-extended ...")
+set(NFD_BUILD_TESTS OFF CACHE BOOL "Disable tests")
+set(NFD_PORTAL OFF CACHE BOOL "Disable Flatpak portal (Linux)")
+FetchContent_MakeAvailable(nfd)
 
 # Fetch GTest
 FetchContent_Declare(
@@ -115,8 +128,10 @@ add_library(ui
   ${UI_DIR}/character_manager/CharacterManager.cpp 
 
   ${UI_DIR}/utils/images.cpp
+  ${UI_DIR}/utils/upload_file.cpp
+  ${UI_DIR}/utils/platform.cpp
 )
-target_link_libraries(ui PUBLIC imgui_sdl model) # model for reading some data
+target_link_libraries(ui PUBLIC imgui_sdl model nfd)
 target_include_directories(ui PUBLIC ${UI_DIR} ${THIRDPARTY_DIR})
 target_include_directories(ui PUBLIC ${UI_DIR})
 # The executable

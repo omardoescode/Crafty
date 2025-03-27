@@ -11,7 +11,7 @@ public:
   void draw();
 
 private:
-  void draw_button();
+  void upload_char();
 
 private:
   UIOptions& _options;
