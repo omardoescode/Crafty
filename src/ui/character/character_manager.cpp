@@ -1,8 +1,8 @@
 #include "character_manager.h"
 #include <imgui.h>
 #include <cassert>
+#include <cmath>
 #include <memory>
-#include <thread>
 #include "character/character_miniview.h"
 #include "project_manager.h"
 #include "stage/stage_manager.h"
@@ -11,7 +11,9 @@
 #include "utils/images.h"
 
 namespace ui {
-CharacterManager::CharacterManager(UIOptions& options) : _options(options) {}
+CharacterManager::CharacterManager(UIOptions& options) : _options(options) {
+  upload_char(std::filesystem::path("./builtin/cat.png"));  // for debug
+}
 void CharacterManager::draw() {
   ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 7.0f);
   ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(40, 40, 40, 255));
@@ -38,9 +40,12 @@ void CharacterManager::draw() {
     ImGui::EndGroup();
     ImGui::Separator();
 
-    // TODO: Render all characters in a scrollable view
+    ImGui::Columns(
+        ImGui::GetContentRegionAvail().x / CharacterMiniView::CARD_WIDTH, NULL,
+        false);
     for (auto& mv : _miniviews) {
       mv->draw();
+      ImGui::NextColumn();
     }
   }
   ImGui::EndChild();
@@ -52,13 +57,11 @@ void CharacterManager::draw() {
 
 void CharacterManager::upload_char(std::filesystem::path path) {
   auto asset_folder = _options.asset_dest_folder();
-  std::thread([this, path, asset_folder]() {
-    auto& mgr = model::ProjectManager::instance();
-    auto new_char = mgr.add_character(path, asset_folder);
-    StageManager::instance().add_character(_options, new_char);
-    auto new_miniview = std::make_shared<CharacterMiniView>(_options, new_char);
-    _miniviews.push_back(new_miniview);
-  }).detach();
+  auto& mgr = model::ProjectManager::instance();
+  auto new_char = mgr.add_character(path, asset_folder);
+  StageManager::instance().add_character(_options, new_char);
+  auto new_miniview = std::make_shared<CharacterMiniView>(_options, new_char);
+  _miniviews.push_back(new_miniview);
 }
 
 }  // namespace ui

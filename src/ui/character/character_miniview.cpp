@@ -20,50 +20,57 @@ CharacterMiniView::~CharacterMiniView() {
 void CharacterMiniView::draw() {
   load_texture_once();
 
+  // Constants for card dimensions, image size, and padding
+  const float PADDING = 10.0f;
+
   // Style parameters
   const float rounding = 3.0f;
   const ImU32 color = IM_COL32(128, 128, 128, 255);
   const ImU32 hovered_color = IM_COL32(192, 192, 192, 255);
 
-  const ImVec2 padding = ImVec2(10, 10);
-
   ImGui::PushID(_character->id().c_str());  // Ensure unique ID
 
-  // Calculate total size
-  const ImVec2 image_size(sz_x, sz_y);
-  const ImVec2 total_size =
-      ImVec2(image_size.x + padding.x * 2,
-             image_size.y + ImGui::GetTextLineHeight() + padding.y * 3);
-
-  // Create an invisible button for interaction
-  ImGui::InvisibleButton("character_card", total_size);
+  // Use fixed card size for the invisible button
+  ImGui::InvisibleButton("character_card", ImVec2(CARD_WIDTH, CARD_HEIGHT));
   const bool is_hovered = ImGui::IsItemHovered();
   const bool is_clicked = ImGui::IsItemClicked();
 
-  // Draw rounded rectangle background
-  ImDrawList* draw_list = ImGui::GetWindowDrawList();
+  // Get the position and size of the invisible button
   const ImVec2 min = ImGui::GetItemRectMin();
   const ImVec2 max = ImGui::GetItemRectMax();
+  ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
+  // Draw rounded rectangle background
   draw_list->AddRectFilled(
       min, max, ImGui::GetColorU32(is_hovered ? hovered_color : color),
       rounding);
 
-  // Draw image with padding
-  ImGui::SetCursorScreenPos(ImVec2(min.x + padding.x, min.y + padding.y));
-  ImGui::Image((ImTextureID)(intptr_t)out_texture, image_size, ImVec2(0, 0),
-               ImVec2(1, 1));
+  // Position the image centered horizontally at the top with padding
+  const ImVec2 image_top_left(min.x + (CARD_WIDTH - IMAGE_X) / 2.0f,
+                              min.y + PADDING);
+  ImGui::SetCursorScreenPos(image_top_left);
+  ImGui::Image((ImTextureID)(intptr_t)out_texture, ImVec2(IMAGE_X, IMAGE_Y));
 
-  // Draw character name below image
-  ImGui::SetCursorScreenPos(
-      ImVec2(min.x + padding.x, min.y + image_size.y + padding.y * 2));
-  ImGui::TextWrapped("%s", _character->name().c_str());
+  // Calculate position for the character name
+  const std::string name = _character->name();
+  const float available_text_width = CARD_WIDTH - 2 * PADDING;
+  ImVec2 text_size =
+      ImGui::CalcTextSize(name.c_str(), nullptr, false, available_text_width);
+
+  // Center the text horizontally and position below the image
+  const ImVec2 text_pos(min.x + (CARD_WIDTH - text_size.x) / 2.0f,
+                        image_top_left.y + IMAGE_Y + PADDING);
+
+  ImGui::SetCursorScreenPos(text_pos);
+  ImGui::TextWrapped("%s", name.c_str());
 
   // Handle click
   if (is_clicked) {
-    std::cout << "clicked" << std::endl;
+    std::cout << "Clicked on character: " << _character->name() << std::endl;
   }
 
+  ImGui::SetCursorScreenPos(
+      ImVec2(image_top_left.x + CARD_WIDTH, image_top_left.y + CARD_HEIGHT));
   ImGui::PopID();
 }
 

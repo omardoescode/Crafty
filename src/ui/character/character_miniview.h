@@ -6,13 +6,15 @@
 namespace ui {
 class CharacterMiniView {
 public:
+  constexpr static float CARD_WIDTH = 100.0f;
+  constexpr static float CARD_HEIGHT = 130.0f;
+  constexpr static float IMAGE_X = 80.f;
+  constexpr static float IMAGE_Y = 80.f;
+
+public:
   CharacterMiniView(UIOptions&, std::shared_ptr<model::Character>);
   ~CharacterMiniView();
   void draw();
-
-private:
-  constexpr static float sz_x = 70;
-  constexpr static float sz_y = 70;
 
 private:
   /**
