@@ -12,7 +12,7 @@
 #include "stage/stage.h"
 #include "ui/editor/block_category_panel.h"
 #include "ui/main_menu_bar.h"
-#include "utils/MaterialSymbols.h"
+#include "utils/material_symbols.h"
 
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <SDL3/SDL_opengles2.h>

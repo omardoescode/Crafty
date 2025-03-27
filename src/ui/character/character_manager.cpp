@@ -6,9 +6,9 @@
 #include "character/character_miniview.h"
 #include "project_manager.h"
 #include "stage/stage_manager.h"
-#include "utils/MaterialSymbols.h"
 #include "utils/file_utils.h"
 #include "utils/images.h"
+#include "utils/material_symbols.h"
 
 namespace ui {
 CharacterManager::CharacterManager(UIOptions& options) : _options(options) {
