@@ -2,7 +2,6 @@
 #include <atomic>
 #include <cassert>
 #include <cstdlib>
-#include <iostream>
 #include "nfd.h"
 
 std::atomic<bool> is_dialog_open = false;
@@ -26,7 +25,6 @@ std::filesystem::path upload_file(const char* filter_list_title,
   nfdresult_t result = NFD_OpenDialog(&outPath, filter_input, 0, default_path);
 
   is_dialog_open = false;  // Reset flag
-  std::cout << outPath << std::endl;
 
   std::filesystem::path res;
 

@@ -124,8 +124,10 @@ add_library(ui
   ${UI_DIR}/editor/block_view.cpp 
 
   ${UI_DIR}/stage/stage.cpp 
+  ${UI_DIR}/stage/stage_manager.cpp 
 
-  ${UI_DIR}/character_manager/character_manager.cpp 
+  ${UI_DIR}/character/character_view.cpp 
+  ${UI_DIR}/character/character_manager.cpp 
 
   ${UI_DIR}/utils/images.cpp
   ${UI_DIR}/utils/file_utils.cpp

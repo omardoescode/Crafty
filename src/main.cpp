@@ -4,7 +4,7 @@
 #include "backends/imgui_impl_opengl3.h"
 #include "backends/imgui_impl_sdl3.h"
 #include "block/block_library.h"
-#include "character_manager/character_manager.h"
+#include "character/character_manager.h"
 #include "editor/block_canvas.h"
 #include "editor/block_picker.h"
 #include "imgui.h"

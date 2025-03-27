@@ -1,9 +1,9 @@
 #include "character_manager.h"
 #include <imgui.h>
 #include <cassert>
-#include <iostream>
 #include <thread>
 #include "project_manager.h"
+#include "stage/stage_manager.h"
 #include "utils/MaterialSymbols.h"
 #include "utils/file_utils.h"
 #include "utils/images.h"
@@ -48,7 +48,7 @@ void CharacterManager::upload_char(std::filesystem::path path) {
   std::thread([this, path, asset_folder]() {
     auto& mgr = model::ProjectManager::instance();
     auto new_char = mgr.add_character(path, asset_folder);
-    // TODO: Create a character view
+    StageManager::instance().add_character(new_char);
   }).detach();
 }
 
