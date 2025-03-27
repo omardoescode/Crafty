@@ -1,6 +1,7 @@
 #include "project_manager.h"
 #include <cassert>
 #include <filesystem>
+#include <iostream>
 #include <memory>
 #include <random>
 #include "character.h"
@@ -108,5 +109,12 @@ std::shared_ptr<Character> ProjectManager::add_character(
           *_current_project, x_pos_gen(gen), y_pos_gen(gen));
   new_char->add_sprite(new_asset->id());
   return new_char;
+}
+
+std::shared_ptr<Asset> ProjectManager::character_current_sprite(
+    std::shared_ptr<Character> character) {
+  auto asset_id = character->current_texture();
+  auto asset = _current_project->asset_store().get_entity(asset_id);
+  return asset;
 }
 }  // namespace model

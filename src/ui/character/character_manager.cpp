@@ -1,7 +1,9 @@
 #include "character_manager.h"
 #include <imgui.h>
 #include <cassert>
+#include <memory>
 #include <thread>
+#include "character/character_miniview.h"
 #include "project_manager.h"
 #include "stage/stage_manager.h"
 #include "utils/MaterialSymbols.h"
@@ -35,6 +37,11 @@ void CharacterManager::draw() {
     ImGui::PopFont();
     ImGui::EndGroup();
     ImGui::Separator();
+
+    // TODO: Render all characters in a scrollable view
+    for (auto& mv : _miniviews) {
+      mv->draw();
+    }
   }
   ImGui::EndChild();
 
@@ -48,7 +55,9 @@ void CharacterManager::upload_char(std::filesystem::path path) {
   std::thread([this, path, asset_folder]() {
     auto& mgr = model::ProjectManager::instance();
     auto new_char = mgr.add_character(path, asset_folder);
-    StageManager::instance().add_character(new_char);
+    StageManager::instance().add_character(_options, new_char);
+    auto new_miniview = std::make_shared<CharacterMiniView>(_options, new_char);
+    _miniviews.push_back(new_miniview);
   }).detach();
 }
 

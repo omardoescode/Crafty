@@ -10,7 +10,6 @@ set(MODEL_DIR ${CMAKE_SOURCE_DIR}/src/model)
 set(THIRDPARTY_DIR ${CMAKE_SOURCE_DIR}/src/thirdparty) 
 
 # Get opengl from system
-# TODO: Change to use FetchContent Instead too
 find_package(OpenGL REQUIRED)
 
 # Import FetchContent
@@ -127,6 +126,7 @@ add_library(ui
   ${UI_DIR}/stage/stage_manager.cpp 
 
   ${UI_DIR}/character/character_view.cpp 
+  ${UI_DIR}/character/character_miniview.cpp 
   ${UI_DIR}/character/character_manager.cpp 
 
   ${UI_DIR}/utils/images.cpp

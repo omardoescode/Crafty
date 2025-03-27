@@ -1,5 +1,6 @@
 #include "character_view.h"
 namespace ui {
-CharacterView::CharacterView(std::shared_ptr<model::Character> character)
-    : _character(character) {}
+CharacterView::CharacterView(UIOptions& options,
+                             std::shared_ptr<model::Character> character)
+    : _character(character), _options(options) {}
 }  // namespace ui

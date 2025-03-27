@@ -14,7 +14,8 @@ public:
 
   static StageManager& instance();
 
-  void add_character(std::shared_ptr<model::Character> character);
+  void add_character(UIOptions& options,
+                     std::shared_ptr<model::Character> character);
 
 private:
   StageManager() = default;

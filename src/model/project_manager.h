@@ -52,6 +52,12 @@ public:
   std::shared_ptr<Asset> add_asset(std::filesystem::path file_path,
                                    std::filesystem::path copy_folder);
 
+  /**
+   * @brief Get the Character sprite
+   */
+  std::shared_ptr<Asset> character_current_sprite(
+      std::shared_ptr<Character> character);
+
   bool has_project() const;
   std::shared_ptr<Project> project() const;
 

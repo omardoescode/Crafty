@@ -8,7 +8,7 @@
 namespace model {
 
 Character::Character(const std::string& id, Project& project, float x, float y)
-    : Serializable(id, project), _pos(x, y) {}
+    : Serializable(id, project), _pos(x, y), _current_texture_idx(0) {}
 void Character::add_sprite(const IDManager::IDType& id, int pos) {
   assert(project_.asset_store().has_entity(id) &&
          "Asset store doesn't have this ID");
@@ -44,6 +44,9 @@ void Character::set_pos(std::pair<float, float> new_pos) { _pos = new_pos; }
 unsigned Character::current_texture_idx() const { return _current_texture_idx; }
 
 const IDManager::IDType& Character::current_texture() const {
+  assert(!_sprites.empty() &&
+         "No sprites");  // TODO: Return a null value instead, because this
+                         // shouldn't be asserted
   return _sprites[_current_texture_idx];
 }
 
