@@ -1,4 +1,4 @@
-#include "BlockPicker.h"
+#include "block_picker.h"
 #include "block/block_library.h"
 #include "imgui.h"
 #include "ui_options.h"

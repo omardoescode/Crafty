@@ -1,4 +1,4 @@
-#include "Stage.h"
+#include "stage.h"
 #include <SDL3/SDL_render.h>
 #include "SDL3/SDL_opengl.h"
 #include "imgui.h"

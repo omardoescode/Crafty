@@ -2,7 +2,7 @@
 
 #include <map>
 #include <vector>
-#include "BlockView.h"
+#include "block_view.h"
 #include "ui_options.h"
 
 namespace ui {

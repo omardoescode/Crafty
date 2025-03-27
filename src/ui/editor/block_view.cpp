@@ -1,6 +1,5 @@
-#include "BlockView.h"
+#include "block_view.h"
 #include <memory>
-#include "block/block_definition.h"
 #include "block/block_instance.h"
 #include "imgui.h"
 #include "ui_options.h"

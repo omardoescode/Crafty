@@ -1,5 +1,4 @@
-
-#include "MainMenuBar.h"
+#include "main_menu_bar.h"
 #include <imgui.h>
 namespace ui {
 MainMenuBar::MainMenuBar(UIOptions& options) : _options(options) {}

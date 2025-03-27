@@ -1,4 +1,4 @@
-#include "CharacterManager.h"
+#include "character_manager.h"
 #include <imgui.h>
 #include <cassert>
 #include <iostream>

@@ -116,16 +116,16 @@ target_link_libraries(imgui_sdl PUBLIC SDL3::SDL3 OpenGL::GL)
 # Build a library for ui
 add_library(ui
   ${UI_DIR}/ui_options.cpp 
-  ${UI_DIR}/MainMenuBar.cpp 
+  ${UI_DIR}/main_menu_bar.cpp 
 
-  ${UI_DIR}/editor/BlockCategoryPanel.cpp 
-  ${UI_DIR}/editor/BlockPicker.cpp 
-  ${UI_DIR}/editor/BlockCanvas.cpp 
-  ${UI_DIR}/editor/BlockView.cpp 
+  ${UI_DIR}/editor/block_category_panel.cpp 
+  ${UI_DIR}/editor/block_picker.cpp 
+  ${UI_DIR}/editor/block_canvas.cpp 
+  ${UI_DIR}/editor/block_view.cpp 
 
-  ${UI_DIR}/stage/Stage.cpp 
+  ${UI_DIR}/stage/stage.cpp 
 
-  ${UI_DIR}/character_manager/CharacterManager.cpp 
+  ${UI_DIR}/character_manager/character_manager.cpp 
 
   ${UI_DIR}/utils/images.cpp
   ${UI_DIR}/utils/file_utils.cpp

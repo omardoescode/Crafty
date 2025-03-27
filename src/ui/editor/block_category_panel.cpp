@@ -1,4 +1,4 @@
-#include "BlockCategoryPanel.h"
+#include "block_category_panel.h"
 #include <imgui.h>
 #include "block/block_library.h"
 

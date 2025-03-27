@@ -1,4 +1,4 @@
-#include "BlockCanvas.h"
+#include "block_canvas.h"
 #include <algorithm>
 #include <iostream>
 #include "imgui.h"
