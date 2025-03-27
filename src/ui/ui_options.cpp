@@ -1,6 +1,7 @@
 #include "ui_options.h"
 namespace ui {
-UIOptions::UIOptions() : _running{true} {}
+UIOptions::UIOptions(int args, char** argv)
+    : _running{true}, _args(args), _argv(argv) {}
 const bool& UIOptions::running() const { return _running; }
 void UIOptions::close() { _running = false; }
 

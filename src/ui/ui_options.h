@@ -23,7 +23,7 @@ public:
    * Initialize the various variables
    * TODO: Load Future Layout from a file
    */
-  UIOptions();
+  UIOptions(int args, char** argv);
 
   // App State
   const bool& running() const;
@@ -42,9 +42,14 @@ public:
   }
   ImFont* get_font(Font);
 
+  // Args, and argv
+  const char* get_path_name();
+
 private:
   bool _running;
   std::string _current_cateogry = "Motion";  // WARN: for debugging for now
   std::map<Font, ImFont*> _fonts;
+  int _args;
+  char** _argv;
 };
 }  // namespace ui

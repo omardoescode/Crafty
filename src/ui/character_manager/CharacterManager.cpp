@@ -1,6 +1,7 @@
 #include "CharacterManager.h"
 #include <imgui.h>
 #include <cassert>
+#include <experimental/filesystem>
 #include <iostream>
 #include <thread>
 #include "utils/MaterialSymbols.h"
