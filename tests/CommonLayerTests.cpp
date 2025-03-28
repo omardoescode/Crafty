@@ -68,7 +68,7 @@ TEST_F(EventDispatcherTest, EventInheritance) {
 TEST_F(EventDispatcherTest, ThreadSafetyMultiplePublish) {
   std::atomic<long long> result{0};
 
-  constexpr int sz = 100;
+  constexpr int sz = 10000;
   std::array<int, sz> arr;
   std::fill(begin(arr), end(arr), 10);
   int sum = std::accumulate(begin(arr), end(arr), 0);
@@ -96,8 +96,8 @@ TEST_F(EventDispatcherTest, ThreadSafetyMultiplePublish) {
 TEST_F(EventDispatcherTest, ThreadSafetyMultipleSubscribe) {
   std::atomic<long long> result{0};
 
-  constexpr int sub_count = 100;
-  constexpr int sz = 100;
+  constexpr int sub_count = 10000;
+  constexpr int sz = 10000;
   std::array<int, sz> arr;
   std::fill(begin(arr), end(arr), 10);
 
@@ -107,17 +107,24 @@ TEST_F(EventDispatcherTest, ThreadSafetyMultipleSubscribe) {
 
   std::vector<std::thread> threads;
   for (int i = 0; i < sub_count; i++)
-    dispatcher.subscribe<SimpleEvent>([&](std::shared_ptr<SimpleEvent> evt) {
-      int idx = (evt->val);
-      result += arr[idx];
+    threads.emplace_back([&]() {
+      dispatcher.subscribe<SimpleEvent>([&](std::shared_ptr<SimpleEvent> evt) {
+        int idx = (evt->val);
+        result += arr[idx];
+      });
     });
 
+  // Wait for all suscribing threads
+  for (auto& t : threads) {
+    t.join();
+  }
+  threads.clear();
   for (int i = 0; i < sz; i++) {
     threads.emplace_back(
         [&, i]() { dispatcher.publish(std::make_shared<SimpleEvent>(i)); });
   }
 
-  // Wait for all threads
+  // Wait for all publishing threads
   for (auto& t : threads) {
     t.join();
   }
