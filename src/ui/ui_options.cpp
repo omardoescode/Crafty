@@ -1,10 +1,20 @@
 #include "ui_options.h"
 #include <filesystem>
+#include <memory>
+#include "events/event_dispatcher.h"
+#include "events/events.h"
 #include "utils/platform.h"
 namespace ui {
 UIOptions::UIOptions(int args, char** argv)
     : _running{true}, _args(args), _argv(argv) {
   _path_name = get_executable_path().parent_path();
+
+  auto& dispatcher = common::EventDispatcher::instance();
+  dispatcher.subscribe<model::events::beforeCharacterDeleted>(
+      [this](std::shared_ptr<model::events::beforeCharacterDeleted> evt) {
+        auto& chr = evt->character;
+        if (chr == _current_character) _current_character = nullptr;
+      });
 }
 const bool& UIOptions::running() const { return _running; }
 void UIOptions::close() { _running = false; }

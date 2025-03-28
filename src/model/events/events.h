@@ -4,7 +4,14 @@
 
 namespace model::events {
 struct onCharacterCreated : public common::EventBase {
-  std::shared_ptr<Character> chr;
-  onCharacterCreated(std::shared_ptr<Character> chr) : chr{chr} {}
+  std::shared_ptr<Character> character;
+  onCharacterCreated(std::shared_ptr<Character> character)
+      : character{character} {}
+};
+
+struct beforeCharacterDeleted : public common::EventBase {
+  std::shared_ptr<Character> character;
+  beforeCharacterDeleted(std::shared_ptr<Character> character)
+      : character{character} {}
 };
 }  // namespace model::events

@@ -2,6 +2,7 @@
 #include <imgui.h>
 #include <cassert>
 #include <cmath>
+#include <iostream>
 #include <memory>
 #include "character/character_miniview.h"
 #include "events/event_dispatcher.h"
@@ -16,9 +17,19 @@ CharacterManager::CharacterManager(UIOptions& options) : _options(options) {
   auto& dispatcher = common::EventDispatcher::instance();
   dispatcher.subscribe<model::events::onCharacterCreated>(
       [this](std::shared_ptr<model::events::onCharacterCreated> evt) {
-        _miniviews.push_back(
-            std::make_shared<CharacterMiniView>(_options, evt->chr));
+        auto& chr = evt->character;
+        _miniviews.emplace(chr->id(),
+                           std::make_shared<CharacterMiniView>(_options, chr));
       });
+
+  dispatcher.subscribe<model::events::beforeCharacterDeleted>(
+      [this](std::shared_ptr<model::events::beforeCharacterDeleted> evt) {
+        auto& chr = evt->character;
+        auto itr = _miniviews.find(chr->id());
+        assert(itr != _miniviews.end());
+        _miniviews.erase(itr);
+      });
+
   upload_char(std::filesystem::path("./builtin/cat.png"));  // for debug
 }
 void CharacterManager::draw() {
@@ -50,7 +61,7 @@ void CharacterManager::draw() {
     ImGui::Columns(
         ImGui::GetContentRegionAvail().x / CharacterMiniView::CARD_WIDTH, NULL,
         false);
-    for (auto& mv : _miniviews) {
+    for (auto& [id, mv] : _miniviews) {
       mv->draw();
       ImGui::NextColumn();
     }

@@ -1,6 +1,7 @@
 #include "project_manager.h"
 #include <cassert>
 #include <filesystem>
+#include <iostream>
 #include <memory>
 #include <random>
 #include "character.h"
@@ -123,6 +124,8 @@ std::shared_ptr<Asset> ProjectManager::character_current_sprite(
 
 void ProjectManager::remove_character(const IDManager::IDType& character_id) {
   auto chr = _current_project->char_store().get_entity(character_id);
+  auto& dispatcher = common::EventDispatcher::instance();
+  dispatcher.publish(std::make_shared<events::beforeCharacterDeleted>(chr));
 
   // remove all sprites & scripts
   for (auto& sprite : chr->sprites()) {
@@ -133,6 +136,10 @@ void ProjectManager::remove_character(const IDManager::IDType& character_id) {
   }
 
   _current_project->char_store().remove_entity(character_id);
+
+  // The remaining reference is in this scope only
+  assert(chr.use_count() == 1 &&
+         "There are still remaining references to this object");
 }
 
 void ProjectManager::remove_asset(const IDManager::IDType& asset_id) {

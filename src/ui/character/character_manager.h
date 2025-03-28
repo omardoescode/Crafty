@@ -3,9 +3,12 @@
 #include <filesystem>
 #include <memory>
 #include <mutex>
-#include <vector>
+#include <type_traits>
+#include <unordered_map>
+#include "character.h"
 #include "character/character_miniview.h"
 #include "ui_options.h"
+#include "utils/ID_manager.h"
 namespace ui {
 class CharacterManager {
 private:
@@ -20,7 +23,13 @@ private:
 
 private:
   UIOptions& _options;
-  std::vector<std::shared_ptr<CharacterMiniView>> _miniviews;
+  std::unordered_map<model::IDManager::IDType,
+                     std::shared_ptr<CharacterMiniView>>
+      _miniviews;
+  // std::unordered_map<std::remove_const_t<std::remove_reference_t<
+  //                        decltype(std::declval<model::Character>().id())>>,
+  //                    std::shared_ptr<CharacterMiniView>>
+  //     _miniviews;
   std::mutex _miniviews_mtx;
 };
 }  // namespace ui
