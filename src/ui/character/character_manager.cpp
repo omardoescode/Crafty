@@ -4,6 +4,7 @@
 #include <cmath>
 #include <memory>
 #include "character/character_miniview.h"
+#include "character/character_view.h"
 #include "events/event_dispatcher.h"
 #include "events/events.h"
 #include "project_manager.h"
@@ -29,7 +30,7 @@ CharacterManager::CharacterManager(UIOptions& options) : _options(options) {
         _miniviews.erase(itr);
       });
 
-  upload_char(std::filesystem::path("./builtin/cat.png"));  // for debug
+  upload_char(std::filesystem::path("./builtin/cat.png"));
 }
 void CharacterManager::draw() {
   ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 7.0f);
@@ -44,14 +45,7 @@ void CharacterManager::draw() {
 
     ImGui::PushFont(_options.get_font(_options.ICONS_FONT_MEDIUM));
     if (ImGui::Button(ICON_MD_ADD)) {
-      auto default_path = _options.executable_path() / "builtin";
-      assert(std::filesystem::exists(default_path) &&
-             "Default path for uploading characters doesn't exist");
-      auto path = upload_file("Image Files", "png,jpg,jpeg,gif,bmp,webppng",
-                              default_path.c_str());
-      if (!path.empty()) {
-        upload_char(path);
-      }
+      handle_add_click();
     }
     ImGui::PopFont();
     ImGui::EndGroup();
@@ -72,12 +66,23 @@ void CharacterManager::draw() {
   ImGui::PopStyleVar();
 }
 
+void CharacterManager::handle_add_click() {
+  auto default_path = _options.executable_path() / "builtin";
+  assert(std::filesystem::exists(default_path) &&
+         "Default path for uploading characters doesn't exist");
+  auto path = upload_file("Image Files", "png,jpg,jpeg,gif,bmp,webppng",
+                          default_path.c_str());
+
+  if (!path.empty()) {
+    upload_char(path);
+  }
+}
+
 void CharacterManager::upload_char(std::filesystem::path path) {
   auto asset_folder = _options.asset_dest_folder();
   auto& mgr = model::ProjectManager::instance();
   auto new_char = mgr.add_character(path, asset_folder);
   _options.set_current_character(new_char);
-  // TODO: setup a subscription in the stage manager
 }
 
 }  // namespace ui

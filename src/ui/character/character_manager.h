@@ -17,6 +17,7 @@ public:
   void draw();
 
 private:
+  void handle_add_click();
   void upload_char(std::filesystem::path);
 
 private:
