@@ -47,7 +47,7 @@ std::shared_ptr<Object> Store<Object>::create_entity(T&&... args) {
 }
 template <typename Object>
 void Store<Object>::remove_entity(const IDManager::IDType& id) {
-  assert(_store.count(id) && "Store doesn't have this ID: " + id);
+  assert(_store.count(id) && "Store doesn't have this ID");
   _store.erase(id);
 }
 }  // namespace model

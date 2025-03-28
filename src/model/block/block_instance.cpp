@@ -1,4 +1,5 @@
 #include "block_instance.h"
+#include <cassert>
 #include "block/block_instance.h"
 #include "script.h"
 #include "utils/serializable.h"
@@ -24,4 +25,9 @@ std::shared_ptr<const BlockDefinition> BlockInstance::def() const {
 float BlockInstance::x() const { return _pos.first; }
 float BlockInstance::y() const { return _pos.second; }
 
+bool BlockInstance::has_body() { return _body.empty(); }
+IDManager::IDType BlockInstance::body() {
+  assert(has_body());
+  return _body;
+}
 }  // namespace model

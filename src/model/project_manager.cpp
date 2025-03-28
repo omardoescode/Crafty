@@ -1,10 +1,11 @@
 #include "project_manager.h"
 #include <cassert>
 #include <filesystem>
-#include <iostream>
 #include <memory>
 #include <random>
 #include "character.h"
+#include "events/event_dispatcher.h"
+#include "events/events.h"
 #include "utils/ID_manager.h"
 #include "utils/fs.h"
 
@@ -89,8 +90,8 @@ std::shared_ptr<Asset> ProjectManager::add_asset(fs::path file_path,
   return new_asset;
 }
 
-std::shared_ptr<Character> ProjectManager::add_character(
-    std::filesystem::path file_path, std::filesystem::path copy_folder) {
+void ProjectManager::add_character(std::filesystem::path file_path,
+                                   std::filesystem::path copy_folder) {
   assert(_current_project && "There's no current project");
   assert(fs::exists(file_path) && "File path doesn't exist");
   assert(fs::exists(copy_folder) && "Copy folder doesn't exist");
@@ -108,7 +109,9 @@ std::shared_ptr<Character> ProjectManager::add_character(
       _current_project->char_store().create_entity(
           *_current_project, x_pos_gen(gen), y_pos_gen(gen));
   new_char->add_sprite(new_asset->id());
-  return new_char;
+
+  auto& dispatcher = common::EventDispatcher::instance();
+  dispatcher.publish(std::make_shared<events::onCharacterCreated>(new_char));
 }
 
 std::shared_ptr<Asset> ProjectManager::character_current_sprite(
@@ -116,5 +119,40 @@ std::shared_ptr<Asset> ProjectManager::character_current_sprite(
   auto asset_id = character->current_texture();
   auto asset = _current_project->asset_store().get_entity(asset_id);
   return asset;
+}
+
+void ProjectManager::remove_character(const IDManager::IDType& character_id) {
+  auto chr = _current_project->char_store().get_entity(character_id);
+
+  // remove all sprites & scripts
+  for (auto& sprite : chr->sprites()) {
+    remove_asset(sprite);
+  }
+  for (auto& script : chr->scripts()) {
+    remove_script(script);
+  }
+
+  _current_project->char_store().remove_entity(character_id);
+}
+
+void ProjectManager::remove_asset(const IDManager::IDType& asset_id) {
+  _current_project->asset_store().remove_entity(asset_id);
+}
+
+void ProjectManager::remove_script(const IDManager::IDType& script_id) {
+  auto scr = _current_project->script_store().get_entity(script_id);
+  for (auto& blk : scr->blocks()) remove_block_instance(blk);
+  _current_project->asset_store().remove_entity(script_id);
+}
+
+void ProjectManager::remove_block_instance(
+    const IDManager::IDType& instance_id) {
+  auto blk = _current_project->instances_store().get_entity(instance_id);
+
+  // if has body, remove it
+  if (blk->has_body()) remove_block_instance(blk->body());
+
+  // remove
+  _current_project->instances_store().remove_entity(instance_id);
 }
 }  // namespace model

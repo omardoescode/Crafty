@@ -68,7 +68,7 @@ void Character::next_texture() {
 const std::vector<IDManager::IDType>& Character::scripts() const {
   return _scripts;
 }
-const std::vector<IDManager::IDType>& Character::textures() const {
+const std::vector<IDManager::IDType>& Character::sprites() const {
   return _sprites;
 }
 const std::string Character::name() const { return _name; }

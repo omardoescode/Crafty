@@ -27,7 +27,7 @@ public:
   void next_texture();
 
   const std::vector<IDManager::IDType>& scripts() const;
-  const std::vector<IDManager::IDType>& textures() const;
+  const std::vector<IDManager::IDType>& sprites() const;
 
   const std::string name() const;
   void set_name(const std::string& name);

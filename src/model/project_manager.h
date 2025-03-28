@@ -1,7 +1,9 @@
 #pragma once
 
 #include <filesystem>
+#include <functional>
 #include "project.h"
+#include "utils/ID_manager.h"
 namespace model {
 class ProjectManager {
 public:
@@ -42,8 +44,8 @@ public:
    * creating an asset and putting it to `copy_folder`, and then attaching this
    * asset to the newly created character
    */
-  std::shared_ptr<Character> add_character(std::filesystem::path file_path,
-                                           std::filesystem::path copy_folder);
+  void add_character(std::filesystem::path file_path,
+                     std::filesystem::path copy_folder);
 
   /**
    * @brief Copy an asset from `file_path` to folder `copy_folder` and then
@@ -51,6 +53,26 @@ public:
    */
   std::shared_ptr<Asset> add_asset(std::filesystem::path file_path,
                                    std::filesystem::path copy_folder);
+
+  /**
+   * @brief remove a character by using the id
+   */
+  void remove_character(const IDManager::IDType&);
+
+  /**
+   * @brief remove an asset by using the id
+   */
+  void remove_asset(const IDManager::IDType&);
+
+  /**
+   * @brief remove a script by using the id
+   */
+  void remove_script(const IDManager::IDType&);
+
+  /**
+   * @brief remove a block instance by using the id
+   */
+  void remove_block_instance(const IDManager::IDType&);
 
   /**
    * @brief Get the Character sprite

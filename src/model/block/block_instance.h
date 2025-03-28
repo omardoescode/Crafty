@@ -32,12 +32,14 @@ public:
   float x() const;
   float y() const;
 
+  bool has_body();
+  IDManager::IDType body();
   // TODO: Add metthod to control input slots
 private:
   std::shared_ptr<const BlockDefinition> _def;
   std::pair<float, float> _pos;
   std::vector<IDManager::IDType> _inputs;
   // TODO: handle script body
-  IDManager::IDType body;
+  IDManager::IDType _body;
 };
 }  // namespace model

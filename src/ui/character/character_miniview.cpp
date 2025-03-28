@@ -1,6 +1,7 @@
 #include "character_miniview.h"
 #include <cassert>
 #include "SDL3/SDL_opengl.h"
+#include "action_deferrer.h"
 #include "imgui.h"
 #include "project_manager.h"
 #include "ui_options.h"
@@ -96,9 +97,8 @@ void CharacterMiniView::load_texture_once() {
 
 void CharacterMiniView::draw_context_menu() {
   if (ImGui::BeginPopupContextItem()) {
-    if (ImGui::MenuItem("Set as Current")) {
+    if (ImGui::MenuItem("Set as Current"))
       _options.set_current_character(_character);
-    }
 
     if (ImGui::MenuItem("Rename")) {
       // Use the action deferrer to rename
@@ -110,6 +110,10 @@ void CharacterMiniView::draw_context_menu() {
 
     if (ImGui::MenuItem("Delete")) {
       // Use the action deferrer to delete
+      ActionDeferrer::instance().defer([this]() {
+        auto& dfr = model::ProjectManager::instance();
+        dfr.remove_character(_character->id());
+      });
     }
     ImGui::EndPopup();
   }

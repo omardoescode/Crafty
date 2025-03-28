@@ -4,14 +4,21 @@
 #include <cmath>
 #include <memory>
 #include "character/character_miniview.h"
+#include "events/event_dispatcher.h"
+#include "events/events.h"
 #include "project_manager.h"
-#include "stage/stage_manager.h"
 #include "utils/file_utils.h"
 #include "utils/images.h"
 #include "utils/material_symbols.h"
 
 namespace ui {
 CharacterManager::CharacterManager(UIOptions& options) : _options(options) {
+  auto& dispatcher = common::EventDispatcher::instance();
+  dispatcher.subscribe<model::events::onCharacterCreated>(
+      [this](std::shared_ptr<model::events::onCharacterCreated> evt) {
+        _miniviews.push_back(
+            std::make_shared<CharacterMiniView>(_options, evt->chr));
+      });
   upload_char(std::filesystem::path("./builtin/cat.png"));  // for debug
 }
 void CharacterManager::draw() {
@@ -58,10 +65,8 @@ void CharacterManager::draw() {
 void CharacterManager::upload_char(std::filesystem::path path) {
   auto asset_folder = _options.asset_dest_folder();
   auto& mgr = model::ProjectManager::instance();
-  auto new_char = mgr.add_character(path, asset_folder);
-  StageManager::instance().add_character(_options, new_char);
-  auto new_miniview = std::make_shared<CharacterMiniView>(_options, new_char);
-  _miniviews.push_back(new_miniview);
+  mgr.add_character(path, asset_folder);
+  // TODO: setup a subscription in the stage manager
 }
 
 }  // namespace ui

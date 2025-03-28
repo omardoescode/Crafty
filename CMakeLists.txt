@@ -92,8 +92,8 @@ add_library(model
   ${MODEL_DIR}/character.cpp
 )
 
-target_link_libraries(model PUBLIC nlohmann_json::nlohmann_json)
-target_include_directories(model PUBLIC ${MODEL_DIR}) # encapsulate model dir but only the public interface
+target_link_libraries(model PUBLIC common nlohmann_json::nlohmann_json)
+target_include_directories(model PUBLIC ${MODEL_DIR} ${COMMON_DIR}) # encapsulate model dir but only the public interface
 
 # Building the ImGUI library
 add_library(imgui_sdl
@@ -140,9 +140,8 @@ add_library(ui
   ${UI_DIR}/utils/file_utils.cpp
   ${UI_DIR}/utils/platform.cpp
 )
-target_link_libraries(ui PUBLIC imgui_sdl model nfd)
-target_include_directories(ui PUBLIC ${UI_DIR} ${THIRDPARTY_DIR})
-target_include_directories(ui PUBLIC ${UI_DIR})
+target_link_libraries(ui PUBLIC common imgui_sdl model nfd)
+target_include_directories(ui PUBLIC ${UI_DIR} ${THIRDPARTY_DIR} ${COMMON_DIR})
 # The executable
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
