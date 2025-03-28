@@ -2,7 +2,6 @@
 #include <imgui.h>
 #include <cassert>
 #include <cmath>
-#include <iostream>
 #include <memory>
 #include "character/character_miniview.h"
 #include "events/event_dispatcher.h"
@@ -76,7 +75,8 @@ void CharacterManager::draw() {
 void CharacterManager::upload_char(std::filesystem::path path) {
   auto asset_folder = _options.asset_dest_folder();
   auto& mgr = model::ProjectManager::instance();
-  mgr.add_character(path, asset_folder);
+  auto new_char = mgr.add_character(path, asset_folder);
+  _options.set_current_character(new_char);
   // TODO: setup a subscription in the stage manager
 }
 

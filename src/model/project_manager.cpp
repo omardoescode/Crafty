@@ -91,8 +91,8 @@ std::shared_ptr<Asset> ProjectManager::add_asset(fs::path file_path,
   return new_asset;
 }
 
-void ProjectManager::add_character(std::filesystem::path file_path,
-                                   std::filesystem::path copy_folder) {
+std::shared_ptr<Character> ProjectManager::add_character(
+    std::filesystem::path file_path, std::filesystem::path copy_folder) {
   assert(_current_project && "There's no current project");
   assert(fs::exists(file_path) && "File path doesn't exist");
   assert(fs::exists(copy_folder) && "Copy folder doesn't exist");
@@ -113,6 +113,8 @@ void ProjectManager::add_character(std::filesystem::path file_path,
 
   auto& dispatcher = common::EventDispatcher::instance();
   dispatcher.publish(std::make_shared<events::onCharacterCreated>(new_char));
+
+  return new_char;
 }
 
 std::shared_ptr<Asset> ProjectManager::character_current_sprite(
@@ -137,7 +139,8 @@ void ProjectManager::remove_character(const IDManager::IDType& character_id) {
 
   _current_project->char_store().remove_entity(character_id);
 
-  // The remaining reference is in this scope only
+  // The remaining reference is in this scope only, which will be deleted before
+  // this
   assert(chr.use_count() == 1 &&
          "There are still remaining references to this object");
 }

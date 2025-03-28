@@ -44,8 +44,8 @@ public:
    * creating an asset and putting it to `copy_folder`, and then attaching this
    * asset to the newly created character
    */
-  void add_character(std::filesystem::path file_path,
-                     std::filesystem::path copy_folder);
+  std::shared_ptr<Character> add_character(std::filesystem::path file_path,
+                                           std::filesystem::path copy_folder);
 
   /**
    * @brief Copy an asset from `file_path` to folder `copy_folder` and then

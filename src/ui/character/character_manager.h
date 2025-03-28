@@ -3,9 +3,7 @@
 #include <filesystem>
 #include <memory>
 #include <mutex>
-#include <type_traits>
 #include <unordered_map>
-#include "character.h"
 #include "character/character_miniview.h"
 #include "ui_options.h"
 #include "utils/ID_manager.h"
