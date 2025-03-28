@@ -8,6 +8,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS True)
 set(UI_DIR ${CMAKE_SOURCE_DIR}/src/ui) 
 set(MODEL_DIR ${CMAKE_SOURCE_DIR}/src/model)
 set(THIRDPARTY_DIR ${CMAKE_SOURCE_DIR}/src/thirdparty) 
+set(COMMON_DIR ${CMAKE_SOURCE_DIR}/src/common) 
 
 # Get opengl from system
 find_package(OpenGL REQUIRED)
@@ -67,6 +68,11 @@ FetchContent_Declare(
 message(STATUS "Fetching GTest ...")
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
+
+# Build a library for common
+add_library(common
+  ${COMMON_DIR}/events/event_dispatcher.cpp
+)
 
 # Build a library for model
 add_library(model
@@ -147,10 +153,11 @@ target_link_libraries(crafty PUBLIC ui)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}) # Back to normal
 enable_testing()
 
-add_executable(tests tests/ModelLayerTests.cpp)
-target_link_libraries(tests GTest::gtest_main model)
+add_executable(tests tests/ModelLayerTests.cpp tests/CommonLayerTests.cpp)
+target_link_libraries(tests GTest::gtest_main model common)
 target_include_directories(tests PRIVATE 
   ${MODEL_DIR}
+  ${COMMON_DIR}
 )
 include(GoogleTest)
 gtest_discover_tests(tests)
