@@ -7,11 +7,14 @@
 
 namespace model {
 
-Character::Character(const std::string& id, Project& project, float x, float y)
+Character::Character(const std::string& id, Project& project, float x, float y,
+                     float width)
     : Serializable(id, project),
       _pos(x, y),
       _current_texture_idx(0),
-      _name(id) {}
+      _name(id),
+      _width(width)  // TODO: Refactor this magic number
+{}
 
 void Character::add_sprite(const IDManager::IDType& id, int pos) {
   assert(project_.asset_store().has_entity(id) &&
@@ -74,4 +77,7 @@ const std::vector<IDManager::IDType>& Character::sprites() const {
 const std::string Character::name() const { return _name; }
 void Character::set_name(const std::string& name) { _name = name; }
 void Character::set_name(std::string&& name) { _name = std::move(name); }
+
+const float Character::width() const { return _width; }
+void Character::set_width(float width) { _width = width; }
 }  // namespace model

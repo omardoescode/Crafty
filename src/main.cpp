@@ -1,6 +1,7 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include <stdio.h>
+#include <iostream>
 #include "action_deferrer.h"
 #include "backends/imgui_impl_opengl3.h"
 #include "backends/imgui_impl_sdl3.h"
@@ -195,7 +196,8 @@ int main(int args, char **argv) {
     int right_width = options.RIGHT_SIDEBAR_WIDTH - style.WindowPadding.x;
     ImGui::BeginChild("RightSidebar", ImVec2(right_width, 0));
     ImGui::BeginChild("Stage",
-                      ImVec2(right_width, right_width / options.STAGE_ASPECT));
+                      ImVec2(right_width, right_width / options.STAGE_ASPECT),
+                      ImGuiChildFlags_None, ImGuiWindowFlags_NoScrollbar);
     stage.draw();
     ImGui::EndChild();
     character_mgr.draw();

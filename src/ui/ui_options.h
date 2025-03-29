@@ -59,6 +59,9 @@ public:
   std::filesystem::path executable_path();
   std::filesystem::path asset_dest_folder();
 
+  void set_stage_width(float);
+  std::pair<float, float> stage_cords() const;
+
 private:
   bool _running;
   std::string _current_cateogry = "Motion";  // WARN: for debugging for now
@@ -67,5 +70,6 @@ private:
   char** _argv;
   std::filesystem::path _path_name;
   std::shared_ptr<model::Character> _current_character;
+  float _stage_width;
 };
 }  // namespace ui

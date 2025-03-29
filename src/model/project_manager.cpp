@@ -10,10 +10,10 @@
 #include "utils/fs.h"
 
 namespace fs = std::filesystem;
-std::default_random_engine gen;
+std::random_device rd;
+std::default_random_engine gen(rd());
 
 namespace model {
-
 ProjectManager::ProjectManager() : _current_project(nullptr) {}
 
 ProjectManager& ProjectManager::instance() {
@@ -37,7 +37,7 @@ void ProjectManager::create() {
       std::make_unique<Store<BlockInstance>>(std::move(instances_mgr_id));
 
   _current_project = std::make_shared<Project>(
-      _untitled_project_name, std::move(char_store), std::move(script_store),
+      untitled_project_name, std::move(char_store), std::move(script_store),
       std::move(asset_store), std::move(instances_store));
 }
 
@@ -99,15 +99,19 @@ std::shared_ptr<Character> ProjectManager::add_character(
   assert(fs::is_directory(copy_folder) && "Copy folder is not a directory");
 
   // Get random coordinates
-  static std::uniform_int_distribution<int> x_pos_gen(0,
-                                                      _world_resolution.first);
-  static std::uniform_int_distribution<int> y_pos_gen(0,
-                                                      _world_resolution.first);
+  int x_margin = world_resolution.first / 4;
+  int y_margin = world_resolution.second / 4;
+
+  std::uniform_int_distribution<int> x_pos_gen(
+      x_margin, world_resolution.first - x_margin);
+  std::uniform_int_distribution<int> y_pos_gen(
+      y_margin, world_resolution.second - y_margin);
 
   std::shared_ptr<Asset> new_asset = add_asset(file_path, copy_folder);
   std::shared_ptr<Character> new_char =
       _current_project->char_store().create_entity(
-          *_current_project, x_pos_gen(gen), y_pos_gen(gen));
+          *_current_project, x_pos_gen(gen), y_pos_gen(gen),
+          100);  // TODO: Refactor this magic number
   new_char->add_sprite(new_asset->id());
 
   auto& dispatcher = common::EventDispatcher::instance();
@@ -138,8 +142,8 @@ void ProjectManager::remove_character(const IDManager::IDType& character_id) {
 
   _current_project->char_store().remove_entity(character_id);
 
-  // The remaining reference is in this scope only, which will be deleted before
-  // this
+  // The remaining reference is in this scope only, which will be deleted
+  // before this
   assert(chr.use_count() == 1 &&
          "There are still remaining references to this object");
 }

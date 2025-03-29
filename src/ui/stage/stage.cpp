@@ -1,23 +1,11 @@
 #include "stage.h"
 #include <SDL3/SDL_render.h>
-#include <iostream>
-#include "SDL3/SDL_opengl.h"
 #include "events/event_dispatcher.h"
 #include "events/events.h"
 #include "imgui.h"
 
 namespace ui {
-Stage::Stage(UIOptions& options, SDL_Renderer* renderer)
-    : _options(options), _sdlRenderer(renderer) {
-  assert(renderer && "nullptr to renderer");
-  // Create render target texture
-  _gameTexture =
-      SDL_CreateTexture(_sdlRenderer, SDL_PIXELFORMAT_RGBA32,
-                        SDL_TEXTUREACCESS_TARGET, _options.RIGHT_SIDEBAR_WIDTH,
-                        _options.RIGHT_SIDEBAR_WIDTH / _options.STAGE_ASPECT);
-
-  assert(_gameTexture && "Failed to create game texture");
-
+Stage::Stage(UIOptions& options, SDL_Renderer* renderer) : _options(options) {
   auto& dispatcher = common::EventDispatcher::instance();
   dispatcher.subscribe<model::events::onCharacterCreated>(
       [this](std::shared_ptr<model::events::onCharacterCreated> evt) {
@@ -34,10 +22,6 @@ Stage::Stage(UIOptions& options, SDL_Renderer* renderer)
       });
 }
 
-Stage::~Stage() {
-  if (_gameTexture) SDL_DestroyTexture(_gameTexture);
-}
-
 void Stage::draw() {
   ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
@@ -51,5 +35,11 @@ void Stage::draw() {
 
   draw_list->AddRectFilled(p_min, p_max, IM_COL32(255, 255, 255, 255),
                            _options.rounding);
+
+  _options.set_stage_width(_options.RIGHT_SIDEBAR_WIDTH);
+  // Draw The characters
+  for (auto& [id, chr_vw] : _characters_views) {
+    chr_vw->draw();
+  }
 }
 }  // namespace ui

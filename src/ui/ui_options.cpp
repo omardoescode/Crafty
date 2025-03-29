@@ -49,4 +49,8 @@ void UIOptions::set_current_character(
     std::shared_ptr<model::Character> character) {
   _current_character = character;
 }
+void UIOptions::set_stage_width(float width) { _stage_width = width; }
+std::pair<float, float> UIOptions::stage_cords() const {
+  return {_stage_width, _stage_width / STAGE_ASPECT};
+}
 }  // namespace ui

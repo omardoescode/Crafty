@@ -7,9 +7,10 @@
 namespace model {
 class ProjectManager {
 public:
-  constexpr static std::string _untitled_project_name = "Untitled";
-  constexpr static std::pair<float, float> _world_resolution = {
+  constexpr static std::pair<float, float> world_resolution = {
       640, 320};  // https://www.youtube.com/shorts/y_TwL5IfPxA
+private:
+  constexpr static std::string untitled_project_name = "Untitled";
 
 public:
   // remove copying

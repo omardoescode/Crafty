@@ -9,13 +9,10 @@ namespace ui {
 class Stage {
 public:
   Stage(UIOptions& options, SDL_Renderer* renderer);
-  ~Stage();
   void draw();
 
 private:
   UIOptions& _options;
-  SDL_Renderer* _sdlRenderer;
-  SDL_Texture* _gameTexture;
 
   // Model
   std::unordered_map<model::IDManager::IDType, std::shared_ptr<CharacterView>>

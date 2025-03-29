@@ -8,7 +8,8 @@ class BlockInstance;
 
 class Character : public Serializable {
 public:
-  Character(const IDManager::IDType& id, Project& project, float x, float y);
+  Character(const std::string& id, Project& project, float x, float y,
+            float width);
 
   void add_sprite(const IDManager::IDType& id, int pos = -1);
   void remove_sprite(const IDManager::IDType& id);
@@ -33,11 +34,17 @@ public:
   void set_name(const std::string& name);
   void set_name(std::string&& name);
 
+  const float width() const;
+  void set_width(float width);
+
 private:
   std::vector<IDManager::IDType> _sprites;
   std::vector<IDManager::IDType> _scripts;
   std::pair<float, float> _pos;
   size_t _current_texture_idx;
   std::string _name;
+  // The height is evaluated by multiplying the width by the ratio of height to
+  // width in runtime
+  float _width;
 };
 }  // namespace model
