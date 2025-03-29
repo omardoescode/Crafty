@@ -130,6 +130,9 @@ int main(int args, char **argv) {
   ui::Stage stage(options, renderer);
   ui::CharacterManager character_mgr(options);
 
+  // ImGui Style
+  ImGuiStyle &style = ImGui::GetStyle();
+
   // Main loop
   while (options.running()) {
     SDL_Event event;
@@ -167,53 +170,38 @@ int main(int args, char **argv) {
         ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove |
         ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings |
         ImGuiWindowFlags_NoBringToFrontOnFocus;
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
     ImGui::Begin("CraftyMainWindow", NULL, window_flags);
-    ImGui::PopStyleVar(2);
 
     // Draw UI components
     main_menu_bar.draw();
 
     // Left Sidebar
-    if (ImGui::BeginChild("Left Sidebar",
-                          ImVec2(options.LEFT_SIDEBAR_WIDTH, 0))) {
-      // Categorises Panel
-      ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 3.0f);
-      if (ImGui::BeginChild(
-              "BlockCategoryPanel", ImVec2(0, 0),
-              ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY)) {
-        block_category_panel.draw();
-        ImGui::EndChild();
-      }
-      ImGui::PopStyleVar();
+    ImGui::BeginChild(
+        "Left Sidebar", ImVec2(options.LEFT_SIDEBAR_WIDTH, -1),
+        ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY);
+    block_category_panel.draw();
+    picker.draw();
+    ImGui::EndChild();
 
-      if (ImGui::BeginChild("BlockPicker")) {
-        picker.draw();
-        ImGui::EndChild();
-      }
-
-      ImGui::EndChild();
-    }
     ImGui::SameLine();
-    if (ImGui::BeginChild("Canvas", ImVec2(ImGui::GetContentRegionAvail().x -
-                                               options.RIGHT_SIDEBAR_WIDTH,
-                                           -1))) {
-      canvas.draw();
-      ImGui::EndChild();
-    }
+    ImGui::BeginChild("Canvas", ImVec2(ImGui::GetContentRegionAvail().x -
+                                           options.RIGHT_SIDEBAR_WIDTH,
+                                       0));
+    canvas.draw();
+    ImGui::EndChild();
 
     ImGui::SameLine();
 
-    ImGui::BeginChild("RightSidebar",
-                      ImVec2(options.RIGHT_SIDEBAR_WIDTH - 8, 0));
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 8));
-    stage.draw();  // Find some way to specify the size
-    ImGui::PopStyleVar();
-    ImGui::BeginChild("CharacterManager");
+    int right_width = options.RIGHT_SIDEBAR_WIDTH - style.WindowPadding.x;
+    ImGui::BeginChild("RightSidebar", ImVec2(right_width, 0));
+    ImGui::BeginChild("Stage",
+                      ImVec2(right_width, right_width / options.STAGE_ASPECT));
+    stage.draw();
+    ImGui::EndChild();
     character_mgr.draw();
+
     ImGui::EndChild();
-    ImGui::EndChild();
+
     ImGui::End();
 
     // Rendering
@@ -225,7 +213,8 @@ int main(int args, char **argv) {
     SDL_GL_SwapWindow(window);
 
     // Flushing Actions
-    ui::ActionDeferrer::instance().flush();
+    auto &deferrer = ui::ActionDeferrer::instance();
+    deferrer.flush();
   }
 
   // Cleanup

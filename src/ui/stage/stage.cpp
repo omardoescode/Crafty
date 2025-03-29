@@ -1,5 +1,6 @@
 #include "stage.h"
 #include <SDL3/SDL_render.h>
+#include <iostream>
 #include "SDL3/SDL_opengl.h"
 #include "events/event_dispatcher.h"
 #include "events/events.h"
@@ -38,49 +39,17 @@ Stage::~Stage() {
 }
 
 void Stage::draw() {
-  if (!_gameTexture) return;
+  ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
-  // 1. Render game to texture
-  SDL_SetRenderTarget(_sdlRenderer, _gameTexture);
-  SDL_SetRenderDrawColor(_sdlRenderer, 0, 0, 0, 1);
-  SDL_RenderClear(_sdlRenderer);
+  // Get position AFTER accounting for padding (cursor position)
+  ImVec2 p_min = ImGui::GetCursorScreenPos();
 
-  // Your game rendering here...
+  // Get available space in current child window
+  ImVec2 size = ImGui::GetContentRegionAvail();
 
-  // 2. Reset render target
-  SDL_SetRenderTarget(_sdlRenderer, nullptr);
+  ImVec2 p_max(p_min.x + size.x, p_min.y + size.y);
 
-  // 3. Display in ImGui
-  if (ImGui::BeginChild("Game View", ImVec2(_options.RIGHT_SIDEBAR_WIDTH,
-                                            _options.RIGHT_SIDEBAR_WIDTH /
-                                                _options.STAGE_ASPECT))) {
-    // Get texture properties
-    SDL_PropertiesID props = SDL_GetTextureProperties(_gameTexture);
-
-    // Get OpenGL texture ID using SDL3 property string
-    const char* OPENGL_TEXTURE_PROP = "sdl.texture.opengl.texture";
-    GLuint glTextureID = static_cast<GLuint>(
-        SDL_GetNumberProperty(props, OPENGL_TEXTURE_PROP, 0));
-
-    // Get texture size
-    float texWidth, texHeight;
-    SDL_GetTextureSize(_gameTexture, &texWidth, &texHeight);
-
-    // Calculate display size
-    ImVec2 availSize = ImGui::GetContentRegionAvail();
-    float aspect = static_cast<float>(texWidth) / static_cast<float>(texHeight);
-    ImVec2 displaySize(availSize.x, availSize.x / aspect);
-
-    if (displaySize.y > availSize.y) {
-      displaySize.y = availSize.y;
-      displaySize.x = displaySize.y * aspect;
-    }
-
-    // Display the texture
-    ImGui::Image((intptr_t)glTextureID, displaySize,
-                 ImVec2(0, 1),  // UV coordinates
-                 ImVec2(1, 0));
-    ImGui::EndChild();
-  }
+  draw_list->AddRectFilled(p_min, p_max, IM_COL32(255, 255, 255, 255),
+                           _options.rounding);
 }
 }  // namespace ui

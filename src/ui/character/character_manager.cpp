@@ -4,7 +4,6 @@
 #include <cmath>
 #include <memory>
 #include "character/character_miniview.h"
-#include "character/character_view.h"
 #include "events/event_dispatcher.h"
 #include "events/events.h"
 #include "project_manager.h"
@@ -33,31 +32,31 @@ CharacterManager::CharacterManager(UIOptions& options) : _options(options) {
   upload_char(std::filesystem::path("./builtin/cat.png"));
 }
 void CharacterManager::draw() {
-  ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 7.0f);
+  ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, _options.rounding);
   ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(40, 40, 40, 255));
 
-  if (ImGui::BeginChild("RoundedContainer", ImVec2(0, 0), true)) {
-    ImGui::BeginGroup();
+  ImGui::BeginChild("RoundedContainer", ImVec2(0, 0), true);
+  ImGui::BeginGroup();
 
-    ImGui::AlignTextToFramePadding();
-    ImGui::Text("New Sprite: ");
-    ImGui::SameLine();
+  ImGui::AlignTextToFramePadding();
+  ImGui::Text("New Sprite: ");
+  ImGui::SameLine();
 
-    ImGui::PushFont(_options.get_font(_options.ICONS_FONT_MEDIUM));
-    if (ImGui::Button(ICON_MD_ADD)) {
-      handle_add_click();
-    }
-    ImGui::PopFont();
-    ImGui::EndGroup();
-    ImGui::Separator();
+  ImGui::PushFont(_options.get_font(_options.ICONS_FONT_MEDIUM));
+  if (ImGui::Button(ICON_MD_ADD)) {
+    handle_add_click();
+  }
+  ImGui::PopFont();
+  ImGui::EndGroup();
+  ImGui::Separator();
 
-    ImGui::Columns(
-        ImGui::GetContentRegionAvail().x / CharacterMiniView::CARD_WIDTH, NULL,
-        false);
-    for (auto& [id, mv] : _miniviews) {
-      mv->draw();
-      ImGui::NextColumn();
-    }
+  float available_width = ImGui::GetContentRegionAvail().x;
+  int num_columns = (int)(available_width / CharacterMiniView::CARD_WIDTH);
+  num_columns = std::max(1, num_columns);  // Ensure at least 1 column
+  ImGui::Columns(num_columns, NULL, false);
+  for (auto& [id, mv] : _miniviews) {
+    mv->draw();
+    ImGui::NextColumn();
   }
   ImGui::EndChild();
 

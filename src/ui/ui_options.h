@@ -11,6 +11,9 @@ public:
   const float LEFT_SIDEBAR_WIDTH = 200.0f;
   const float STAGE_ASPECT = 1.5f;
 
+  // variable sized global variable
+  float rounding = 3.0f;
+
   enum Font {
     DEFAULT_FONT,
     ICONS_FONT_SMALL,

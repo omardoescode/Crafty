@@ -2,7 +2,6 @@
 #include <mutex>
 
 namespace common {
-
 EventDispatcher& EventDispatcher::instance() {
   static EventDispatcher instance;
   return instance;

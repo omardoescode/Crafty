@@ -1,7 +1,6 @@
 #include "project_manager.h"
 #include <cassert>
 #include <filesystem>
-#include <iostream>
 #include <memory>
 #include <random>
 #include "character.h"

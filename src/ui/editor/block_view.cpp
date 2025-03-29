@@ -25,14 +25,12 @@ void BlockView::draw() {
   if (is_hovered) ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
 
   ImGui::PushStyleVar(ImGuiStyleVar_PopupBorderSize, 0);
-  ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
   if (ImGui::BeginDragDropSource()) {
     ImGui::SetDragDropPayload("BlockInstance", &_block_instance,
                               sizeof(_block_instance));
     draw();  // draw the same thing over, bro this is genius xD
     ImGui::EndDragDropSource();
   }
-  ImGui::PopStyleVar();
   ImGui::PopStyleVar();
 
   // Draw over the reserved space
