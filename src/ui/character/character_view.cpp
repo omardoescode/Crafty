@@ -26,16 +26,22 @@ void CharacterView::draw() {
   ImGui::GetWindowDrawList()->AddCircle(ImGui::GetMousePos(), 5.0f,
                                         IM_COL32(255, 0, 0, 255));
   if (ImGui::IsItemActive() && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
-    ImVec2 mouse_delta = ImGui::GetMouseDragDelta();
+    ImVec2 mouse_delta = ImGui::GetMouseDragDelta(ImGuiMouseButton_Left);
 
     // Calculate new position in world (backend) coordinates
-    std::cout << res_x / mgr.world_resolution.first << std::endl;
-    float new_x = world_x + mouse_delta.x * res_x / mgr.world_resolution.first;
-    float new_y = world_y + mouse_delta.y * res_y / mgr.world_resolution.second;
+    const float scale_x = res_x / mgr.world_resolution.first;
+    const float scale_y = res_y / mgr.world_resolution.second;
+    const float uniform_scale = std::min(scale_x, scale_y);
+
+    float new_x = world_x + mouse_delta.x / uniform_scale;
+    float new_y = world_y + mouse_delta.y / uniform_scale;
 
     // Apply boundary constraints
-    new_x = std::clamp(new_x, 0.0f, mgr.world_resolution.first);
-    new_y = std::clamp(new_y, 0.0f, mgr.world_resolution.second);
+    const float max_x = mgr.world_resolution.first - _character->width();
+    const float max_y = mgr.world_resolution.second -
+                        (_character->width() * out_height / out_width);
+    new_x = std::clamp(new_x, 0.0f, max_x);
+    new_y = std::clamp(new_y, 0.0f, max_y);
 
     // Update character position
     _character->set_pos({new_x, new_y});
