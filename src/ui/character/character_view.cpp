@@ -1,4 +1,6 @@
 #include "character_view.h"
+#include <algorithm>
+#include <iostream>
 #include "imgui.h"
 #include "project_manager.h"
 #include "utils/images.h"
@@ -10,16 +12,43 @@ CharacterView::CharacterView(UIOptions& options,
 void CharacterView::draw() {
   load_texture_once();
 
-  auto [x, y] = _character->pos();
-  auto wid = _character->width();
+  auto [world_x, world_y] = _character->pos();
+  float wid = _character->width(), hei;
   auto [res_x, res_y] = _options.stage_cords();
-  x *= res_x / mgr.world_resolution.first;
-  y *= res_y / mgr.world_resolution.second;
-  wid *= res_x / mgr.world_resolution.first;
+  float screen_x = world_x * res_x / mgr.world_resolution.first;
+  float screen_y = world_y * res_y / mgr.world_resolution.second;
 
-  ImGui::SetCursorPos(ImVec2(x, y));
-  ImGui::Image((ImTextureID)(intptr_t)out_texture,
-               ImVec2(wid, wid * out_height / out_width));
+  wid *= res_x / mgr.world_resolution.first;
+  hei = wid * out_height / out_width;
+
+  ImGui::SetCursorPos(ImVec2(screen_x, screen_y));
+  ImGui::InvisibleButton("##drag_handle", ImVec2(wid, hei));
+  ImGui::GetWindowDrawList()->AddCircle(ImGui::GetMousePos(), 5.0f,
+                                        IM_COL32(255, 0, 0, 255));
+  if (ImGui::IsItemActive() && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
+    ImVec2 mouse_delta = ImGui::GetMouseDragDelta();
+
+    // Calculate new position in world (backend) coordinates
+    std::cout << res_x / mgr.world_resolution.first << std::endl;
+    float new_x = world_x + mouse_delta.x * res_x / mgr.world_resolution.first;
+    float new_y = world_y + mouse_delta.y * res_y / mgr.world_resolution.second;
+
+    // Apply boundary constraints
+    new_x = std::clamp(new_x, 0.0f, mgr.world_resolution.first);
+    new_y = std::clamp(new_y, 0.0f, mgr.world_resolution.second);
+
+    // Update character position
+    _character->set_pos({new_x, new_y});
+
+    // Reset drag delta (important for smooth dragging)
+    ImGui::ResetMouseDragDelta(ImGuiMouseButton_Left);
+  }
+  if (ImGui::IsItemHovered()) {
+    ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+  }
+
+  ImGui::SetCursorPos(ImVec2(screen_x, screen_y));
+  ImGui::Image((ImTextureID)(intptr_t)out_texture, ImVec2(wid, hei));
 }
 
 void CharacterView::load_texture_once() {
