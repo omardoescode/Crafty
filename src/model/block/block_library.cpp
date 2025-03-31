@@ -5,6 +5,8 @@
 #include <stdexcept>
 #include "block/block_definition.h"
 #include "block/block_instance.h"
+#include "logger/logger.h"
+#include "model_logger.h"
 #include "utils/fs.h"
 #include "utils/json.h"
 namespace model {
@@ -36,12 +38,12 @@ void BlockLibrary::_load_blocks() {
   auto initfile_path =
       construct_path(block_folder_pathname, block_initfile_pathname);
 
+  std::filesystem::path p(".");
+  assert(std::filesystem::exists(initfile_path));
   // Read _initfile
   json initfile = parse_json(initfile_path);
 
-#ifdef MODEL_LAYER_DEBUG
-  std::cout << "Successlly initiated initfile" << std::endl;
-#endif
+  model_logger.info("Successfully initiated initfile");
 
   // Clear first
   _block_definitions.clear();
@@ -55,15 +57,12 @@ void BlockLibrary::_load_blocks() {
     assert(std::filesystem::is_directory(dir_entry));
     _categories.push_back(dir_entry.filename());
 
-#ifdef MODEL_LAYER_DEBUG
-    std::cout << "Reading Category " << dir_entry << std::endl;
-#endif
+    model_logger.info("Reading Category: " + dir_entry.string());
     for (std::filesystem::path const& block_definition :
          std::filesystem::directory_iterator(dir_entry)) {
       assert(std::filesystem::is_regular_file(block_definition));
-#ifdef MODEL_LAYER_DEBUG
-      std::cout << "Reading block " << block_definition << std::endl;
-#endif
+
+      model_logger.info("Reading Block: " + block_definition.string());
 
       std::fstream file(block_definition);
       json block_def_json = json::parse(file);
@@ -73,11 +72,6 @@ void BlockLibrary::_load_blocks() {
       _block_definitions[def.id()] = std::make_shared<BlockDefinition>(def);
     }
   }
-
-#ifdef MODEL_LAYER_DEBUG
-  std::cout << "Finished Reading " << _block_definitions.size()
-            << " builtin blocks" << std::endl;
-#endif
 }
 
 BlockDefinition _parse_block(const json& js, const std::string& category) {

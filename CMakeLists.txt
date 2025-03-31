@@ -3,6 +3,8 @@ project(crafty)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_EXPORT_COMPILE_COMMANDS True)
+set(CMAKE_BUILD_TYPE DEBUG)
+set(GIT_VERBOSE false)
 
 # Set directory paths
 set(UI_DIR ${CMAKE_SOURCE_DIR}/src/ui) 
@@ -22,7 +24,7 @@ FetchContent_Declare(
   SDL3
   GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git"
   GIT_TAG release-3.2.8
-  GIT_PROGRESS TRUE
+  GIT_PROGRESS ${GIT_VERBOSE}
 )
 message(STATUS "Fetching SDL ...")
 FetchContent_MakeAvailable(SDL3)
@@ -32,7 +34,7 @@ FetchContent_Declare(
   imgui
   GIT_REPOSITORY "https://github.com/ocornut/imgui.git"
   GIT_TAG docking
-  GIT_PROGRESS TRUE
+  GIT_PROGRESS ${GIT_VERBOSE}
 )
 
 message(STATUS "Fetching imgui ...")
@@ -42,7 +44,7 @@ FetchContent_Declare(
   json 
   URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz
   GIT_TAG master
-  GIT_PROGRESS TRUE
+  GIT_PROGRESS ${GIT_VERBOSE}
 )
 
 message(STATUS "Fetching nlohmann/json ...")
@@ -53,6 +55,7 @@ FetchContent_Declare(
   nfd
   GIT_REPOSITORY https://github.com/btzy/nativefiledialog-extended
   GIT_TAG        master  
+  GIT_PROGRESS ${GIT_VERBOSE}
 )
 
 message(STATUS "Fetching nativefiledialong-extended ...")
@@ -64,6 +67,7 @@ FetchContent_MakeAvailable(nfd)
 FetchContent_Declare(
   googletest
   URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
+  GIT_PROGRESS ${GIT_VERBOSE}
 )
 message(STATUS "Fetching GTest ...")
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
@@ -72,6 +76,7 @@ FetchContent_MakeAvailable(googletest)
 # Build a library for common
 add_library(common
   ${COMMON_DIR}/events/event_dispatcher.cpp
+  ${COMMON_DIR}/logger/logger.cpp
 )
 
 # Build a library for model
@@ -90,6 +95,7 @@ add_library(model
   ${MODEL_DIR}/asset.cpp
   ${MODEL_DIR}/script.cpp
   ${MODEL_DIR}/character.cpp
+  ${MODEL_DIR}/model_logger.cpp
 )
 
 target_link_libraries(model PUBLIC common nlohmann_json::nlohmann_json)
@@ -121,6 +127,7 @@ target_link_libraries(imgui_sdl PUBLIC SDL3::SDL3 OpenGL::GL)
 # Build a library for ui
 add_library(ui
   ${UI_DIR}/ui_options.cpp 
+  ${UI_DIR}/ui_logger.cpp 
   ${UI_DIR}/main_menu_bar.cpp 
   ${UI_DIR}/action_deferrer.cpp 
 
@@ -151,11 +158,16 @@ target_link_libraries(crafty PUBLIC ui)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}) # Back to normal
 enable_testing()
 
-add_executable(tests tests/ModelLayerTests.cpp tests/CommonLayerTests.cpp)
-target_link_libraries(tests GTest::gtest_main model common)
+add_executable(tests 
+  tests/ModelLayerTests.cpp 
+  tests/CommonLayerTests.cpp
+  tests/UILayerTests.cpp
+)
+target_link_libraries(tests GTest::gtest_main model common ui)
 target_include_directories(tests PRIVATE 
   ${MODEL_DIR}
   ${COMMON_DIR}
+  ${UI_DIR}
 )
 include(GoogleTest)
 gtest_discover_tests(tests)

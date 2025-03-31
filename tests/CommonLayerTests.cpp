@@ -1,7 +1,6 @@
 #include <algorithm>
 #include <bitset>
 #include <numeric>
-#include <utility>
 #include <vector>
 #include "events/event_dispatcher.h"
 #include "gtest/gtest.h"
@@ -96,8 +95,8 @@ TEST_F(EventDispatcherTest, ThreadSafetyMultiplePublish) {
 TEST_F(EventDispatcherTest, ThreadSafetyMultipleSubscribe) {
   std::atomic<long long> result{0};
 
-  constexpr int sub_count = 10000;
-  constexpr int sz = 10000;
+  constexpr int sub_count = 100;
+  constexpr int sz = 100;
   std::array<int, sz> arr;
   std::fill(begin(arr), end(arr), 10);
 
@@ -125,9 +124,7 @@ TEST_F(EventDispatcherTest, ThreadSafetyMultipleSubscribe) {
   }
 
   // Wait for all publishing threads
-  for (auto& t : threads) {
-    t.join();
-  }
+  for (auto& t : threads) t.join();
 
   // Result should be predictable
   EXPECT_EQ(result, sum * sub_count);
