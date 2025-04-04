@@ -176,16 +176,33 @@ std::shared_ptr<Script> ProjectManager::add_script(
     float x, float y) {
   assert(_current_project && "No current project");
   std::shared_ptr<Script> script =
-      _current_project->script_store().create_entity(*_current_project, x, y);
+      _current_project->script_store().create_entity(*_current_project, chr, x,
+                                                     y);
   std::shared_ptr<BlockInstance> instance =
       _current_project->instances_store().create_entity(*_current_project, def);
 
   script->add_block_instance(instance->id());
   chr->add_script(script->id());
-  dispatcher.publish(std::make_shared<events::onScriptCreated>(script, chr));
+  dispatcher.publish(std::make_shared<events::onScriptCreated>(script));
 
   // model_logger("Script Created at x=" + std::to_string(x) +
   //              " and y=" + std::to_string(y));
   return script;
+}
+
+void ProjectManager::add_block_to_existing_script(
+    const IDManager::IDType& script_id,
+    std::shared_ptr<const BlockDefinition> definition, int position) {
+  auto script = _current_project->script_store().get_entity(script_id);
+
+  // Create the instance first and publish it
+  auto instance = _current_project->instances_store().create_entity(
+      *_current_project, definition);
+
+  int final_position = script->add_block_instance(instance->id(), position);
+
+  // Publish the event
+  dispatcher.publish(std::make_shared<events::onBlockInstanceAddToScript>(
+      script, instance, final_position));
 }
 }  // namespace model

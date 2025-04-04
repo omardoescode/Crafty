@@ -1,12 +1,15 @@
 #include "editor/script_view.h"
 #include <unistd.h>
 #include <memory>
+#include "events/event_dispatcher.h"
+#include "events/events.h"
 #include "imgui.h"
 #include "project_manager.h"
 #include "ui_logger.h"
 #include "ui_options.h"
 
 static auto& mgr = model::ProjectManager::instance();
+static auto& dispatcher = common::EventDispatcher::instance();
 
 namespace ui {
 ScriptView::ScriptView(UIOptions& options,
@@ -20,6 +23,13 @@ ScriptView::ScriptView(UIOptions& options,
   }
 
   // 2. TODO: Subscribe to instanceAddedToScript event
+  dispatcher.subscribe<model::events::onBlockInstanceAddToScript>(
+      [this](std::shared_ptr<model::events::onBlockInstanceAddToScript> evt) {
+        if (evt->script->id() != _script->id()) return;
+        instances_views[evt->instance->id()] =
+            std::make_shared<BlockView>(_options, evt->instance, false);
+        ui_logger("HELLO");
+      });
 }
 void ScriptView::draw() {
   ImGui::SetCursorScreenPos(
@@ -39,7 +49,7 @@ void ScriptView::draw() {
     ImGui::PopID();
 
     ImGui::PushID(i);
-    draw_drop_invisible_btn();
+    draw_drop_invisible_btn(i + 1);
     ImGui::PopID();
   }
 
@@ -47,7 +57,7 @@ void ScriptView::draw() {
   ImGui::EndChild();
 }
 
-void ScriptView::draw_drop_invisible_btn() {
+void ScriptView::draw_drop_invisible_btn(int position) {
   auto current_cursor = ImGui::GetCursorScreenPos();
   ImGui::SetCursorScreenPos(
       ImVec2(current_cursor.x, current_cursor.y - DRAG_BTN_HEIGHT / 2.f));
@@ -57,7 +67,11 @@ void ScriptView::draw_drop_invisible_btn() {
   if (ImGui::BeginDragDropTarget()) {
     if (const ImGuiPayload* payload =
             ImGui::AcceptDragDropPayload("BlockInstance")) {
-      // TODO: Add script to view
+      std::shared_ptr<model::BlockInstance> instance =
+          *static_cast<std::shared_ptr<model::BlockInstance>*>(payload->Data);
+
+      mgr.add_block_to_existing_script(_script->id(), instance->def(),
+                                       position);
     }
     ImGui::EndDragDropTarget();
   }

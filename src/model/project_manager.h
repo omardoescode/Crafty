@@ -66,6 +66,13 @@ public:
                                      float x, float y);
 
   /**
+   * @brief Create a block instance and add it to a script
+   */
+  void add_block_to_existing_script(
+      const IDManager::IDType& script_id,
+      std::shared_ptr<const BlockDefinition> definition, int position);
+
+  /**
    * @brief remove a character by using the id
    */
   void remove_character(const IDManager::IDType&);

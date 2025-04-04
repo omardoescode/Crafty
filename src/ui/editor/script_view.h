@@ -14,7 +14,7 @@ public:
 private:
   constexpr static float DRAG_BTN_HEIGHT = 16.f;
 
-  void draw_drop_invisible_btn();
+  void draw_drop_invisible_btn(int position);
 
 private:
   UIOptions& _options;

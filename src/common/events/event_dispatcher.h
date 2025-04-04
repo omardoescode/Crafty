@@ -13,6 +13,8 @@ public:
   virtual ~EventBase() = default;
 };
 
+// TODO: When an element is removed, and a function has `this` in the closure,
+// will this make a problem? Figure out and change this dependingly
 class EventDispatcher {
 public:
   EventDispatcher(EventDispatcher&) = delete;
