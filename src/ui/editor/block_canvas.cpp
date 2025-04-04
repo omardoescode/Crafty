@@ -89,8 +89,8 @@ void BlockCanvas::handle_canvas_drop() {
 
       // Create a script
       auto& mgr = model::ProjectManager::instance();
-      auto script = mgr.add_script(_options.current_character(),
-                                   instance->def(), pos.x, pos.y);
+      mgr.add_script(_options.current_character(), instance->def(), pos.x,
+                     pos.y);
     }
     ImGui::EndDragDropTarget();
   }

@@ -12,8 +12,7 @@ public:
   void draw();
 
 private:
-  constexpr static float DRAG_BTN_HEIGHT = 20;
-  constexpr static float DRAG_BTN_WIDTH = 100;
+  constexpr static float DRAG_BTN_HEIGHT = 16.f;
 
   void draw_drop_invisible_btn();
 

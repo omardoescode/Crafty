@@ -32,23 +32,36 @@ void ScriptView::draw() {
 
   // 1. Draw the scripts
   const auto& block_ids = _script->blocks();
-  for (const auto& block_id : _script->blocks()) {
-    ImGui::PushID(&block_id);
+  for (int i = 0; i < block_ids.size(); i++) {
+    const auto& block_id = block_ids[i];
+    ImGui::PushID(i);
     instances_views[block_id]->draw();
     ImGui::PopID();
-  }
 
-  // 2. Draw Invisible buttons to drop new blocks on
-  // TODO:
+    ImGui::PushID(i);
+    draw_drop_invisible_btn();
+    ImGui::PopID();
+  }
 
   ImGui::PopStyleVar();
   ImGui::EndChild();
 }
 
 void ScriptView::draw_drop_invisible_btn() {
-  auto current_cursor = ImGui::GetCursorPos();
-  ImGui::SetCursorPos(
-      ImVec2(current_cursor.x, current_cursor.y -= DRAG_BTN_HEIGHT));
-  ImGui::Button("##DUMMY", ImVec2(DRAG_BTN_WIDTH, DRAG_BTN_HEIGHT));
+  auto current_cursor = ImGui::GetCursorScreenPos();
+  ImGui::SetCursorScreenPos(
+      ImVec2(current_cursor.x, current_cursor.y - DRAG_BTN_HEIGHT / 2.f));
+
+  ImGui::InvisibleButton(
+      "", ImVec2(ImGui::GetContentRegionAvail().x, DRAG_BTN_HEIGHT));
+  if (ImGui::BeginDragDropTarget()) {
+    if (const ImGuiPayload* payload =
+            ImGui::AcceptDragDropPayload("BlockInstance")) {
+      // TODO: Add script to view
+    }
+    ImGui::EndDragDropTarget();
+  }
+
+  ImGui::SetCursorScreenPos(current_cursor);
 }
 }  // namespace ui
