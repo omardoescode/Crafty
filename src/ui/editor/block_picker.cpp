@@ -12,7 +12,7 @@ void BlockPicker::fetch_category_instances(const std::string& category_name) {
   auto blocks_definitions = lib.category_blocks(category_name);
 
   for (auto& block_def : blocks_definitions) {
-    BlockView view(_options, lib.create_dummy_instance(block_def->id()));
+    BlockView view(_options, lib.create_dummy_instance(block_def->id()), true);
     _views_per_category[category_name].push_back(view);
   }
 }

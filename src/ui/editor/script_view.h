@@ -12,6 +12,12 @@ public:
   void draw();
 
 private:
+  constexpr static float DRAG_BTN_HEIGHT = 20;
+  constexpr static float DRAG_BTN_WIDTH = 100;
+
+  void draw_drop_invisible_btn();
+
+private:
   UIOptions& _options;
   std::shared_ptr<model::Script> _script;
   std::unordered_map<model::IDManager::IDType, std::shared_ptr<BlockView>>

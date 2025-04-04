@@ -23,7 +23,7 @@ public:
   constexpr static int DIRECT_VALUE_BUFFER_SIZE = 8;
 
 public:
-  BlockView(UIOptions&, std::shared_ptr<model::BlockInstance>);
+  BlockView(UIOptions&, std::shared_ptr<model::BlockInstance>, bool);
   void draw();
 
 private:
@@ -58,5 +58,6 @@ private:
   std::vector<BlockPart> _parts;
   std::vector<std::shared_ptr<BlockView>> _inner_views;
   ImVec2 _size;
+  bool _draggable;
 };
 }  // namespace ui

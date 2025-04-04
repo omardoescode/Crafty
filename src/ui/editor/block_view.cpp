@@ -14,8 +14,9 @@
 namespace ui {
 // TODO: Refactor this mess
 BlockView::BlockView(UIOptions& options,
-                     std::shared_ptr<model::BlockInstance> instance)
-    : _options(options), _block_instance(instance) {
+                     std::shared_ptr<model::BlockInstance> instance,
+                     bool draggable)
+    : _options(options), _block_instance(instance), _draggable(draggable) {
   auto def = instance->def();
   std::stringstream name_stream(def->name());
   std::string word;
@@ -89,6 +90,7 @@ void BlockView::draw() {
 }
 
 void BlockView::handle_drag() {
+  if (!_draggable) return;
   ImGui::PushStyleVar(ImGuiStyleVar_PopupBorderSize, 0);
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
   // TODO: Move the cursor to be in the middle of the block
