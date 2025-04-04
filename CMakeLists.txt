@@ -105,6 +105,8 @@ target_include_directories(model PUBLIC ${MODEL_DIR} ${COMMON_DIR}) # encapsulat
 add_library(imgui_sdl
   ${imgui_SOURCE_DIR}/imgui.cpp
   ${imgui_SOURCE_DIR}/imgui.h
+  ${imgui_SOURCE_DIR}/misc/cpp/imgui_stdlib.cpp
+  ${imgui_SOURCE_DIR}/misc/cpp/imgui_stdlib.h
   ${imgui_SOURCE_DIR}/imconfig.h
   ${imgui_SOURCE_DIR}/imgui_demo.cpp
   ${imgui_SOURCE_DIR}/imgui_draw.cpp
@@ -148,14 +150,11 @@ add_library(ui
 )
 target_link_libraries(ui PUBLIC common imgui_sdl model nfd)
 target_include_directories(ui PUBLIC ${UI_DIR} ${THIRDPARTY_DIR} ${COMMON_DIR})
-# The executable
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 add_executable(crafty src/main.cpp)
 target_link_libraries(crafty PUBLIC ui)
 
 # Testing
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}) # Back to normal
 enable_testing()
 
 add_executable(tests 
@@ -174,7 +173,7 @@ gtest_discover_tests(tests)
 
 # Copy assets
 message("Copying assets and data")
-file(COPY assets DESTINATION ${CMAKE_BINARY_DIR}/bin)
-file(COPY data DESTINATION ${CMAKE_BINARY_DIR}/bin)
-file(COPY builtin DESTINATION ${CMAKE_BINARY_DIR}/bin)
+file(COPY assets DESTINATION ${CMAKE_BINARY_DIR})
+file(COPY data DESTINATION ${CMAKE_BINARY_DIR})
+file(COPY builtin DESTINATION ${CMAKE_BINARY_DIR})
 message("Finishing copying")

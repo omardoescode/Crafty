@@ -17,8 +17,10 @@ BlockDefinition::BlockDefinition(const BlockLibrary::BlockDefIDType& id,
 const BlockLibrary::BlockDefIDType& BlockDefinition::id() const { return _id; }
 const std::string& BlockDefinition::name() const { return _name; }
 const std::string& BlockDefinition::category() const { return _category; }
-const std::vector<BlockDefinition::InputSlot>& BlockDefinition::inputs() {
+const std::vector<BlockDefinition::InputSlot>& BlockDefinition::inputs() const {
   return _inputs;
 }
-const BlockDefinition::OutputSlot& BlockDefinition::output() { return _output; }
+const BlockDefinition::OutputSlot& BlockDefinition::output() const {
+  return _output;
+}
 }  // namespace model

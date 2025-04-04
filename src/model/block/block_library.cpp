@@ -1,6 +1,5 @@
 #include "block/block_library.h"
 #include <filesystem>
-#include <fstream>
 #include <memory>
 #include <stdexcept>
 #include "block/block_definition.h"
@@ -9,6 +8,9 @@
 #include "model_logger.h"
 #include "utils/fs.h"
 #include "utils/json.h"
+
+namespace fs = std::filesystem;
+
 namespace model {
 BlockDefinition _parse_block(const json& js, const std::string& category);
 
@@ -38,8 +40,8 @@ void BlockLibrary::_load_blocks() {
   auto initfile_path =
       construct_path(block_folder_pathname, block_initfile_pathname);
 
-  std::filesystem::path p(".");
-  assert(std::filesystem::exists(initfile_path));
+  fs::path p(".");
+  assert(fs::exists(initfile_path));
   // Read _initfile
   json initfile = parse_json(initfile_path);
 
@@ -50,25 +52,23 @@ void BlockLibrary::_load_blocks() {
 
   // Start reading
   std::string data_directory = initfile.at("data_directory");
-  auto path = construct_path(block_folder_pathname, data_directory.c_str());
+  fs::path path = construct_path(block_folder_pathname, data_directory.c_str());
 
-  for (std::filesystem::path const& dir_entry :
-       std::filesystem::directory_iterator{path}) {
-    assert(std::filesystem::is_directory(dir_entry));
-    _categories.push_back(dir_entry.filename());
+  for (auto& category : initfile.at("categories")) {
+    _categories.push_back(category.at("name"));
 
-    model_logger.info("Reading Category: " + dir_entry.string());
-    for (std::filesystem::path const& block_definition :
-         std::filesystem::directory_iterator(dir_entry)) {
-      assert(std::filesystem::is_regular_file(block_definition));
+    std::string filename = category.at("name");
+    filename += ".json";
 
-      model_logger.info("Reading Block: " + block_definition.string());
+    fs::path category_path = path;
+    category_path /= filename;
 
-      std::fstream file(block_definition);
-      json block_def_json = json::parse(file);
-      BlockDefinition def = _parse_block(block_def_json, dir_entry.filename());
-      if (_block_definitions.count(def.id()) != 0)
-        throw std::runtime_error("Two blocks have the same ID");
+    assert(fs::exists(category_path));
+    model_logger.error("Reading category path: " + category_path.string());
+    json category_file = parse_json(category_path);
+
+    for (auto& blck : category_file) {
+      BlockDefinition def = _parse_block(blck, category.at("name"));
       _block_definitions[def.id()] = std::make_shared<BlockDefinition>(def);
     }
   }
@@ -110,8 +110,9 @@ const std::vector<std::string>& BlockLibrary::categories() const {
 std::vector<std::shared_ptr<const BlockDefinition>>
 BlockLibrary::category_blocks(const std::string& category) const {
   std::vector<std::shared_ptr<const BlockDefinition>> res;
-  for (const auto& [id, def] : _block_definitions)
+  for (const auto& [id, def] : _block_definitions) {
     if (def->category() == category) res.push_back(def);
+  }
 
   return res;
 }

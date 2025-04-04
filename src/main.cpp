@@ -180,6 +180,7 @@ int main(int args, char **argv) {
         "Left Sidebar", ImVec2(options.LEFT_SIDEBAR_WIDTH, -1),
         ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY);
     block_category_panel.draw();
+    ImGui::Separator();
     picker.draw();
     ImGui::EndChild();
 

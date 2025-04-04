@@ -1,6 +1,7 @@
 #include "block_picker.h"
 #include "block/block_library.h"
 #include "imgui.h"
+#include "ui_logger.h"
 #include "ui_options.h"
 
 namespace ui {
@@ -25,14 +26,10 @@ void BlockPicker::draw() {
 
   // Draw
   auto& views = _views_per_category[cur_category];
-  if (ImGui::BeginTable("Block Views", 1)) {
-    ImGui::TableHeadersRow();
-    for (int row = 0; row < views.size(); row++) {
-      ImGui::TableNextRow();
-      ImGui::TableSetColumnIndex(0);
-      views[row].draw();
-    }
-    ImGui::EndTable();
+  ImGui::Columns(1);
+  for (int row = 0; row < views.size(); row++) {
+    views[row].draw();
+    ImGui::NextColumn();
   }
 }
 }  // namespace ui

@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 namespace common {
-class Logger {
+class Logger {  // TODO: Change the design to cout anything, not only strings
 public:
   enum LogLevel { INFO = 0, WARN = 1, ERROR = 2 };
 
@@ -16,10 +16,16 @@ public:
   void warn(std::string&& message);
   void error(std::string&& message);
 
-  void warn(LogLevel);
+  void info(const std::string& message);
+  void warn(const std::string& message);
+  void error(const std::string& message);
+
+  void operator()(std::string&& message);
+  void operator()(const std::string& message);
 
 private:
   void print(std::string&& message, LogLevel lvl);
+  void print(const std::string& message, LogLevel lvl);
 
 private:
   std::string _prefix;

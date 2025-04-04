@@ -1,13 +1,13 @@
 [
   {
     "id": "motion_move",
-    "name": "move %1 steps",
+    "name": "move %0 steps",
     "has_body": false,
     "inputs": [
       {
         "label": "steps",
         "type": "Number",
-        "default_value": "1"
+        "default_value": "100"
       }
     ],
     "output": {
@@ -16,7 +16,7 @@
   },
   {
     "id": "hello",
-    "name": "Love %1 steps",
+    "name": "Love %0 steps",
     "has_body": false,
     "inputs": [
       {

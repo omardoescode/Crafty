@@ -1,6 +1,5 @@
 #include "character_view.h"
 #include <algorithm>
-#include <iostream>
 #include "imgui.h"
 #include "project_manager.h"
 #include "utils/images.h"

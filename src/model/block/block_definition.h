@@ -33,8 +33,8 @@ public:
   const BlockLibrary::BlockDefIDType& id() const;
   const std::string& name() const;
   const std::string& category() const;
-  const std::vector<InputSlot>& inputs();
-  const OutputSlot& output();
+  const std::vector<InputSlot>& inputs() const;
+  const OutputSlot& output() const;
 
 private:
   BlockLibrary::BlockDefIDType _id;
