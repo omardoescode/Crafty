@@ -1,5 +1,6 @@
 #include "block_canvas.h"
 #include <algorithm>
+#include "block/block_instance.h"
 #include "imgui.h"
 #include "ui_logger.h"
 #include "ui_options.h"
@@ -41,10 +42,10 @@ void BlockCanvas::draw() {
     if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(
             "BlockInstance", ImGuiDragDropFlags_AcceptNoDrawDefaultRect)) {
       // Success! Handle the payload
-      ui_logger.info("DragDropSuccess");
       // Access payload data:
-      // auto instance =
-      // *static_cast<std::shared_ptr<model::BlockInstance>*>(payload->Data);
+      std::shared_ptr<model::BlockInstance> instance =
+          *static_cast<std::shared_ptr<model::BlockInstance>*>(payload->Data);
+      ui_logger(instance->x());
     }
     ImGui::EndDragDropTarget();
   }

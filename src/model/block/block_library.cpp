@@ -26,6 +26,7 @@ BlockLibrary& BlockLibrary::instance() {
 
 void BlockLibrary::initialize() {
   if (_initialized) return;
+
   _load_blocks();
   _initialized = true;
 }
@@ -40,7 +41,6 @@ void BlockLibrary::_load_blocks() {
   auto initfile_path =
       construct_path(block_folder_pathname, block_initfile_pathname);
 
-  fs::path p(".");
   assert(fs::exists(initfile_path));
   // Read _initfile
   json initfile = parse_json(initfile_path);

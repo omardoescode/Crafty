@@ -91,7 +91,6 @@ void BlockView::draw() {
 void BlockView::handle_drag() {
   ImGui::PushStyleVar(ImGuiStyleVar_PopupBorderSize, 0);
   if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
-    ui_logger("Starts dragging");
     ImGui::SetDragDropPayload("BlockInstance", &_block_instance,
                               sizeof(_block_instance));
     draw();  // draw the same thing over, bro this is genius xD
