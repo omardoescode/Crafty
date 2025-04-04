@@ -130,6 +130,6 @@ std::shared_ptr<BlockInstance> BlockLibrary::create_dummy_instance(
   auto itr = _block_definitions.find(id);
   assert(itr != _block_definitions.end() && "ID not found in lib");
   return std::make_shared<BlockInstance>(BlockInstance::DUMMY_INSTANCE_ID,
-                                         *_project, itr->second, -1, -1);
+                                         *_project, itr->second);
 }
 }  // namespace model

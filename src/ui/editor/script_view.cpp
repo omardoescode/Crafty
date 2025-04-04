@@ -1,4 +1,5 @@
 #include "editor/script_view.h"
+#include <unistd.h>
 #include <memory>
 #include "imgui.h"
 #include "project_manager.h"
@@ -15,11 +16,6 @@ ScriptView::ScriptView(UIOptions& options,
     instances_views[block_id] = std::make_shared<BlockView>(_options, instance);
   }
 
-  // 2. Create the positon
-  auto first_instance =
-      mgr.project()->instances_store().get_entity(_script->blocks()[0]);
-  _pos = {first_instance->x(), first_instance->y()};
-
   // 2. TODO: Subscribe to instanceAddedToScript event
 }
 void ScriptView::draw() {
@@ -30,7 +26,8 @@ void ScriptView::draw() {
   const auto& block_ids = _script->blocks();
 
   // 1. Set the cursor for the first block instance
-  ImGui::SetCursorScreenPos(_pos);
+  ImGui::SetCursorScreenPos(
+      ImVec2(_script->pos().first, _script->pos().second));
 
   // 2. Draw the scripts
   for (const auto& block_id : _script->blocks()) {

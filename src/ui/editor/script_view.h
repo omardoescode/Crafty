@@ -16,6 +16,5 @@ private:
   std::shared_ptr<model::Script> _script;
   std::unordered_map<model::IDManager::IDType, std::shared_ptr<BlockView>>
       instances_views;
-  ImVec2 _pos;
 };
 }  // namespace ui

@@ -6,7 +6,6 @@
 #include "character.h"
 #include "events/event_dispatcher.h"
 #include "events/events.h"
-#include "model_logger.h"
 #include "utils/ID_manager.h"
 #include "utils/fs.h"
 
@@ -177,10 +176,9 @@ std::shared_ptr<Script> ProjectManager::add_script(
     float x, float y) {
   assert(_current_project && "No current project");
   std::shared_ptr<Script> script =
-      _current_project->script_store().create_entity(*_current_project);
+      _current_project->script_store().create_entity(*_current_project, x, y);
   std::shared_ptr<BlockInstance> instance =
-      _current_project->instances_store().create_entity(*_current_project, def,
-                                                        x, y);
+      _current_project->instances_store().create_entity(*_current_project, def);
 
   script->add_block_instance(instance->id());
   chr->add_script(script->id());
