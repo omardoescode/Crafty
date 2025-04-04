@@ -7,7 +7,7 @@ namespace model {
 class Project;
 class BlockInstance;
 
-class Script : Serializable {
+class Script : public Serializable {
 public:
   Script(const IDManager::IDType& id, Project& project);
 

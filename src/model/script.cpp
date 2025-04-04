@@ -11,8 +11,10 @@ Script::Script(const IDManager::IDType& id, Project& project)
 
 void Script::add_block_instance(const IDManager::IDType& id, int pos) {
   assert(project_.instances_store().has_entity(id));
-  if (pos < 0 || pos > _blocks.size()) pos = _blocks.size();
-  _blocks.insert(_blocks.begin() + pos, id);
+  if (pos < 0 || pos > _blocks.size())
+    _blocks.push_back(id);
+  else
+    _blocks.insert(_blocks.begin() + pos, id);
 }
 
 void Script::remove_block_instance(const IDManager::IDType& id) {

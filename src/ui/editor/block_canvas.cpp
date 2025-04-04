@@ -2,6 +2,7 @@
 #include <algorithm>
 #include "block/block_instance.h"
 #include "imgui.h"
+#include "project_manager.h"
 #include "ui_logger.h"
 #include "ui_options.h"
 
@@ -38,6 +39,9 @@ void BlockCanvas::draw() {
 
   // Handle Drop logic
   ImGui::InvisibleButton("##CanvasDummy", canvas_size);
+  handle_canvas_drop();
+}
+void BlockCanvas::handle_canvas_drop() {
   if (ImGui::BeginDragDropTarget()) {
     if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(
             "BlockInstance", ImGuiDragDropFlags_AcceptNoDrawDefaultRect)) {
@@ -45,7 +49,14 @@ void BlockCanvas::draw() {
       // Access payload data:
       std::shared_ptr<model::BlockInstance> instance =
           *static_cast<std::shared_ptr<model::BlockInstance>*>(payload->Data);
-      ui_logger(instance->x());
+
+      // Get the Mouse positon
+      auto pos = ImGui::GetIO().MousePos;
+
+      // Create a script
+      auto& mgr = model::ProjectManager::instance();
+      auto script = mgr.add_script(_options.current_character(),
+                                   instance->def(), pos.x, pos.y);
     }
     ImGui::EndDragDropTarget();
   }

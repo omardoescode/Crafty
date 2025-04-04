@@ -6,12 +6,15 @@
 #include "character.h"
 #include "events/event_dispatcher.h"
 #include "events/events.h"
+#include "model_logger.h"
 #include "utils/ID_manager.h"
 #include "utils/fs.h"
 
 namespace fs = std::filesystem;
 std::random_device rd;
 std::default_random_engine gen(rd());
+
+auto& dispatcher = common::EventDispatcher::instance();
 
 namespace model {
 ProjectManager::ProjectManager() : _current_project(nullptr) {}
@@ -114,7 +117,6 @@ std::shared_ptr<Character> ProjectManager::add_character(
           100);  // TODO: Refactor this magic number
   new_char->add_sprite(new_asset->id());
 
-  auto& dispatcher = common::EventDispatcher::instance();
   dispatcher.publish(std::make_shared<events::onCharacterCreated>(new_char));
 
   return new_char;
@@ -167,5 +169,24 @@ void ProjectManager::remove_block_instance(
 
   // remove
   _current_project->instances_store().remove_entity(instance_id);
+}
+
+std::shared_ptr<Script> ProjectManager::add_script(
+    std::shared_ptr<Character> chr, std::shared_ptr<const BlockDefinition> def,
+    float x, float y) {
+  assert(_current_project && "No current project");
+  std::shared_ptr<Script> script =
+      _current_project->script_store().create_entity(*_current_project);
+  std::shared_ptr<BlockInstance> instance =
+      _current_project->instances_store().create_entity(*_current_project, def,
+                                                        x, y);
+
+  script->add_block_instance(instance->id());
+  chr->add_script(script->id());
+  dispatcher.publish(std::make_shared<events::onScriptCreated>(script));
+
+  // model_logger("Script Created at x=" + std::to_string(x) +
+  //              " and y=" + std::to_string(y));
+  return script;
 }
 }  // namespace model

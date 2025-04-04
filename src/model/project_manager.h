@@ -2,6 +2,8 @@
 
 #include <filesystem>
 #include <functional>
+#include <memory>
+#include "block/block_definition.h"
 #include "project.h"
 #include "utils/ID_manager.h"
 namespace model {
@@ -54,6 +56,14 @@ public:
    */
   std::shared_ptr<Asset> add_asset(std::filesystem::path file_path,
                                    std::filesystem::path copy_folder);
+
+  /**
+   * @brief Create a script for character 'chr' with an initial bl ck definition
+   * to create an instance of in the script and place at position (x, y)
+   */
+  std::shared_ptr<Script> add_script(std::shared_ptr<Character> chr,
+                                     std::shared_ptr<const BlockDefinition> def,
+                                     float x, float y);
 
   /**
    * @brief remove a character by using the id
