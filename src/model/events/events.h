@@ -16,7 +16,14 @@ struct beforeCharacterDeleted : public common::EventBase {
       : character{character} {}
 };
 struct onScriptCreated : public common::EventBase {
-  std::shared_ptr<Script> instance;
-  onScriptCreated(std::shared_ptr<Script> script) : instance{script} {}
+  std::shared_ptr<Script> script;
+  std::shared_ptr<Character> character;
+  onScriptCreated(std::shared_ptr<Script> script,
+                  std::shared_ptr<Character> character)
+      : script{script}, character(character) {}
+};
+struct beforeScriptDeleted : public common::EventBase {
+  std::shared_ptr<Script> script;
+  beforeScriptDeleted(std::shared_ptr<Script> script) : script{script} {}
 };
 }  // namespace model::events

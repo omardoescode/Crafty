@@ -90,13 +90,15 @@ void BlockView::draw() {
 
 void BlockView::handle_drag() {
   ImGui::PushStyleVar(ImGuiStyleVar_PopupBorderSize, 0);
+  ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+  // TODO: Move the cursor to be in the middle of the block
   if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
     ImGui::SetDragDropPayload("BlockInstance", &_block_instance,
                               sizeof(_block_instance));
     draw();  // draw the same thing over, bro this is genius xD
     ImGui::EndDragDropSource();
   }
-  ImGui::PopStyleVar();
+  ImGui::PopStyleVar(2);
 }
 
 void BlockView::draw_parts() {

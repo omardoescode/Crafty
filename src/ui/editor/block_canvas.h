@@ -1,6 +1,10 @@
 #pragma once
 
+#include <memory>
+#include <unordered_map>
+#include "editor/script_view.h"
 #include "ui_options.h"
+#include "utils/ID_manager.h"
 namespace ui {
 class BlockCanvas {
 public:
@@ -12,5 +16,9 @@ private:
 
 private:
   UIOptions& _options;
+  // A Map from a character scripts to the character scripts
+  std::unordered_map<model::IDManager::IDType,
+                     std::vector<std::shared_ptr<ScriptView>>>
+      _script_views;
 };
 }  // namespace ui

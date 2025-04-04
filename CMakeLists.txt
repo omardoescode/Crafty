@@ -137,6 +137,7 @@ add_library(ui
   ${UI_DIR}/editor/block_picker.cpp 
   ${UI_DIR}/editor/block_canvas.cpp 
   ${UI_DIR}/editor/block_view.cpp 
+  ${UI_DIR}/editor/script_view.cpp 
 
   ${UI_DIR}/stage/stage.cpp 
 

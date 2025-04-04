@@ -155,9 +155,10 @@ void ProjectManager::remove_asset(const IDManager::IDType& asset_id) {
 }
 
 void ProjectManager::remove_script(const IDManager::IDType& script_id) {
-  auto scr = _current_project->script_store().get_entity(script_id);
-  for (auto& blk : scr->blocks()) remove_block_instance(blk);
-  _current_project->asset_store().remove_entity(script_id);
+  // TODO: Create this method
+  // auto scr = _current_project->script_store().get_entity(script_id);
+  // for (auto& blk : scr->blocks()) remove_block_instance(blk);
+  // _current_project->script_store().remove_entity(script_id);
 }
 
 void ProjectManager::remove_block_instance(
@@ -183,7 +184,7 @@ std::shared_ptr<Script> ProjectManager::add_script(
 
   script->add_block_instance(instance->id());
   chr->add_script(script->id());
-  dispatcher.publish(std::make_shared<events::onScriptCreated>(script));
+  dispatcher.publish(std::make_shared<events::onScriptCreated>(script, chr));
 
   // model_logger("Script Created at x=" + std::to_string(x) +
   //              " and y=" + std::to_string(y));

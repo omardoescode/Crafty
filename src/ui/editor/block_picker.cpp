@@ -28,7 +28,9 @@ void BlockPicker::draw() {
   auto& views = _views_per_category[cur_category];
   ImGui::Columns(1);
   for (int row = 0; row < views.size(); row++) {
+    ImGui::PushID(row);
     views[row].draw();
+    ImGui::PopID();
     ImGui::NextColumn();
   }
 }
