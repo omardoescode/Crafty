@@ -146,3 +146,36 @@ TEST_F(EventDispatcherTest, BasicUnsubscribe) {
   EXPECT_EQ(result, 0);
   dispatcher.clear_all();
 }
+
+TEST_F(EventDispatcherTest, UniqueIDS) {
+  std::set<common::EventDispatcher::handler_id> ids;
+  int result = 0;
+  constexpr int sz = 100;
+  for (int i = 0; i < sz; i++)
+    ids.insert(dispatcher.subscribe<SimpleEvent>(
+        [&](std::shared_ptr<SimpleEvent> evt) { result++; }));
+  EXPECT_EQ(ids.size(), sz);
+  dispatcher.clear_all();
+}
+
+TEST_F(EventDispatcherTest, BasicThreadSafetyUnsubscribe) {
+  std::set<common::EventDispatcher::handler_id> ids;
+  int result = 0;
+  for (int i = 0; i < 100; i++)
+    ids.insert(dispatcher.subscribe<SimpleEvent>(
+        [&](std::shared_ptr<SimpleEvent> evt) { result++; }));
+
+  std::vector<std::thread> threads;
+  for (auto& id : ids) {
+    threads.emplace_back(
+        std::thread([this, id]() { dispatcher.unsubscribe<SimpleEvent>(id); }));
+  }
+  for (auto& th : threads) th.join();
+
+  // Expect to do nothing, since all are unsubscribed
+  dispatcher.publish(std::make_shared<SimpleEvent>(3));
+
+  EXPECT_EQ(result, 0);
+  dispatcher.clear_all();  // unnecessary for this test, but should do it in
+                           // case if fails, others don't
+}
