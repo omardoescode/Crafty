@@ -11,11 +11,11 @@
 namespace ui {
 BlockCanvas::BlockCanvas(UIOptions& options) : _options(options) {
   auto& dispatcher = common::EventDispatcher::instance();
-  dispatcher.subscribe<model::events::onScriptCreated>(
+  _tkns.emplace_back(dispatcher.subscribe<model::events::onScriptCreated>(
       [this](std::shared_ptr<model::events::onScriptCreated> evt) {
         _script_views[evt->script->character()->id()].push_back(
             std::make_shared<ScriptView>(_options, evt->script));
-      });
+      }));
 }
 
 void BlockCanvas::draw() {

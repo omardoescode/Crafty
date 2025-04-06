@@ -11,26 +11,28 @@
 #include "utils/images.h"
 #include "utils/material_symbols.h"
 
+static auto& dispatcher = common::EventDispatcher::instance();
 namespace ui {
 CharacterManager::CharacterManager(UIOptions& options) : _options(options) {
-  auto& dispatcher = common::EventDispatcher::instance();
-  dispatcher.subscribe<model::events::onCharacterCreated>(
+  _tkns.emplace_back(dispatcher.subscribe<model::events::onCharacterCreated>(
       [this](std::shared_ptr<model::events::onCharacterCreated> evt) {
         auto& chr = evt->character;
         _miniviews.emplace(chr->id(),
                            std::make_shared<CharacterMiniView>(_options, chr));
-      });
+      }));
 
-  dispatcher.subscribe<model::events::beforeCharacterDeleted>(
-      [this](std::shared_ptr<model::events::beforeCharacterDeleted> evt) {
-        auto& chr = evt->character;
-        auto itr = _miniviews.find(chr->id());
-        assert(itr != _miniviews.end());
-        _miniviews.erase(itr);
-      });
+  _tkns.emplace_back(
+      dispatcher.subscribe<model::events::beforeCharacterDeleted>(
+          [this](std::shared_ptr<model::events::beforeCharacterDeleted> evt) {
+            auto& chr = evt->character;
+            auto itr = _miniviews.find(chr->id());
+            assert(itr != _miniviews.end());
+            _miniviews.erase(itr);
+          }));
 
   upload_char(std::filesystem::path("./builtin/cat.png"));
 }
+CharacterManager::~CharacterManager() {}
 void CharacterManager::draw() {
   ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, _options.rounding);
   ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(40, 40, 40, 255));

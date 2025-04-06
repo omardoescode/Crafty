@@ -3,6 +3,7 @@
 #include <memory>
 #include <unordered_map>
 #include "editor/script_view.h"
+#include "events/event_dispatcher.h"
 #include "ui_options.h"
 #include "utils/ID_manager.h"
 namespace ui {
@@ -20,5 +21,6 @@ private:
   std::unordered_map<model::IDManager::IDType,
                      std::vector<std::shared_ptr<ScriptView>>>
       _script_views;
+  std::vector<common::EventDispatcher::Token> _tkns;
 };
 }  // namespace ui

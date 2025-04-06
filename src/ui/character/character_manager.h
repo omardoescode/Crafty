@@ -3,8 +3,10 @@
 #include <filesystem>
 #include <memory>
 #include <mutex>
+#include <set>
 #include <unordered_map>
 #include "character/character_miniview.h"
+#include "events/event_dispatcher.h"
 #include "ui_options.h"
 #include "utils/ID_manager.h"
 namespace ui {
@@ -14,6 +16,7 @@ private:
 
 public:
   CharacterManager(UIOptions&);
+  ~CharacterManager();
   void draw();
 
 private:
@@ -30,5 +33,6 @@ private:
   //                    std::shared_ptr<CharacterMiniView>>
   //     _miniviews;
   std::mutex _miniviews_mtx;
+  std::vector<common::EventDispatcher::Token> _tkns;
 };
 }  // namespace ui

@@ -40,7 +40,7 @@ public:
 TEST_F(EventDispatcherTest, BasicTest) {
   constexpr int after = 42;
   int result = 0;
-  dispatcher.subscribe<SimpleEvent>(
+  auto tkn = dispatcher.subscribe<SimpleEvent>(
       [&](std::shared_ptr<SimpleEvent> evt) { result = evt->val; });
 
   dispatcher.publish(std::make_shared<SimpleEvent>(after));
@@ -57,10 +57,11 @@ TEST_F(EventDispatcherTest, EventInheritance) {
   const std::string after_s = "world";
   int result = 0;
   std::string msg = "";
-  dispatcher.subscribe<DerivedEvent>([&](std::shared_ptr<DerivedEvent> evt) {
-    result = evt->val;
-    msg = evt->msg;
-  });
+  auto tkn = dispatcher.subscribe<DerivedEvent>(
+      [&](std::shared_ptr<DerivedEvent> evt) {
+        result = evt->val;
+        msg = evt->msg;
+      });
 
   dispatcher.publish(std::make_shared<DerivedEvent>(after, after_s));
   EXPECT_EQ(result, after);
@@ -76,10 +77,11 @@ TEST_F(EventDispatcherTest, ThreadSafetyMultiplePublish) {
   int sum = std::accumulate(begin(arr), end(arr), 0);
 
   std::vector<std::thread> threads;
-  dispatcher.subscribe<SimpleEvent>([&](std::shared_ptr<SimpleEvent> evt) {
-    int idx = (evt->val);
-    result += arr[idx];
-  });
+  auto tkn =
+      dispatcher.subscribe<SimpleEvent>([&](std::shared_ptr<SimpleEvent> evt) {
+        int idx = (evt->val);
+        result += arr[idx];
+      });
 
   for (int i = 0; i < sz; i++) {
     threads.emplace_back(
@@ -111,10 +113,11 @@ TEST_F(EventDispatcherTest, ThreadSafetyMultipleSubscribe) {
   std::vector<std::thread> threads;
   for (int i = 0; i < sub_count; i++)
     threads.emplace_back([&]() {
-      dispatcher.subscribe<SimpleEvent>([&](std::shared_ptr<SimpleEvent> evt) {
-        int idx = (evt->val);
-        result += arr[idx];
-      });
+      auto tkn = dispatcher.subscribe<SimpleEvent>(
+          [&](std::shared_ptr<SimpleEvent> evt) {
+            int idx = (evt->val);
+            result += arr[idx];
+          });
     });
 
   // Wait for all suscribing threads
@@ -137,38 +140,26 @@ TEST_F(EventDispatcherTest, ThreadSafetyMultipleSubscribe) {
 
 TEST_F(EventDispatcherTest, BasicUnsubscribe) {
   int result = 0;
-  int id = dispatcher.subscribe<SimpleEvent>(
+  auto tkn = dispatcher.subscribe<SimpleEvent>(
       [&result](std::shared_ptr<SimpleEvent> evt) { result = evt->val; });
 
-  dispatcher.unsubscribe<SimpleEvent>(id);
+  tkn.unsubscribe();
   dispatcher.publish<SimpleEvent>(std::make_shared<SimpleEvent>(3));
 
   EXPECT_EQ(result, 0);
   dispatcher.clear_all();
 }
 
-TEST_F(EventDispatcherTest, UniqueIDS) {
-  std::set<common::EventDispatcher::handler_id> ids;
-  int result = 0;
-  constexpr int sz = 100;
-  for (int i = 0; i < sz; i++)
-    ids.insert(dispatcher.subscribe<SimpleEvent>(
-        [&](std::shared_ptr<SimpleEvent> evt) { result++; }));
-  EXPECT_EQ(ids.size(), sz);
-  dispatcher.clear_all();
-}
-
 TEST_F(EventDispatcherTest, BasicThreadSafetyUnsubscribe) {
-  std::set<common::EventDispatcher::handler_id> ids;
+  std::vector<common::EventDispatcher::Token> tkns;
   int result = 0;
   for (int i = 0; i < 100; i++)
-    ids.insert(dispatcher.subscribe<SimpleEvent>(
+    tkns.push_back(dispatcher.subscribe<SimpleEvent>(
         [&](std::shared_ptr<SimpleEvent> evt) { result++; }));
 
   std::vector<std::thread> threads;
-  for (auto& id : ids) {
-    threads.emplace_back(
-        std::thread([this, id]() { dispatcher.unsubscribe<SimpleEvent>(id); }));
+  for (auto& tkn : tkns) {
+    threads.emplace_back(std::thread([&]() { tkn.unsubscribe(); }));
   }
   for (auto& th : threads) th.join();
 
