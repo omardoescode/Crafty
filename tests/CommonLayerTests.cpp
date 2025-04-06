@@ -45,6 +45,8 @@ TEST_F(EventDispatcherTest, BasicTest) {
 
   dispatcher.publish(std::make_shared<SimpleEvent>(after));
   EXPECT_EQ(result, after);
+
+  dispatcher.clear_all();
 }
 
 TEST_F(EventDispatcherTest, NoSubscribersTest) {
@@ -63,6 +65,7 @@ TEST_F(EventDispatcherTest, EventInheritance) {
   dispatcher.publish(std::make_shared<DerivedEvent>(after, after_s));
   EXPECT_EQ(result, after);
   EXPECT_EQ(msg, after_s);
+  dispatcher.clear_all();
 }
 TEST_F(EventDispatcherTest, ThreadSafetyMultiplePublish) {
   std::atomic<long long> result{0};
@@ -90,6 +93,7 @@ TEST_F(EventDispatcherTest, ThreadSafetyMultiplePublish) {
 
   // Result should be predictable
   EXPECT_EQ(result, sum);
+  dispatcher.clear_all();
 }
 
 TEST_F(EventDispatcherTest, ThreadSafetyMultipleSubscribe) {
@@ -128,4 +132,17 @@ TEST_F(EventDispatcherTest, ThreadSafetyMultipleSubscribe) {
 
   // Result should be predictable
   EXPECT_EQ(result, sum * sub_count);
+  dispatcher.clear_all();
+}
+
+TEST_F(EventDispatcherTest, BasicUnsubscribe) {
+  int result = 0;
+  int id = dispatcher.subscribe<SimpleEvent>(
+      [&result](std::shared_ptr<SimpleEvent> evt) { result = evt->val; });
+
+  dispatcher.unsubscribe<SimpleEvent>(id);
+  dispatcher.publish<SimpleEvent>(std::make_shared<SimpleEvent>(3));
+
+  EXPECT_EQ(result, 0);
+  dispatcher.clear_all();
 }

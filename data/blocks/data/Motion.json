@@ -15,14 +15,49 @@
     }
   },
   {
-    "id": "hello",
-    "name": "Love %0 steps",
+    "id": "motion_go",
+    "name": "go to %0 x %1 y",
     "has_body": false,
     "inputs": [
       {
-        "label": "steps",
+        "label": "x",
         "type": "Number",
-        "default_value": "1"
+        "default_value": "0"
+      },
+      {
+        "label": "y",
+        "type": "Number",
+        "default_value": "0"
+      }
+    ],
+    "output": {
+      "type": "Exec"
+    }
+  },
+  {
+    "id": "motion_turn",
+    "name": "turn %0 clockwise",
+    "has_body": false,
+    "inputs": [
+      {
+        "label": "degrees",
+        "type": "Number",
+        "default_value": "0"
+      }
+    ],
+    "output": {
+      "type": "Exec"
+    }
+  },
+  {
+    "id": "motion_turn_anticlockwise",
+    "name": "turn %0 anticlockwise",
+    "has_body": false,
+    "inputs": [
+      {
+        "label": "degrees",
+        "type": "Number",
+        "default_value": "0"
       }
     ],
     "output": {
