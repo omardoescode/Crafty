@@ -3,7 +3,14 @@
 #include "action_deferrer.h"
 #include "gtest/gtest.h"
 
-TEST(ActionDeferrerTests, BasicTest) {
+class ActionDeferrerTest : public testing::Test {
+public:
+  void SetUp() override {}
+  void TearDown() override {}
+  ui::ActionDeferrer& deferrer = ui::ActionDeferrer::instance();
+};
+
+TEST_F(ActionDeferrerTest, BasicTest) {
   auto& deferrer = ui::ActionDeferrer::instance();
   int modified = 0;
 
@@ -16,9 +23,7 @@ TEST(ActionDeferrerTests, BasicTest) {
   EXPECT_EQ(modified, counter);
 }
 
-TEST(ActionDeferrerTests, MultiplePriority) {
-  auto& deferrer = ui::ActionDeferrer::instance();
-
+TEST_F(ActionDeferrerTest, MultiplePriority) {
   int result = 42;
   deferrer.defer([&]() { result = 20; }, 1);
   deferrer.defer([&]() { result = 23; }, 2);
@@ -28,8 +33,7 @@ TEST(ActionDeferrerTests, MultiplePriority) {
   EXPECT_EQ(result, 20);
 }
 
-TEST(ActionDeferrerTests, ThreadSafetyMultipleDeferring) {
-  auto& deferrer = ui::ActionDeferrer::instance();
+TEST_F(ActionDeferrerTest, ThreadSafetyMultipleDeferring) {
   int modified = 0;
 
   int counter = 100;
@@ -44,13 +48,18 @@ TEST(ActionDeferrerTests, ThreadSafetyMultipleDeferring) {
   EXPECT_EQ(modified, counter);
 }
 
-TEST(ActionDeferrerTests, DebugTagPrinting) {
-  auto& deferrer = ui::ActionDeferrer::instance();
+TEST_F(ActionDeferrerTest, DebugTagPrinting) {
   int modified = 0;
 
   int counter = 100;
   const int zero = 0;
   deferrer.defer([&]() { throw std::runtime_error("Hello"); });
 
+  // negate stdout
+  std::streambuf* originalStdout = std::cout.rdbuf();
+  std::cout.rdbuf(nullptr);
   EXPECT_NO_THROW(deferrer.flush());
+
+  // restore stdout
+  std::cout.rdbuf(originalStdout);
 }
