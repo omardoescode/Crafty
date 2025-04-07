@@ -3,7 +3,6 @@
 #include <filesystem>
 #include <memory>
 #include <mutex>
-#include <set>
 #include <unordered_map>
 #include "character/character_miniview.h"
 #include "events/event_dispatcher.h"
@@ -33,6 +32,6 @@ private:
   //                    std::shared_ptr<CharacterMiniView>>
   //     _miniviews;
   std::mutex _miniviews_mtx;
-  std::vector<common::EventDispatcher::Token> _tkns;
+  std::vector<common::EventDispatcher::TokenP> _tkns;
 };
 }  // namespace ui

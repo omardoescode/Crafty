@@ -23,7 +23,7 @@ ScriptView::ScriptView(UIOptions& options,
   }
 
   // 2. TODO: Subscribe to instanceAddedToScript event
-  dispatcher.subscribe<model::events::onBlockInstanceAddToScript>(
+  _instance_add_tkn = dispatcher.subscribe<model::events::onBlockInstanceAddToScript>(
       [this](std::shared_ptr<model::events::onBlockInstanceAddToScript> evt) {
         if (evt->script->id() != _script->id()) return;
         instances_views[evt->instance->id()] =

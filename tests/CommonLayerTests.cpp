@@ -1,23 +1,11 @@
 #include <algorithm>
 #include <bitset>
+#include <memory>
 #include <numeric>
 #include <vector>
 #include "events/event_dispatcher.h"
 #include "gtest/gtest.h"
 #include "string"
-
-// TEST(CommonLayerTests, InitializeEventDispatcher) {
-//   auto& dispatcher = common::EventDispatcher::instance();
-//   int before = 1;
-//   int after = 10;
-//   int res = before;
-//   dispatcher.subscribe<EventTest>(
-//       [&](std::shared_ptr<EventTest> evt) { res = evt->val; });
-//
-//   EXPECT_EQ(res, before);
-//   dispatcher.publish(std::make_shared<EventTest>(after));
-//   EXPECT_EQ(res, after);
-// }
 
 class EventDispatcherTest : public testing::Test {
 public:
@@ -32,7 +20,7 @@ public:
   };
 
   void SetUp() override { dispatcher.clear_all(); }
-  void TearDown() override {}
+  void TearDown() override { dispatcher.clear_all(); }
 
   common::EventDispatcher& dispatcher = common::EventDispatcher::instance();
 };
@@ -111,13 +99,14 @@ TEST_F(EventDispatcherTest, ThreadSafetyMultipleSubscribe) {
   int sum = std::accumulate(begin(arr), end(arr), 0);
 
   std::vector<std::thread> threads;
+  std::vector<common::EventDispatcher::TokenP> tkns;
   for (int i = 0; i < sub_count; i++)
     threads.emplace_back([&]() {
-      auto tkn = dispatcher.subscribe<SimpleEvent>(
+      tkns.emplace_back(dispatcher.subscribe<SimpleEvent>(
           [&](std::shared_ptr<SimpleEvent> evt) {
             int idx = (evt->val);
             result += arr[idx];
-          });
+          }));
     });
 
   // Wait for all suscribing threads
@@ -143,7 +132,7 @@ TEST_F(EventDispatcherTest, BasicUnsubscribe) {
   auto tkn = dispatcher.subscribe<SimpleEvent>(
       [&result](std::shared_ptr<SimpleEvent> evt) { result = evt->val; });
 
-  tkn.unsubscribe();
+  tkn->cancel();
   dispatcher.publish<SimpleEvent>(std::make_shared<SimpleEvent>(3));
 
   EXPECT_EQ(result, 0);
@@ -151,7 +140,7 @@ TEST_F(EventDispatcherTest, BasicUnsubscribe) {
 }
 
 TEST_F(EventDispatcherTest, BasicThreadSafetyUnsubscribe) {
-  std::vector<common::EventDispatcher::Token> tkns;
+  std::vector<common::EventDispatcher::TokenP> tkns;
   int result = 0;
   for (int i = 0; i < 100; i++)
     tkns.push_back(dispatcher.subscribe<SimpleEvent>(
@@ -159,7 +148,7 @@ TEST_F(EventDispatcherTest, BasicThreadSafetyUnsubscribe) {
 
   std::vector<std::thread> threads;
   for (auto& tkn : tkns) {
-    threads.emplace_back(std::thread([&]() { tkn.unsubscribe(); }));
+    threads.emplace_back(std::thread([&]() { tkn->cancel(); }));
   }
   for (auto& th : threads) th.join();
 

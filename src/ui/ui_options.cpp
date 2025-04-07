@@ -10,7 +10,7 @@ UIOptions::UIOptions(int args, char** argv)
   _path_name = get_executable_path().parent_path();
 
   auto& dispatcher = common::EventDispatcher::instance();
-  dispatcher.subscribe<model::events::beforeCharacterDeleted>(
+  auto tkn = dispatcher.subscribe<model::events::beforeCharacterDeleted>(
       [this](std::shared_ptr<model::events::beforeCharacterDeleted> evt) {
         auto& chr = evt->character;
         if (chr == _current_character) _current_character = nullptr;

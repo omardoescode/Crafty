@@ -21,6 +21,6 @@ private:
   std::unordered_map<model::IDManager::IDType,
                      std::vector<std::shared_ptr<ScriptView>>>
       _script_views;
-  std::vector<common::EventDispatcher::Token> _tkns;
+  std::vector<common::EventDispatcher::TokenP> _tkns;
 };
 }  // namespace ui

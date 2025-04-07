@@ -6,6 +6,7 @@
 #include "events/events.h"
 #include "imgui.h"
 #include "project_manager.h"
+#include "ui_logger.h"
 #include "ui_options.h"
 
 namespace ui {
@@ -15,6 +16,7 @@ BlockCanvas::BlockCanvas(UIOptions& options) : _options(options) {
       [this](std::shared_ptr<model::events::onScriptCreated> evt) {
         _script_views[evt->script->character()->id()].push_back(
             std::make_shared<ScriptView>(_options, evt->script));
+        ui_logger("HELLO");
       }));
 }
 
