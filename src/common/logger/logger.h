@@ -1,81 +1,75 @@
 #pragma once
 
 #include <unistd.h>
+#include <chrono>
+#include <cstdio>
 #include <iostream>
-#include <ostream>
+#include <print>
+#include <stdexcept>
 #include <string>
+#include <string_view>
+#include <utility>
 namespace common {
-class Logger {  // TODO: Change the design to cout anything, not only strings
+class Logger {
 public:
   enum LogLevel { INFO = 0, WARN = 1, ERROR = 2 };
 
-public:
   Logger(std::string&&, std::ostream& = std::cout, LogLevel = INFO);
   Logger(const std::string&, std::ostream& = std::cout, LogLevel = INFO);
 
-  void set_loglevel(LogLevel);
-
-  template <typename T>
-  void info(T&& message) {
-    print(std::move(message), INFO);
+  template <typename... Args>
+  void info(std::string_view fmt, Args&&... args) {
+    log(INFO, fmt, std::forward<Args>(args)...);
   }
-  template <typename T>
-  void warn(T&& message) {
-    print(std::move(message), WARN);
+  template <typename... Args>
+  void warn(std::string_view fmt, Args&&... args) {
+    log(WARN, fmt, std::forward<Args>(args)...);
   }
-  template <typename T>
-  void error(T&& message) {
-    print(std::move(message), ERROR);
-  }
-
-  template <typename T>
-  void info(const T& message) {
-    print(message, INFO);
-  }
-  template <typename T>
-  void warn(const T& message) {
-    print(message, WARN);
-  }
-  template <typename T>
-  void error(const T& message) {
-    print(message, ERROR);
-  }
-
-  template <typename T>
-  void operator()(T&& message) {
-    print(std::move(message), _lvl);
-  }
-  template <typename T>
-  void operator()(const T& message) {
-    print(message, _lvl);
+  template <typename... Args>
+  void error(std::string_view fmt, Args&&... args) {
+    LogMessage log_message =
+        generate_log_message(ERROR, fmt, std::forward<Args>(args)...);
+    throw std::runtime_error(log_message.message);
   }
 
 private:
-  template <typename T>
-  void print(T&& message, LogLevel lvl) {
-    if (lvl < _lvl) return;
-    if (is_terminal())
-      _out << color_codes[lvl] << "[" << _prefix << "] " << std::move(message)
-           << reset_code << std::endl;
-    else
-      _out << "[" << _prefix << "] " << std::move(message) << std::endl;
-    std::flush(_out);
-  }
-  template <typename T>
-  void print(const T& message, LogLevel lvl) {
-    if (lvl < _lvl) return;
-    if (is_terminal())
-      _out << color_codes[lvl] << "[" << _prefix << "] " << message
-           << reset_code << std::endl;
-    else
-      _out << "[" << _prefix << "] " << std::move(message) << std::endl;
+  struct LogMessage {
+    LogLevel level;
+    std::string message;
+    std::chrono::system_clock::time_point timestamp;
+  };
+
+  template <typename... Args>
+  LogMessage generate_log_message(LogLevel level, std::string_view fmt,
+                                  Args&&... args) {
+    auto timestamp = std::chrono::system_clock::now();
+    std::string message;
+
+    // TODO: Understand this part
+    if constexpr (std::is_same_v<std::remove_cvref_t<decltype(fmt)>,
+                                 const char*>) {
+      // If format string is a string literal
+      message = std::format(fmt, std::forward<Args>(args)...);
+    } else {
+      // If format string is a std::string or std::string_view
+      message = std::vformat(fmt, std::make_format_args(args...));
+    }
+
+    return {level, message, timestamp};
   }
 
-  bool is_terminal() const;
+  template <typename... Args>
+  void log(LogLevel level, std::string_view fmt, Args&&... args) {
+    LogMessage log_message =
+        generate_log_message(level, fmt, std::forward<Args>(args)...);
+    if (log_message.level >= _level) {
+      std::print(_out, "[{}] {}\n", _prefix, log_message.message);
+    }
+  }
 
 private:
   std::string _prefix;
-  LogLevel _lvl;
+  LogLevel _level;
   std::ostream& _out;
 
   static const char* color_codes[];
