@@ -6,7 +6,8 @@
 #include "character.h"
 #include "events/event_dispatcher.h"
 #include "events/events.h"
-#include "utils/ID_manager.h"
+#include "identity/id/id.h"
+#include "identity/id/prefixed_id_generator.h"
 #include "utils/fs.h"
 
 namespace fs = std::filesystem;
@@ -25,22 +26,22 @@ ProjectManager& ProjectManager::instance() {
 
 void ProjectManager::create() {
   assert(!_current_project && "There is a project already");
-  auto char_mgr_id = std::make_unique<IDManager>("char");
+  auto char_mgr_id = std::make_unique<PrefixedIDGenerator>("char");
   auto char_store = std::make_unique<Store<Character>>(std::move(char_mgr_id));
 
-  auto script_mgr_id = std::make_unique<IDManager>("script");
+  auto script_mgr_id = std::make_unique<PrefixedIDGenerator>("script");
   auto script_store = std::make_unique<Store<Script>>(std::move(script_mgr_id));
 
-  auto asset_mgr_id = std::make_unique<IDManager>("asset");
+  auto asset_mgr_id = std::make_unique<PrefixedIDGenerator>("asset");
   auto asset_store = std::make_unique<Store<Asset>>(std::move(asset_mgr_id));
 
-  auto instances_mgr_id = std::make_unique<IDManager>("instances");
+  auto instances_mgr_id = std::make_unique<PrefixedIDGenerator>("instances");
   auto instances_store =
       std::make_unique<Store<BlockInstance>>(std::move(instances_mgr_id));
 
   _current_project = std::make_shared<Project>(
-      untitled_project_name, std::move(char_store), std::move(script_store),
-      std::move(asset_store), std::move(instances_store));
+      std::move(char_store), std::move(script_store), std::move(asset_store),
+      std::move(instances_store));
 }
 
 void ProjectManager::save() {
@@ -128,7 +129,7 @@ std::shared_ptr<Asset> ProjectManager::character_current_sprite(
   return asset;
 }
 
-void ProjectManager::remove_character(const IDManager::IDType& character_id) {
+void ProjectManager::remove_character(IDPtr character_id) {
   auto chr = _current_project->char_store().get_entity(character_id);
   auto& dispatcher = common::EventDispatcher::instance();
   dispatcher.publish(std::make_shared<events::beforeCharacterDeleted>(chr));
@@ -149,19 +150,18 @@ void ProjectManager::remove_character(const IDManager::IDType& character_id) {
          "There are still remaining references to this object");
 }
 
-void ProjectManager::remove_asset(const IDManager::IDType& asset_id) {
+void ProjectManager::remove_asset(IDPtr asset_id) {
   _current_project->asset_store().remove_entity(asset_id);
 }
 
-void ProjectManager::remove_script(const IDManager::IDType& script_id) {
+void ProjectManager::remove_script(IDPtr id) {
   // TODO: Create this method
   // auto scr = _current_project->script_store().get_entity(script_id);
   // for (auto& blk : scr->blocks()) remove_block_instance(blk);
   // _current_project->script_store().remove_entity(script_id);
 }
 
-void ProjectManager::remove_block_instance(
-    const IDManager::IDType& instance_id) {
+void ProjectManager::remove_block_instance(IDPtr instance_id) {
   auto blk = _current_project->instances_store().get_entity(instance_id);
 
   // if has body, remove it
@@ -191,8 +191,8 @@ std::shared_ptr<Script> ProjectManager::add_script(
 }
 
 void ProjectManager::add_block_to_existing_script(
-    const IDManager::IDType& script_id,
-    std::shared_ptr<const BlockDefinition> definition, int position) {
+    IDPtr script_id, std::shared_ptr<const BlockDefinition> definition,
+    int position) {
   auto script = _current_project->script_store().get_entity(script_id);
 
   // Create the instance first and publish it

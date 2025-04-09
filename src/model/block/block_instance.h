@@ -1,13 +1,10 @@
 #pragma once
 
 #include <memory>
-#include <string>
-#include <utility>
 #include <vector>
 #include "block/block_definition.h"
 #include "block/block_library.h"
-#include "utils/ID_manager.h"
-#include "utils/serializable.h"
+#include "identity/serializable/serializable.h"
 
 namespace model {
 /**
@@ -18,25 +15,18 @@ namespace model {
  */
 class BlockInstance : public Serializable {
 public:
-  constexpr static std::string DUMMY_INSTANCE_ID = "";
-
-public:
-  BlockInstance(const IDManager::IDType&, Project& project,
+  BlockInstance(IDPtr id, Project& project,
                 std::shared_ptr<const BlockDefinition>);
-  BlockInstance(IDManager::IDType&&, Project& project,
-                std::shared_ptr<const BlockDefinition>);
-
-  bool is_dummy_instance() const;
 
   std::shared_ptr<const BlockDefinition> def() const;
 
   bool has_body();
-  IDManager::IDType body();
+  IDPtr body();
   // TODO: Add metthod to control input slots
 private:
   std::shared_ptr<const BlockDefinition> _def;
-  std::vector<IDManager::IDType> _inputs;
+  std::vector<IDPtr> _inputs;
   // TODO: handle script body
-  IDManager::IDType _body;
+  IDPtr _body;
 };
 }  // namespace model

@@ -1,18 +1,15 @@
 #pragma once
 
 #include <filesystem>
-#include <functional>
 #include <memory>
 #include "block/block_definition.h"
+#include "identity/id/id.h"
 #include "project.h"
-#include "utils/ID_manager.h"
 namespace model {
 class ProjectManager {
 public:
   constexpr static std::pair<float, float> world_resolution = {
       640, 320};  // https://www.youtube.com/shorts/y_TwL5IfPxA
-private:
-  constexpr static std::string untitled_project_name = "Untitled";
 
 public:
   // remove copying
@@ -67,30 +64,32 @@ public:
 
   /**
    * @brief Create a block instance and add it to a script
+   * @param id The script id to add this block to
+   * @param definition The block definition to create an instance of
+   * @param position The position to insert the instance at
    */
-  void add_block_to_existing_script(
-      const IDManager::IDType& script_id,
-      std::shared_ptr<const BlockDefinition> definition, int position);
+  void add_block_to_existing_script(IDPtr script_id, BlockDefPtr definition,
+                                    int position);
 
   /**
    * @brief remove a character by using the id
    */
-  void remove_character(const IDManager::IDType&);
+  void remove_character(IDPtr id);
 
   /**
    * @brief remove an asset by using the id
    */
-  void remove_asset(const IDManager::IDType&);
+  void remove_asset(IDPtr);
 
   /**
    * @brief remove a script by using the id
    */
-  void remove_script(const IDManager::IDType&);
+  void remove_script(IDPtr);
 
   /**
    * @brief remove a block instance by using the id
    */
-  void remove_block_instance(const IDManager::IDType&);
+  void remove_block_instance(IDPtr);
 
   /**
    * @brief Get the Character sprite

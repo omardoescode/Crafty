@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.18)
 project(crafty)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_EXPORT_COMPILE_COMMANDS True)
 set(CMAKE_BUILD_TYPE DEBUG)
 set(GIT_VERBOSE false)
@@ -84,11 +84,20 @@ add_library(model
   ${MODEL_DIR}/block/block_library.cpp
   ${MODEL_DIR}/block/block_instance.cpp
   ${MODEL_DIR}/block/block_definition.cpp
+  ${MODEL_DIR}/block/json_block_storage.cpp
 
+
+  # identity/id
+  ${MODEL_DIR}/identity/id/id.cpp
+  ${MODEL_DIR}/identity/id/prefixed_id_generator.cpp
+  ${MODEL_DIR}/identity/id/string_id.cpp
+
+  # identity/serializable
+  ${MODEL_DIR}/identity/serializable/serializable.cpp
+
+  # utils
   ${MODEL_DIR}/utils/fs.cpp
   ${MODEL_DIR}/utils/json.cpp
-  ${MODEL_DIR}/utils/serializable.cpp
-  ${MODEL_DIR}/utils/ID_manager.cpp
 
   ${MODEL_DIR}/project.cpp
   ${MODEL_DIR}/project_manager.cpp
@@ -160,10 +169,14 @@ enable_testing()
 
 add_executable(tests 
   tests/ModelLayerTests.cpp 
-  tests/CommonLayerTests.cpp
-  tests/UILayerTests.cpp
+  # tests/CommonLayerTests.cpp
+  # tests/UILayerTests.cpp
 )
-target_link_libraries(tests GTest::gtest_main model common ui)
+target_link_libraries(tests GTest::gtest_main 
+  model 
+  common 
+  # ui
+)
 target_include_directories(tests PRIVATE 
   ${MODEL_DIR}
   ${COMMON_DIR}

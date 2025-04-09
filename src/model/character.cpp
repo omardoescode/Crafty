@@ -2,42 +2,39 @@
 #include <algorithm>
 #include <cassert>
 #include "project.h"
-#include "utils/ID_manager.h"
-#include "utils/serializable.h"
 
 namespace model {
 
-Character::Character(const std::string& id, Project& project, float x, float y,
-                     float width)
+Character::Character(IDPtr id, Project& project, float x, float y, float width)
     : Serializable(id, project),
       _pos(x, y),
       _current_texture_idx(0),
-      _name(id),
+      _name(id->to_string()),
       _width(width)  // TODO: Refactor this magic number
 {}
 
-void Character::add_sprite(const IDManager::IDType& id, int pos) {
+void Character::add_sprite(IDPtr id, int pos) {
   assert(project_.asset_store().has_entity(id) &&
          "Asset store doesn't have this ID");
   if (pos < 0 || pos > _sprites.size()) pos = _sprites.size();
   _sprites.insert(_sprites.begin() + pos, id);
 }
 
-void Character::remove_sprite(const IDManager::IDType& id) {
+void Character::remove_sprite(IDPtr id) {
   auto it = std::remove(_sprites.begin(), _sprites.end(), id);
   assert(it != _sprites.end());
   _sprites.erase(it, _sprites.end());
 }
 bool Character::has_sprites() const { return !_sprites.empty(); }
 
-void Character::add_script(const IDManager::IDType& id, int pos) {
+void Character::add_script(IDPtr id, int pos) {
   assert(project_.script_store().has_entity(id) &&
          "Script store doesn't have this id");
   if (pos < 0 || pos > _scripts.size()) pos = _scripts.size();
   _scripts.insert(_scripts.begin() + pos, id);
 }
 
-void Character::remove_script(const IDManager::IDType& id) {
+void Character::remove_script(IDPtr id) {
   auto it = std::remove(_scripts.begin(), _scripts.end(), id);
   assert(it != _sprites.end());
   _scripts.erase(it, _scripts.end());
@@ -50,7 +47,7 @@ void Character::set_pos(std::pair<float, float> new_pos) { _pos = new_pos; }
 
 unsigned Character::current_texture_idx() const { return _current_texture_idx; }
 
-const IDManager::IDType& Character::current_texture() const {
+IDPtr Character::current_texture() const {
   assert(!_sprites.empty() &&
          "No sprites");  // TODO: Return a null value instead, because this
                          // shouldn't be asserted
@@ -68,12 +65,8 @@ void Character::next_texture() {
   _current_texture_idx++, _current_texture_idx %= _sprites.size();
 }
 
-const std::vector<IDManager::IDType>& Character::scripts() const {
-  return _scripts;
-}
-const std::vector<IDManager::IDType>& Character::sprites() const {
-  return _sprites;
-}
+const std::vector<IDPtr>& Character::scripts() const { return _scripts; }
+const std::vector<IDPtr>& Character::sprites() const { return _sprites; }
 const std::string Character::name() const { return _name; }
 void Character::set_name(const std::string& name) { _name = name; }
 void Character::set_name(std::string&& name) { _name = std::move(name); }

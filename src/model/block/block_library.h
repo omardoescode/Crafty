@@ -1,58 +1,44 @@
 #pragma once
-#include <map>
+#include <filesystem>
 #include <memory>
 #include <vector>
+#include "block_storage.h"
+#include "identity/id/id.h"
+
+/**
+ * @brief a Facade for Block Storage, an interface for handling blocks
+ */
 namespace model {
 class BlockDefinition;
 class BlockInstance;
 class Project;
+
 class BlockLibrary {
 public:
-  constexpr static std::string DUMMY_INSTANCE_ID = "";
-  static const char* block_folder_pathname;
-  static const char* block_initfile_pathname;
+  /**
+   * @brief a Config type for BlockLibrary Initialization
+   */
+  struct Config {
+    std::filesystem::path block_file_path;
+  };
 
-  typedef std::string BlockDefIDType;
+  /**
+   * @brief Constructor for BlockLibrary
+   * @param storage A repository for the block definitions
+   * @param config A `BlockLibrary::Config` struct for initialization
+   */
+  BlockLibrary(std::unique_ptr<BlockStorage> storage, const Config& config);
 
-public:
-  // remove copying for singltons
-  BlockLibrary(BlockLibrary&) = delete;
-  BlockLibrary& operator=(BlockLibrary&) = delete;
-
-  // Get instance
-  static BlockLibrary& instance();
-
-  // Initialize the block library
-  void initialize();
-
-  void load_project(std::shared_ptr<Project>);
-
-  void reload();
-
-  const std::vector<std::string>& categories() const;
+  std::vector<std::string> categories() const;
   std::vector<std::shared_ptr<const BlockDefinition>> category_blocks(
       const std::string& category) const;
 
   std::shared_ptr<const BlockDefinition> get_block_definition_by_id(
-      const BlockDefIDType&) const;
+      IDPtr) const;
 
-  std::shared_ptr<BlockInstance> create_dummy_instance(
-      const BlockDefIDType& id);
-
-private:
-  BlockLibrary();
-
-  void _load_blocks();
+  std::shared_ptr<BlockInstance> create_dummy_instance();
 
 private:
-  bool _initialized;
-  // TODO: Optimize category block queries by changing this design layer when
-  // refactoring
-  // TODO: Figure out some way to handle ordering because map doesn't care about
-  // what folder was scanned first
-  std::map<std::string, std::shared_ptr<const BlockDefinition>>
-      _block_definitions;
-  std::vector<std::string> _categories;
-  std::shared_ptr<Project> _project;
-};
+  std::unique_ptr<BlockStorage> _storage;
+};  // namespace model
 }  // namespace model

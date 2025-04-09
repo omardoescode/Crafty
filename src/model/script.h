@@ -1,8 +1,8 @@
 #pragma once
 #include <memory>
 #include <vector>
-#include "utils/ID_manager.h"
-#include "utils/serializable.h"
+#include "identity/id/id.h"
+#include "identity/serializable/serializable.h"
 
 namespace model {
 class Project;
@@ -11,15 +11,15 @@ class BlockInstance;
 
 class Script : public Serializable {
 public:
-  Script(const IDManager::IDType& id, Project& project,
-         std::shared_ptr<Character> character, float x, float y);
+  Script(const IDPtr id, Project& project, std::shared_ptr<Character> character,
+         float x, float y);
 
   /**
    * Add a block instance to the script
    * @return the new script position
    */
-  int add_block_instance(const IDManager::IDType& id, int pos = -1);
-  void remove_block_instance(const IDManager::IDType& id);
+  int add_block_instance(IDPtr id, int pos = -1);
+  void remove_block_instance(IDPtr id);
   bool has_block_instances() const;
 
   /**
@@ -29,10 +29,10 @@ public:
 
   const std::pair<float, float> pos() const;
 
-  const std::vector<IDManager::IDType>& blocks() const;
+  const std::vector<IDPtr>& blocks() const;
 
 private:
-  std::vector<IDManager::IDType> _blocks;
+  std::vector<IDPtr> _blocks;
   std::pair<float, float> _pos;
   std::shared_ptr<Character> _character;
 };
