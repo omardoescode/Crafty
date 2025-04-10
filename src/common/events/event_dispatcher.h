@@ -6,10 +6,10 @@
 #include <shared_mutex>
 #include <typeindex>
 #include <vector>
+#include "common_logger.h"
 #include "event_base.h"
 
 namespace common {
-// TODO: Refactor: stared discussion on claude
 class EventDispatcher {
 public:
   class Token;
@@ -119,7 +119,7 @@ public:
       try {
         handler.func(evt);
       } catch (const std::exception &) {
-        // TODO: Put in logger
+        common_logger().error("Failed to run handler\n");
       }
     }
   }

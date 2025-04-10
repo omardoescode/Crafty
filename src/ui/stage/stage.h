@@ -2,8 +2,9 @@
 #include <SDL3/SDL.h>
 #include <unordered_map>
 #include "character/character_view.h"
+#include "events/event_dispatcher.h"
+#include "identity/id.h"
 #include "ui_options.h"
-#include "utils/ID_manager.h"
 
 namespace ui {
 class Stage {
@@ -13,9 +14,11 @@ public:
 
 private:
   UIOptions& _options;
+  common::EventDispatcher::TokenP on_character_created_token;
+  common::EventDispatcher::TokenP before_character_deleted_token;
 
   // Model
-  std::unordered_map<model::IDManager::IDType, std::shared_ptr<CharacterView>>
+  std::unordered_map<model::IDPtr, std::shared_ptr<CharacterView>>
       _characters_views;
 };
 }  // namespace ui

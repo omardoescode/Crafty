@@ -1,8 +1,8 @@
 #include <map>
 #include <memory>
 #include "block/block_library.h"
-#include "identity/id/id.h"
-#include "identity/id/id_generator.h"
+#include "identity/id.h"
+#include "identity/id_generator.h"
 namespace model {
 class JsonBlockStorage : public BlockStorage {
 public:

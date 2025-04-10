@@ -8,6 +8,8 @@ public:
   PrefixedIDGenerator(const std::string& prefix, unsigned int start = 0);
   PrefixedIDGenerator(std::string&& prefix, unsigned int start = 0);
 
+  ~PrefixedIDGenerator() = default;
+
   /**
    * generates an auto-increment based ID
    */

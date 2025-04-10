@@ -1,14 +1,14 @@
 #pragma once
 
 #include <memory>
-#include "identity/id/store.h"
+#include "identity/store.h"
 
-#include "asset.h"
 #include "block/block_instance.h"
-#include "character.h"
-#include "script.h"
 namespace model {
-
+class Character;
+class Asset;
+class BlockInstance;
+class Script;
 class Project {
 public:
   Project(std::unique_ptr<Store<Character>>, std::unique_ptr<Store<Script>>,
@@ -25,4 +25,9 @@ private:
   std::unique_ptr<Store<Asset>> _asset_store;
   std::unique_ptr<Store<BlockInstance>> _instances_store;
 };
+
+/**
+ * @brief A type alias for a shared pointer to Project
+ */
+typedef std::shared_ptr<Project> ProjectPtr;
 }  // namespace model

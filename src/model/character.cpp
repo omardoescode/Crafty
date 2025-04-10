@@ -5,16 +5,15 @@
 
 namespace model {
 
-Character::Character(IDPtr id, Project& project, float x, float y, float width)
-    : Serializable(id, project),
+Character::Character(IDPtr id, float x, float y, float width, bool serialize)
+    : Serializable(id, serialize),
       _pos(x, y),
       _current_texture_idx(0),
       _name(id->to_string()),
-      _width(width)  // TODO: Refactor this magic number
-{}
+      _width(width) {}
 
-void Character::add_sprite(IDPtr id, int pos) {
-  assert(project_.asset_store().has_entity(id) &&
+void Character::add_sprite(ProjectPtr project, IDPtr id, int pos) {
+  assert(project->asset_store().has_entity(id) &&
          "Asset store doesn't have this ID");
   if (pos < 0 || pos > _sprites.size()) pos = _sprites.size();
   _sprites.insert(_sprites.begin() + pos, id);
@@ -27,8 +26,8 @@ void Character::remove_sprite(IDPtr id) {
 }
 bool Character::has_sprites() const { return !_sprites.empty(); }
 
-void Character::add_script(IDPtr id, int pos) {
-  assert(project_.script_store().has_entity(id) &&
+void Character::add_script(ProjectPtr project, IDPtr id, int pos) {
+  assert(project->script_store().has_entity(id) &&
          "Script store doesn't have this id");
   if (pos < 0 || pos > _scripts.size()) pos = _scripts.size();
   _scripts.insert(_scripts.begin() + pos, id);
@@ -48,9 +47,7 @@ void Character::set_pos(std::pair<float, float> new_pos) { _pos = new_pos; }
 unsigned Character::current_texture_idx() const { return _current_texture_idx; }
 
 IDPtr Character::current_texture() const {
-  assert(!_sprites.empty() &&
-         "No sprites");  // TODO: Return a null value instead, because this
-                         // shouldn't be asserted
+  if (_sprites.empty()) return nullptr;
   return _sprites[_current_texture_idx];
 }
 

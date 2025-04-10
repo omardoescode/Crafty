@@ -3,6 +3,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include "identity/identifiable.h"
 
 namespace model {
 
@@ -25,21 +26,43 @@ struct OutputSlot {
   SlotType type;
 };
 
-class BlockDefinition {
+class BlockDefinition : public Identifiable {
 public:
+  /**
+   * @brief Options for BlockDefinition Initialization
+   */
   enum options {
     BLOCKDEF_HASBODY = 1,
   };
 
-public:
-  BlockDefinition(const std::string& name, const std::string& category,
-                  std::vector<InputSlot>&& inputs, OutputSlot output_slot,
-                  int options = 0);
+  BlockDefinition(IDPtr id, const std::string& name,
+                  const std::string& category, std::vector<InputSlot>&& inputs,
+                  OutputSlot output_slot, int options = 0);
 
+  /**
+   * @brief Getter for name
+   */
   const std::string& name() const;
+
+  /**
+   * @brief Getter for category
+   */
   const std::string& category() const;
+
+  /**
+   * @brief Getter for input slots
+   */
   const std::vector<InputSlot>& inputs() const;
+
+  /**
+   * @brief Getter for output slot
+   */
   const OutputSlot& output() const;
+
+  /**
+   * @brief Check if block accepts a body
+   */
+  bool has_body() const;
 
 private:
   std::string _name;

@@ -29,7 +29,7 @@ void CharacterMiniView::draw() {
   const ImU32 active_color = IM_COL32(255, 200, 100, 255);
   const ImU32 hovered_color = IM_COL32(192, 192, 192, 255);
 
-  ImGui::PushID(_character->id().c_str());  // Ensure unique ID
+  ImGui::PushID(_character->id()->to_string().c_str());  // Ensure unique ID
 
   // Use fixed card size for the invisible button
   ImGui::InvisibleButton("character_card", ImVec2(CARD_WIDTH, CARD_HEIGHT));

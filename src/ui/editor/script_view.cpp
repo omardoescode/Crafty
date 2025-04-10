@@ -5,7 +5,6 @@
 #include "events/events.h"
 #include "imgui.h"
 #include "project_manager.h"
-#include "ui_logger.h"
 #include "ui_options.h"
 
 static auto& mgr = model::ProjectManager::instance();
@@ -23,18 +22,19 @@ ScriptView::ScriptView(UIOptions& options,
   }
 
   // 2. TODO: Subscribe to instanceAddedToScript event
-  _instance_add_tkn = dispatcher.subscribe<model::events::onBlockInstanceAddToScript>(
-      [this](std::shared_ptr<model::events::onBlockInstanceAddToScript> evt) {
-        if (evt->script->id() != _script->id()) return;
-        instances_views[evt->instance->id()] =
-            std::make_shared<BlockView>(_options, evt->instance, false);
-        ui_logger("HELLO");
-      });
+  _instance_add_tkn =
+      dispatcher.subscribe<model::events::onBlockInstanceAddToScript>(
+          [this](
+              std::shared_ptr<model::events::onBlockInstanceAddToScript> evt) {
+            if (evt->script->id() != _script->id()) return;
+            instances_views[evt->instance->id()] =
+                std::make_shared<BlockView>(_options, evt->instance, false);
+          });
 }
 void ScriptView::draw() {
   ImGui::SetCursorScreenPos(
       ImVec2(_script->pos().first, _script->pos().second));
-  ImGui::BeginChild(_script->id().c_str(), ImVec2(0, 0),
+  ImGui::BeginChild(_script->id()->to_string().c_str(), ImVec2(0, 0),
                     ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AutoResizeX);
   ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 3));
   assert(_script->has_block_instances() &&

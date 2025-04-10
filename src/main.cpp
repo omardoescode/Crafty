@@ -1,10 +1,8 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
-#include <stdio.h>
 #include "action_deferrer.h"
 #include "backends/imgui_impl_opengl3.h"
 #include "backends/imgui_impl_sdl3.h"
-#include "block/block_library.h"
 #include "character/character_manager.h"
 #include "editor/block_canvas.h"
 #include "editor/block_picker.h"
@@ -116,11 +114,6 @@ int main(int args, char **argv) {
   auto &prj_mgr = model::ProjectManager::instance();
   prj_mgr.create();
   auto prj = prj_mgr.project();
-
-  // Initialize your application backend (e.g., block library)
-  auto &lib = model::BlockLibrary::instance();
-  lib.initialize();
-  lib.load_project(prj);
 
   // Initialize UI components
   ui::MainMenuBar main_menu_bar(options);

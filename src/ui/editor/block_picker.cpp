@@ -1,6 +1,7 @@
 #include "block_picker.h"
 #include "block/block_library.h"
 #include "imgui.h"
+#include "project_manager.h"
 #include "ui_logger.h"
 #include "ui_options.h"
 
@@ -8,13 +9,16 @@ namespace ui {
 BlockPicker::BlockPicker(UIOptions& options) : _options(options) {}
 
 void BlockPicker::fetch_category_instances(const std::string& category_name) {
-  auto& lib = model::BlockLibrary::instance();
-  auto blocks_definitions = lib.category_blocks(category_name);
+  auto& mgr = model::ProjectManager::instance();
+  auto block_definitions = mgr.block_lib()->category_blocks(category_name);
 
-  for (auto& block_def : blocks_definitions) {
-    BlockView view(_options, lib.create_dummy_instance(block_def->id()), true);
+  for (auto& block_def : block_definitions) {
+    BlockView view(_options, mgr.create_dummy_instance(block_def), true);
     _views_per_category[category_name].push_back(view);
   }
+
+  ui_logger().info("Fetched {} category instances in BlockPicker",
+                   block_definitions.size());
 }
 
 void BlockPicker::draw() {

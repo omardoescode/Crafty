@@ -1,4 +1,4 @@
-#include "identity/id/id.h"
+#include "id.h"
 
 namespace model {
 class StringID : public ID {

@@ -5,7 +5,7 @@
 namespace model {
 class IDGenerator {
 public:
-  ~IDGenerator() = default;
+  virtual ~IDGenerator() = default;
 
   /**
    * @brief Generate a new unique identifer

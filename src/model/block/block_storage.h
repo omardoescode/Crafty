@@ -2,7 +2,7 @@
 #include <memory>
 #include <vector>
 #include "block_definition.h"
-#include "identity/id/id.h"
+#include "identity/id.h"
 
 namespace model {
 class BlockStorage {

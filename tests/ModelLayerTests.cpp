@@ -10,9 +10,9 @@
 #include "utils/fs.h"
 
 TEST(ModelLayerTests, BlockLibraryInitialization) {
-  auto generator(std::make_unique<model::PrefixedIDGenerator>("test"));
   std::unique_ptr<model::BlockStorage> storage(
-      std::make_unique<model::JsonBlockStorage>(std::move(generator)));
+      std::make_unique<model::JsonBlockStorage>(
+          std::make_unique<model::PrefixedIDGenerator>("test")));
   model::BlockLibrary::Config config;
   config.block_file_path = "./data/blocks.json";
   model::BlockLibrary lib(std::move(storage), config);

@@ -6,8 +6,8 @@
 #include <unordered_map>
 #include "character/character_miniview.h"
 #include "events/event_dispatcher.h"
+#include "identity/id.h"
 #include "ui_options.h"
-#include "utils/ID_manager.h"
 namespace ui {
 class CharacterManager {
 private:
@@ -24,8 +24,7 @@ private:
 
 private:
   UIOptions& _options;
-  std::unordered_map<model::IDManager::IDType,
-                     std::shared_ptr<CharacterMiniView>>
+  std::unordered_map<model::IDPtr, std::shared_ptr<CharacterMiniView>>
       _miniviews;
   // std::unordered_map<std::remove_const_t<std::remove_reference_t<
   //                        decltype(std::declval<model::Character>().id())>>,

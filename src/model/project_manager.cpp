@@ -3,11 +3,14 @@
 #include <filesystem>
 #include <memory>
 #include <random>
+#include "asset.h"
+#include "block/block_library.h"
+#include "block/json_block_storage.h"
 #include "character.h"
 #include "events/event_dispatcher.h"
 #include "events/events.h"
-#include "identity/id/id.h"
-#include "identity/id/prefixed_id_generator.h"
+#include "identity/prefixed_id_generator.h"
+#include "model_logger.h"
 #include "utils/fs.h"
 
 namespace fs = std::filesystem;
@@ -17,7 +20,16 @@ std::default_random_engine gen(rd());
 auto& dispatcher = common::EventDispatcher::instance();
 
 namespace model {
-ProjectManager::ProjectManager() : _current_project(nullptr) {}
+ProjectManager::ProjectManager() : _current_project(nullptr) {
+  // ID generator for storage
+  IDGeneratorPtr storage_id_gen = std::make_unique<PrefixedIDGenerator>("def");
+  BlockLibrary::Config config;
+  config.block_file_path = "./data/blocks.json";
+  _block_lib = std::make_shared<BlockLibrary>(
+      std::make_unique<JsonBlockStorage>(std::move(storage_id_gen)), config);
+
+  model_logger().info("Project Manager Initialized");
+}
 
 ProjectManager& ProjectManager::instance() {
   static ProjectManager instance;
@@ -88,8 +100,7 @@ std::shared_ptr<Asset> ProjectManager::add_asset(fs::path file_path,
 
   // Create a new entity
   std::shared_ptr<Asset> new_asset =
-      _current_project->asset_store().create_entity(*_current_project,
-                                                    destination.string());
+      _current_project->asset_store().create_entity(destination.string());
   return new_asset;
 }
 
@@ -113,9 +124,9 @@ std::shared_ptr<Character> ProjectManager::add_character(
   std::shared_ptr<Asset> new_asset = add_asset(file_path, copy_folder);
   std::shared_ptr<Character> new_char =
       _current_project->char_store().create_entity(
-          *_current_project, x_pos_gen(gen), y_pos_gen(gen),
+          x_pos_gen(gen), y_pos_gen(gen),
           100);  // TODO: Refactor this magic number
-  new_char->add_sprite(new_asset->id());
+  new_char->add_sprite(_current_project, new_asset->id());
 
   dispatcher.publish(std::make_shared<events::onCharacterCreated>(new_char));
 
@@ -176,13 +187,12 @@ std::shared_ptr<Script> ProjectManager::add_script(
     float x, float y) {
   assert(_current_project && "No current project");
   std::shared_ptr<Script> script =
-      _current_project->script_store().create_entity(*_current_project, chr, x,
-                                                     y);
+      _current_project->script_store().create_entity(chr, x, y);
   std::shared_ptr<BlockInstance> instance =
-      _current_project->instances_store().create_entity(*_current_project, def);
+      _current_project->instances_store().create_entity(def);
 
-  script->add_block_instance(instance->id());
-  chr->add_script(script->id());
+  script->add_block_instance(_current_project, instance->id());
+  chr->add_script(_current_project, script->id());
   dispatcher.publish(std::make_shared<events::onScriptCreated>(script));
 
   // model_logger("Script Created at x=" + std::to_string(x) +
@@ -196,13 +206,22 @@ void ProjectManager::add_block_to_existing_script(
   auto script = _current_project->script_store().get_entity(script_id);
 
   // Create the instance first and publish it
-  auto instance = _current_project->instances_store().create_entity(
-      *_current_project, definition);
+  auto instance = _current_project->instances_store().create_entity(definition);
 
-  int final_position = script->add_block_instance(instance->id(), position);
+  int final_position =
+      script->add_block_instance(_current_project, instance->id(), position);
 
   // Publish the event
   dispatcher.publish(std::make_shared<events::onBlockInstanceAddToScript>(
       script, instance, final_position));
+}
+
+std::shared_ptr<BlockLibrary> ProjectManager::block_lib() const {
+  return _block_lib;
+}
+
+std::shared_ptr<BlockInstance> ProjectManager::create_dummy_instance(
+    BlockDefPtr def) {
+  return _current_project->instances_store().create_entity(def, false);
 }
 }  // namespace model

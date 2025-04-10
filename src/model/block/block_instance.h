@@ -2,9 +2,10 @@
 
 #include <memory>
 #include <vector>
+#include "asset.h"
 #include "block/block_definition.h"
 #include "block/block_library.h"
-#include "identity/serializable/serializable.h"
+#include "serialization/serializable.h"
 
 namespace model {
 /**
@@ -15,18 +16,17 @@ namespace model {
  */
 class BlockInstance : public Serializable {
 public:
-  BlockInstance(IDPtr id, Project& project,
-                std::shared_ptr<const BlockDefinition>);
+  BlockInstance(IDPtr id, BlockDefPtr def, bool serialize = true);
 
   std::shared_ptr<const BlockDefinition> def() const;
 
   bool has_body();
   IDPtr body();
-  // TODO: Add metthod to control input slots
+  const std::vector<IDWPtr>& inputs() const;
+
 private:
   std::shared_ptr<const BlockDefinition> _def;
-  std::vector<IDPtr> _inputs;
-  // TODO: handle script body
+  std::vector<IDWPtr> _inputs;
   IDPtr _body;
 };
 }  // namespace model

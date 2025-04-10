@@ -2,8 +2,10 @@
 #include <cassert>
 #include <map>
 #include <memory>
+#include <type_traits>
+#include "id.h"
 #include "id_generator.h"
-#include "identity/id/id.h"
+#include "identity/identifiable.h"
 
 namespace model {
 template <typename Object>
@@ -27,7 +29,8 @@ public:
 
   /**
    * @brief Remove an entity from the store with the specified id
-std::unique_ptr<IDGeneratorstd::unique_ptr<IDGenerator>>   * @param id The entity's id to remove
+std::unique_ptr<IDGeneratorstd::unique_ptr<IDGenerator>>   * @param id The
+entity's id to remove
    */
   void remove_entity(IDPtr id);
 
@@ -53,7 +56,9 @@ private:
 // Implementation
 template <typename Object>
 Store<Object>::Store(std::unique_ptr<IDGenerator> mgr)
-    : _id_mgr(std::move(mgr)) {}
+    : _id_mgr(std::move(mgr)) {
+  static_assert(std::is_base_of<Identifiable, Object>());
+}
 
 template <typename Object>
 bool Store<Object>::has_entity(IDPtr id) const {

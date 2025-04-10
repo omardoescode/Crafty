@@ -8,7 +8,6 @@
 #include "block/block_instance.h"
 #include "imgui.h"
 #include "misc/cpp/imgui_stdlib.h"
-#include "ui_logger.h"
 #include "ui_options.h"
 
 namespace ui {
@@ -22,7 +21,6 @@ BlockView::BlockView(UIOptions& options,
   std::string word;
   std::regex slot_reg("^\\%(\\d+)$");  // TODO: Place this regex in model layer
   std::smatch match;
-  ui_logger.error(def->name());
   std::string cur_word;
   while (name_stream >> word) {
     if (std::regex_search(word, match, slot_reg)) {
@@ -33,8 +31,6 @@ BlockView::BlockView(UIOptions& options,
         _parts.emplace_back(std::move(part));
         cur_word.clear();
       }
-      ui_logger.error(std::to_string(def->inputs().size()));
-      ui_logger.error(match.str(1));
       BlockPart part;
       part.type = BlockPart::InputSlot;
       part.value = _inner_views.size();
@@ -62,7 +58,8 @@ void BlockView::draw() {
   auto before_draw = ImGui::GetCursorScreenPos();
 
   ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(40, 40, 40, 255));
-  ImGui::BeginChild(_block_instance->def()->id().c_str(), ImVec2(0, 0),
+  ImGui::BeginChild(_block_instance->def()->id()->to_string().c_str(),
+                    ImVec2(0, 0),
                     ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY);
 
   // Handle Drag and Drop

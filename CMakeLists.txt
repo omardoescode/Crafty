@@ -77,7 +77,10 @@ FetchContent_MakeAvailable(googletest)
 add_library(common
   ${COMMON_DIR}/events/event_dispatcher.cpp
   ${COMMON_DIR}/logger/logger.cpp
+  ${COMMON_DIR}/common_logger.cpp
 )
+
+target_include_directories(common PUBLIC ${COMMON_DIR}) # encapsulate model dir but only the public interface
 
 # Build a library for model
 add_library(model
@@ -88,16 +91,17 @@ add_library(model
 
 
   # identity/id
-  ${MODEL_DIR}/identity/id/id.cpp
-  ${MODEL_DIR}/identity/id/prefixed_id_generator.cpp
-  ${MODEL_DIR}/identity/id/string_id.cpp
-
-  # identity/serializable
-  ${MODEL_DIR}/identity/serializable/serializable.cpp
+  ${MODEL_DIR}/identity/id.cpp
+  ${MODEL_DIR}/identity/prefixed_id_generator.cpp
+  ${MODEL_DIR}/identity/string_id.cpp
+  ${MODEL_DIR}/identity/identifiable.cpp
 
   # utils
   ${MODEL_DIR}/utils/fs.cpp
   ${MODEL_DIR}/utils/json.cpp
+
+  # Serialization
+  ${MODEL_DIR}/serialization/serializable.cpp
 
   ${MODEL_DIR}/project.cpp
   ${MODEL_DIR}/project_manager.cpp
@@ -175,7 +179,7 @@ add_executable(tests
 target_link_libraries(tests GTest::gtest_main 
   model 
   common 
-  # ui
+  ui
 )
 target_include_directories(tests PRIVATE 
   ${MODEL_DIR}

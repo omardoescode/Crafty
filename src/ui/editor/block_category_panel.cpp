@@ -1,14 +1,15 @@
 #include "block_category_panel.h"
 #include <imgui.h>
 #include "block/block_library.h"
+#include "project_manager.h"
 
 namespace ui {
 BlockCategoryPanel::BlockCategoryPanel(UIOptions& options)
     : _options(options) {}
 
 void BlockCategoryPanel::draw() {
-  auto& lib = model::BlockLibrary::instance();
-  auto categories = lib.categories();
+  auto lib = model::ProjectManager::instance().block_lib();
+  auto categories = lib->categories();
 
   if (ImGui::BeginTable("table", 2, ImGuiTableFlags_NoPadInnerX,
                         ImVec2(0, 0))) {

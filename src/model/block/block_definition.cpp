@@ -1,12 +1,17 @@
 #include "block_definition.h"
 #include <stdexcept>
+#include "identity/id.h"
 
 namespace model {
-BlockDefinition::BlockDefinition(const std::string& name,
+BlockDefinition::BlockDefinition(IDPtr id, const std::string& name,
                                  const std::string& category,
                                  std::vector<InputSlot>&& inputs,
                                  OutputSlot output_slot, int options)
-    : _name(name), _category(category), _inputs(inputs), _output(output_slot) {
+    : Identifiable(id),
+      _name(name),
+      _category(category),
+      _inputs(inputs),
+      _output(output_slot) {
   if (options & BLOCKDEF_HASBODY) _has_body = true;
 }
 
@@ -16,6 +21,7 @@ const std::vector<InputSlot>& BlockDefinition::inputs() const {
   return _inputs;
 }
 const OutputSlot& BlockDefinition::output() const { return _output; }
+bool BlockDefinition::has_body() const { return _has_body; }
 
 SlotType parse_type(std::string name) {
   if (name == "Exec")

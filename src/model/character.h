@@ -1,20 +1,19 @@
 #pragma once
 #include <vector>
-#include "identity/id/id.h"
-#include "identity/serializable/serializable.h"
-#include "script.h"
+#include "project.h"
+#include "serialization/serializable.h"
 namespace model {
 class BlockInstance;
 
 class Character : public Serializable {
 public:
-  Character(IDPtr id, Project& project, float x, float y, float width);
+  Character(IDPtr id, float x, float y, float width, bool serialize = true);
 
-  void add_sprite(IDPtr id, int pos = -1);
+  void add_sprite(ProjectPtr project, IDPtr id, int pos = -1);
   void remove_sprite(IDPtr id);
   bool has_sprites() const;
 
-  void add_script(IDPtr id, int pos = -1);
+  void add_script(ProjectPtr project, IDPtr id, int pos = -1);
   void remove_script(IDPtr id);
   bool has_scripts() const;
 
@@ -22,12 +21,19 @@ public:
   void set_pos(std::pair<float, float>);
 
   unsigned current_texture_idx() const;
+
+  /**
+   * @brief Retrieve the current texture
+   * @return A shared pointer to the texture ID if exists or nullptr if there is
+   * no current texture
+   */
   IDPtr current_texture() const;
+
   void set_current_texture_idx(size_t);
   void next_texture();
 
-  const std::vector<IDPtr>& scripts() const;
-  const std::vector<IDPtr>& sprites() const;
+  const std::vector<IDWPtr>& scripts() const;
+  const std::vector<IDWPtr>& sprites() const;
 
   const std::string name() const;
   void set_name(const std::string& name);
@@ -37,8 +43,8 @@ public:
   void set_width(float width);
 
 private:
-  std::vector<IDPtr> _sprites;
-  std::vector<IDPtr> _scripts;
+  std::vector<IDWPtr> _sprites;
+  std::vector<IDWPtr> _scripts;
   std::pair<float, float> _pos;
   size_t _current_texture_idx;
   std::string _name;

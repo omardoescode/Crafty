@@ -42,18 +42,21 @@ void JsonBlockStorage::load_definitions(const std::filesystem::path& path) {
       int options = 0;
       if (has_body) options |= BlockDefinition::BLOCKDEF_HASBODY;
 
-      // Create the block definition
-      BlockDefPtr def = std::make_shared<BlockDefinition>(
-          name, category, std::move(inputs), std::move(output));
-
-      // Create an id and put the values in the maps
+      // Create the ID and the the block definition
       IDPtr id = _id_generator->generate_next();
+      BlockDefPtr def = std::make_shared<BlockDefinition>(
+          id, name, category, std::move(inputs), std::move(output));
+
+      // put the values in the maps
       _defs[id] = def;
-      _category_defs[std::move(category)].push_back(def);
+      _category_defs[category].push_back(def);
     }
+
+    model_logger().info("Loaded {} block definitions of category {}",
+                        _defs.size(), category);
   }
 
-  model_logger.info("Loaded {} block definitions\n", _defs.size());
+  model_logger().info("Loaded {} block definitions", _defs.size());
 }
 
 std::vector<std::string> JsonBlockStorage::categories() const {

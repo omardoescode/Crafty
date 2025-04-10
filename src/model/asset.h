@@ -1,13 +1,12 @@
 #pragma once
 #include <string>
-#include "identity/id/id.h"
-#include "identity/serializable/serializable.h"
+#include "serialization/serializable.h"
 namespace model {
 
 class Project;
 class Asset : public Serializable {
 public:
-  Asset(IDPtr id, Project& project, std::string&& path);
+  Asset(IDPtr id, std::string&& path, bool serialize = true);
 
   const std::string& get_path() const;
 

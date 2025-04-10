@@ -1,4 +1,4 @@
-#include "identity/id/id.h"
+#include "id.h"
 namespace model {
 bool operator<(const IDPtr& lhs, const IDPtr& rhs) {
   if (lhs && rhs) return *lhs < *rhs;

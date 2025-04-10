@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 #include "block_storage.h"
-#include "identity/id/id.h"
+#include "identity/id.h"
 
 /**
  * @brief a Facade for Block Storage, an interface for handling blocks
@@ -16,7 +16,7 @@ class Project;
 class BlockLibrary {
 public:
   /**
-   * @brief a Config type for BlockLibrary Initialization
+   * @brief a Config struct for BlockLibrary Initialization
    */
   struct Config {
     std::filesystem::path block_file_path;
@@ -29,16 +29,27 @@ public:
    */
   BlockLibrary(std::unique_ptr<BlockStorage> storage, const Config& config);
 
+  /**
+   * @brief Retrieve categories
+   * @return A vector of categories names
+   */
   std::vector<std::string> categories() const;
-  std::vector<std::shared_ptr<const BlockDefinition>> category_blocks(
-      const std::string& category) const;
 
-  std::shared_ptr<const BlockDefinition> get_block_definition_by_id(
-      IDPtr) const;
+  /**
+   * @brief Get a specified category blocks
+   * @param category The name of the specified category
+   * @return  A vector of the blocks of this category
+   */
+  std::vector<BlockDefPtr> category_blocks(const std::string& category) const;
 
-  std::shared_ptr<BlockInstance> create_dummy_instance();
+  /**
+   * @brief Get a block by its id
+   * @param id The Block definition ID
+   * @return a pointer to the block definition
+   */
+  BlockDefPtr get_block_definition_by_id(IDPtr id) const;
 
 private:
   std::unique_ptr<BlockStorage> _storage;
-};  // namespace model
+};
 }  // namespace model

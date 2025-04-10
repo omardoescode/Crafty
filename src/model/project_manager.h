@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <memory>
 #include "block/block_definition.h"
-#include "identity/id/id.h"
+#include "identity/id.h"
 #include "project.h"
 namespace model {
 class ProjectManager {
@@ -100,10 +100,21 @@ public:
   bool has_project() const;
   std::shared_ptr<Project> project() const;
 
+  /**
+   * @brief Getter for block library
+   */
+  std::shared_ptr<BlockLibrary> block_lib() const;
+
+  /**
+   * @brief Generate a dummy block instance
+   */
+  std::shared_ptr<BlockInstance> create_dummy_instance(BlockDefPtr def);
+
 private:
   ProjectManager();
 
 private:
   std::shared_ptr<Project> _current_project;
+  std::shared_ptr<BlockLibrary> _block_lib;
 };
 }  // namespace model
