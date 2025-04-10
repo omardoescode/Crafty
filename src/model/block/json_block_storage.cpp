@@ -38,14 +38,15 @@ void JsonBlockStorage::load_definitions(const std::filesystem::path& path) {
 
       // Extract Other data
       std::string name = block.at("name");
+      std::string data_id = block.at("id");
       bool has_body = block.at("has_body");
-      int options = 0;
+      int options = BlockDefinition::BLOCKDEF_DEFAULT;
       if (has_body) options |= BlockDefinition::BLOCKDEF_HASBODY;
 
       // Create the ID and the the block definition
       IDPtr id = _id_generator->generate_next();
       BlockDefPtr def = std::make_shared<BlockDefinition>(
-          id, name, category, std::move(inputs), std::move(output));
+          id, data_id, name, category, std::move(inputs), std::move(output));
 
       // put the values in the maps
       _defs[id] = def;
@@ -71,6 +72,8 @@ BlockDefPtr JsonBlockStorage::get_definition_by_id(const IDPtr& id) const {
 }
 std::vector<BlockDefPtr> JsonBlockStorage::get_definitions_by_category(
     const std::string& category) const {
-  return _category_defs.at(category);
+  auto itr = _category_defs.find(category);
+  if (itr == _category_defs.end()) return {};
+  return itr->second;
 }
 }  // namespace model

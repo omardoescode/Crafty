@@ -1,5 +1,4 @@
 #include <map>
-#include <memory>
 #include "block/block_library.h"
 #include "identity/id.h"
 #include "identity/id_generator.h"

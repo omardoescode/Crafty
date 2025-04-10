@@ -3,11 +3,13 @@
 #include "identity/id.h"
 
 namespace model {
-BlockDefinition::BlockDefinition(IDPtr id, const std::string& name,
+BlockDefinition::BlockDefinition(IDPtr id, std::string data_id,
+                                 const std::string& name,
                                  const std::string& category,
                                  std::vector<InputSlot>&& inputs,
                                  OutputSlot output_slot, int options)
     : Identifiable(id),
+      _data_id(data_id),
       _name(name),
       _category(category),
       _inputs(inputs),

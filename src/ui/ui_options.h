@@ -64,7 +64,7 @@ public:
 
 private:
   bool _running;
-  std::string _current_cateogry = "Motion";  // WARN: for debugging for now
+  std::string _current_cateogry = "motion";  // WARN: for debugging for now
   std::map<Font, ImFont*> _fonts;
   int _args;
   char** _argv;

@@ -32,10 +32,11 @@ public:
    * @brief Options for BlockDefinition Initialization
    */
   enum options {
+    BLOCKDEF_DEFAULT = 0,
     BLOCKDEF_HASBODY = 1,
   };
 
-  BlockDefinition(IDPtr id, const std::string& name,
+  BlockDefinition(IDPtr id, std::string data_id, const std::string& name,
                   const std::string& category, std::vector<InputSlot>&& inputs,
                   OutputSlot output_slot, int options = 0);
 
@@ -70,6 +71,7 @@ private:
   std::vector<InputSlot> _inputs;
   OutputSlot _output;
   bool _has_body;
+  std::string _data_id;
 };
 
 /**
