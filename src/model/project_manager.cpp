@@ -8,8 +8,8 @@
 #include "block/json_block_storage.h"
 #include "character.h"
 #include "events/event_dispatcher.h"
-#include "events/events.h"
 #include "identity/prefixed_id_generator.h"
+#include "model_events.h"
 #include "model_logger.h"
 #include "utils/fs.h"
 
@@ -126,7 +126,7 @@ std::shared_ptr<Character> ProjectManager::add_character(
       _current_project->char_store().create_entity(
           x_pos_gen(gen), y_pos_gen(gen),
           100);  // TODO: Refactor this magic number
-  new_char->add_sprite(_current_project, new_asset->id());
+  new_char->add_sprite(new_asset->id());
 
   dispatcher.publish(std::make_shared<events::onCharacterCreated>(new_char));
 
@@ -146,11 +146,11 @@ void ProjectManager::remove_character(IDPtr character_id) {
   dispatcher.publish(std::make_shared<events::beforeCharacterDeleted>(chr));
 
   // remove all sprites & scripts
-  for (auto& sprite : chr->sprites()) {
-    remove_asset(sprite);
+  for (auto& sprite_w : chr->sprites()) {
+    if (auto sprite = sprite_w.lock()) remove_asset(sprite);
   }
-  for (auto& script : chr->scripts()) {
-    remove_script(script);
+  for (auto& script_w : chr->scripts()) {
+    if (auto script = script_w.lock()) remove_script(script);
   }
 
   _current_project->char_store().remove_entity(character_id);
@@ -193,8 +193,8 @@ std::shared_ptr<Script> ProjectManager::add_script(
   std::shared_ptr<BlockInstance> instance =
       _current_project->instances_store().create_entity(def);
 
-  script->add_block_instance(_current_project, instance->id());
-  chr->add_script(_current_project, script->id());
+  script->add_block_instance(instance->id());
+  chr->add_script(script->id());
   dispatcher.publish(std::make_shared<events::onScriptCreated>(script));
 
   // model_logger("Script Created at x=" + std::to_string(x) +
@@ -210,8 +210,7 @@ void ProjectManager::add_block_to_existing_script(
   // Create the instance first and publish it
   auto instance = _current_project->instances_store().create_entity(definition);
 
-  int final_position =
-      script->add_block_instance(_current_project, instance->id(), position);
+  int final_position = script->add_block_instance(instance->id(), position);
 
   // Publish the event
   dispatcher.publish(std::make_shared<events::onBlockInstanceAddToScript>(

@@ -18,7 +18,7 @@ public:
    * Add a block instance to the script
    * @return the new script position
    */
-  int add_block_instance(ProjectPtr project, IDPtr id, int pos = -1);
+  int add_block_instance(IDPtr id, int pos = -1);
   void remove_block_instance(IDPtr id);
   bool has_block_instances() const;
 

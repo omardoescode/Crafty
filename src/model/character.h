@@ -9,11 +9,11 @@ class Character : public Serializable {
 public:
   Character(IDPtr id, float x, float y, float width, bool serialize = true);
 
-  void add_sprite(ProjectPtr project, IDPtr id, int pos = -1);
+  void add_sprite(IDPtr id, int pos = -1);
   void remove_sprite(IDPtr id);
   bool has_sprites() const;
 
-  void add_script(ProjectPtr project, IDPtr id, int pos = -1);
+  void add_script(IDPtr id, int pos = -1);
   void remove_script(IDPtr id);
   bool has_scripts() const;
 

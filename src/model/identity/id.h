@@ -38,4 +38,18 @@ bool operator<(const IDPtr& lhs, const IDPtr& rhs);
  * @return true if `lhs` is equal to `rhs`
  */
 bool operator==(const IDPtr& lhs, const IDPtr& rhs);
+
+/**
+ * @brief a Helper method to remove a matching shared pointer from a list of
+ * weak pointers
+ */
+template <typename Container, typename ID>
+void remove_weak_ptr(Container& container, ID target_id) {
+  container.erase(std::remove_if(container.begin(), container.end(),
+                                 [&](const auto& weak_ptr) {
+                                   auto ptr = weak_ptr.lock();
+                                   return ptr && ptr == target_id;
+                                 }),
+                  container.end());
+}
 }  // namespace model
