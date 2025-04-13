@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <cstdio>
 #include <iostream>
+#include <map>
 #include <print>
 #include <stdexcept>
 #include <string>
@@ -26,9 +27,8 @@ public:
   }
   template <typename... Args>
   void error(std::string_view fmt, Args&&... args) {
-    std::string log_message =
-        generate_log_message(ERROR, fmt, std::forward<Args>(args)...);
-    throw std::runtime_error(log_message);
+    log(ERROR, fmt, std::forward<Args>(args)...);
+    throw std::runtime_error("An error occurred, check logger output");
   }
 
 private:
@@ -51,7 +51,14 @@ private:
     auto log_message =
         generate_log_message(level, fmt, std::forward<Args>(args)...);
 
-    if (level >= _level) std::print("[{}] {}\n", _prefix, log_message);
+    static const std::map<LogLevel, std::string> values = {
+        {INFO, "INFO"},
+        {WARN, "WARN"},
+        {ERROR, "ERROR"},
+    };
+    if (level >= _level)
+      std::print(_out, "[{}] [{}] {}\n", _prefix, values.at(level),
+                 log_message);
   }
 
 private:
