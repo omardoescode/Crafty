@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <cstdio>
 #include <iostream>
-#include <map>
+#include <mutex>
 #include <print>
 #include <stdexcept>
 #include <string>
@@ -16,6 +16,9 @@ public:
 
   Logger(std::string&&, std::ostream& = std::cout, LogLevel = INFO);
   Logger(const std::string&, std::ostream& = std::cout, LogLevel = INFO);
+
+  Logger(const Logger&) = delete;             // No copying
+  Logger& operator=(const Logger&) = delete;  // No assignment
 
   template <typename... Args>
   void info(std::string_view fmt, Args&&... args) {
@@ -33,33 +36,17 @@ public:
 
 private:
   template <typename... Args>
-  std::string generate_log_message(LogLevel level, std::string_view fmt,
-                                   Args&&... args) {
-    // TODO: Understand this part
-    if constexpr (std::is_same_v<std::remove_cvref_t<decltype(fmt)>,
-                                 const char*>) {
-      // If format string is a string literal
-      return std::format(fmt, std::forward<Args>(args)...);
-    } else {
-      // If format string is a std::string or std::string_view
-      return std::vformat(fmt, std::make_format_args(args...));
+  void log(LogLevel level, std::string_view fmt, Args&&... args) {
+    auto log_message = std::vformat(fmt, std::make_format_args(args...));
+    if (level >= _level) {
+      std::lock_guard lck(get_mutex_for_stream(_out));
+      std::print(_out, "[{}] [{}] {}\n", _prefix, level_to_string(level),
+                 log_message);
     }
   }
 
-  template <typename... Args>
-  void log(LogLevel level, std::string_view fmt, Args&&... args) {
-    auto log_message =
-        generate_log_message(level, fmt, std::forward<Args>(args)...);
-
-    static const std::map<LogLevel, std::string> values = {
-        {INFO, "INFO"},
-        {WARN, "WARN"},
-        {ERROR, "ERROR"},
-    };
-    if (level >= _level)
-      std::print(_out, "[{}] [{}] {}\n", _prefix, values.at(level),
-                 log_message);
-  }
+  static std::mutex& get_mutex_for_stream(std::ostream& stream);
+  static std::string level_to_string(LogLevel level);
 
 private:
   std::string _prefix;
