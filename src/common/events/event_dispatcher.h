@@ -21,7 +21,7 @@ public:
   /**
    * @brief Type alias for the subscription token pointer
    */
-  typedef std::shared_ptr<Token> TokenP;
+  typedef std::unique_ptr<Token> TokenP;
 
 public:
   /**
@@ -90,7 +90,7 @@ public:
                   if (auto downcast = std::dynamic_pointer_cast<EventType>(evt))
                     handler(downcast);
                 }});
-    return std::make_shared<Token>(instance(), event_type, id);
+    return std::make_unique<Token>(instance(), event_type, id);
   }
 
   /**

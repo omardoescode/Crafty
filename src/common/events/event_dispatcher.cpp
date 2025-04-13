@@ -1,5 +1,6 @@
 #include "event_dispatcher.h"
 #include <mutex>
+#include "common_logger.h"
 
 namespace common {
 EventDispatcher::EventDispatcher() : _next_id(0) {}
@@ -26,6 +27,8 @@ void EventDispatcher::unsubscribe(std::type_index event_type,
   if (handler_it == evt_iterator->second.end()) return;
 
   evt_iterator->second.erase(handler_it);
+
+  common_logger().info("Handler has been removed");
 }
 
 EventDispatcher::Token::Token(EventDispatcher &dispatcher, std::type_index idx,
@@ -39,4 +42,5 @@ void EventDispatcher::Token::cancel() {
     _active = false;
   }
 }
+
 }  // namespace common
