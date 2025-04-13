@@ -176,7 +176,9 @@ void ProjectManager::remove_block_instance(IDPtr instance_id) {
   auto blk = _current_project->instances_store().get_entity(instance_id);
 
   // if has body, remove it
-  if (blk->has_body()) remove_block_instance(blk->body());
+  if (blk->has_body()) {
+    if (auto body = blk->body().lock()) remove_block_instance(body);
+  }
 
   // remove
   _current_project->instances_store().remove_entity(instance_id);

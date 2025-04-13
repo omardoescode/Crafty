@@ -26,7 +26,7 @@ typedef std::shared_ptr<ID> IDPtr;
  * @brief A type alias for a weak pointer for identifier
  */
 
-typedef std::shared_ptr<ID> IDWPtr;
+typedef std::weak_ptr<ID> IDWPtr;
 /**
  * @brief Overload of the less than operator for IDPtr
  * @return true if `lhs` is less than `rhs`

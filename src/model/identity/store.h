@@ -2,6 +2,8 @@
 #include <cassert>
 #include <map>
 #include <memory>
+#include <mutex>
+#include <shared_mutex>
 #include <type_traits>
 #include "id.h"
 #include "id_generator.h"
@@ -48,9 +50,17 @@ entity's id to remove
    */
   std::shared_ptr<Object> get_entity(IDPtr id) const;
 
+  /**
+   * @brief Retrieve the entity with the specified id
+   * @param id A weak pointer to the specified id
+   * @return A shared pointer to the entity if exists
+   */
+  std::shared_ptr<Object> get_entity(IDWPtr id) const;
+
 private:
   IDGeneratorPtr _id_mgr;
   std::map<IDPtr, std::shared_ptr<Object>> _store;
+  mutable std::shared_mutex _store_mtx;
 };
 
 // Implementation
@@ -62,10 +72,12 @@ Store<Object>::Store(std::unique_ptr<IDGenerator> mgr)
 
 template <typename Object>
 bool Store<Object>::has_entity(IDPtr id) const {
+  std::shared_lock lck(_store_mtx);
   return _store.count(id);
 }
 template <typename Object>
 std::shared_ptr<Object> Store<Object>::get_entity(IDPtr id) const {
+  std::shared_lock lck(_store_mtx);
   assert(has_entity(id));
   return _store.at(id);
 }
@@ -73,6 +85,7 @@ std::shared_ptr<Object> Store<Object>::get_entity(IDPtr id) const {
 template <typename Object>
 template <typename... T>
 std::shared_ptr<Object> Store<Object>::create_entity(T&&... args) {
+  std::unique_lock lck(_store_mtx);
   auto new_id = _id_mgr->generate_next();
   _store[new_id] =
       std::make_shared<Object>(new_id, std::forward<decltype(args)>(args)...);
@@ -80,7 +93,15 @@ std::shared_ptr<Object> Store<Object>::create_entity(T&&... args) {
 }
 template <typename Object>
 void Store<Object>::remove_entity(IDPtr id) {
+  std::unique_lock lck(_store_mtx);
   assert(_store.count(id) && "Store doesn't have this ID");
   _store.erase(id);
+}
+
+template <typename Object>
+std::shared_ptr<Object> Store<Object>::get_entity(IDWPtr id_w) const {
+  auto id = id_w.lock();
+  if (!id) return nullptr;
+  return get_entity(id);
 }
 }  // namespace model
