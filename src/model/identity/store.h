@@ -1,5 +1,6 @@
 #pragma once
 #include <cassert>
+#include <functional>
 #include <memory>
 #include <mutex>
 #include <shared_mutex>
@@ -58,6 +59,12 @@ entity's id to remove
    */
   std::shared_ptr<Object> get_entity(IDWPtr id) const;
 
+  /**
+   * @brief Execute a function corresponding to each element in store
+   * @param func The function to execute per element
+   */
+  void foreach (std::function<void(std::shared_ptr<Object>)> func);
+
 private:
   IDGeneratorPtr _id_mgr;
   std::unordered_map<IDPtr, std::shared_ptr<Object>> _store;
@@ -111,5 +118,10 @@ std::shared_ptr<Object> Store<Object>::get_entity(IDWPtr id_w) const {
     return it != _store.end() ? it->second : nullptr;
   }
   return nullptr;
+}
+template <typename Object>
+void Store<Object>::foreach (
+    std::function<void(std::shared_ptr<Object>)> func) {
+  for (auto& [_, elm] : _store) func(elm);
 }
 }  // namespace model
