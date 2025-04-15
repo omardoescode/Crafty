@@ -6,6 +6,7 @@
 #include "events/event_dispatcher.h"
 #include "identity/id.h"
 #include "ui_options.h"
+
 namespace ui {
 class BlockCanvas {
 public:

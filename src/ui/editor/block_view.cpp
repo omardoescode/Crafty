@@ -5,55 +5,82 @@
 #include <regex>
 #include <sstream>
 #include <string>
+#include <variant>
 #include "block/block_instance.h"
+#include "block/input_slot_instance.h"
+#include "block/value.h"
+#include "block/value_type.h"
+#include "identity/id.h"
 #include "imgui.h"
 #include "misc/cpp/imgui_stdlib.h"
 #include "ui_options.h"
 
 namespace ui {
-// TODO: Refactor this mess
 BlockView::BlockView(UIOptions& options,
                      std::shared_ptr<model::BlockInstance> instance,
                      bool draggable)
-    : _options(options), _block_instance(instance), _draggable(draggable) {
-  auto def = instance->def();
-  std::stringstream name_stream(def->name());
-  std::string word;
-  std::regex slot_reg("^\\%(\\d+)$");  // TODO: Place this regex in model layer
-  std::smatch match;
-  std::string cur_word;
-  while (name_stream >> word) {
-    if (std::regex_search(word, match, slot_reg)) {
-      if (!cur_word.empty()) {
-        BlockPart part;
-        part.type = BlockPart::BlockText;
-        part.value = cur_word;
-        _parts.emplace_back(std::move(part));
-        cur_word.clear();
-      }
-      BlockPart part;
-      part.type = BlockPart::InputSlot;
-      part.value = _inner_views.size();
-      part.direct_value =
-          def->inputs().at(std::stoi(match.str(1))).default_value;
-      // TODO: Fix this  to use the type of the
-      // corresponding input slot
-      _parts.push_back(part);  // For Now, there will be no current
-                               // input slot instance attached
-      _inner_views.push_back(nullptr);
-    } else {
-      if (!cur_word.empty()) cur_word += " ";
-      cur_word += word;
+    : _options(options),
+      _block_instance(std::move(instance)),
+      _draggable(draggable) {
+  parse_block_name();
+}
+
+void BlockView::parse_block_name() {
+  // Get the block name from the block instance
+  const std::string& name = _block_instance->def()->name();
+
+  // Create a vector to hold the parts
+  std::vector<BlockPart> parts;
+
+  // Parse the name and create parts
+  handle_text(name, parts);
+
+  // Store the parts
+  _parts = std::move(parts);
+}
+
+void BlockView::handle_text(const std::string& text,
+                            std::vector<BlockPart>& parts) {
+  // Regular expression to match input slot placeholders (%0, %1, etc.)
+  static const std::regex slot_reg(R"(\%\d+)");
+
+  // Current position in the text
+  size_t pos = 0;
+
+  // Find all matches of the regex in the text
+  std::sregex_iterator it(text.begin(), text.end(), slot_reg);
+  std::sregex_iterator end;
+
+  // Process each match
+  while (it != end) {
+    // Get the match
+    std::smatch match = *it;
+
+    // Add the text before the match as a string part
+    if (match.position() > pos) {
+      parts.emplace_back(text.substr(pos, match.position() - pos));
     }
+
+    // Extract the slot index from the match
+    std::string slot_str = match.str().substr(1);  // Remove the % character
+    size_t slot_index = std::stoul(slot_str);
+
+    // Add the slot as an InputSlotView part
+    parts.emplace_back(InputSlotView{slot_index});
+
+    // Update the position
+    pos = match.position() + match.length();
+
+    // Move to the next match
+    ++it;
   }
-  if (!cur_word.empty()) {
-    BlockPart part;
-    part.type = BlockPart::BlockText;
-    part.value = cur_word;
-    _parts.emplace_back(std::move(part));
-    cur_word.clear();
+
+  // Add any remaining text as a string part
+  if (pos < text.length()) {
+    parts.emplace_back(text.substr(pos));
   }
 }
+
 void BlockView::draw() {
   auto before_draw = ImGui::GetCursorScreenPos();
 
@@ -102,27 +129,62 @@ void BlockView::handle_drag() {
 
 void BlockView::draw_parts() {
   for (int i = 0; i < _parts.size(); i++) {
-    auto& [type, value, direct_value] = _parts[i];
-    switch (type) {
-      case BlockPart::BlockText: {
-        std::string text = std::get<std::string>(value);
-        ImGui::AlignTextToFramePadding();
-        ImGui::Text("%s", text.c_str());
-      } break;
-      case BlockPart::InputSlot:
+    if (auto view = std::get_if<InputSlotView>(&_parts[i])) {
+      std::shared_ptr<model::InputSlotInstance> slot =
+          _block_instance->inputs()[view->index];
+
+      if (slot->has_block()) {
+        // TODO: Handle connected block
+        // This would involve drawing the connected block or some representation
+        // of it
+        ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "[Connected Block]");
+      } else {
+        // Get the current value from the slot
+        const model::Value& value = slot->value();
+
         ImGui::PushID(i);
         ImGui::PushStyleVar(
             ImGuiStyleVar_FramePadding,
             ImVec2(DIRECT_VALUE_PADDING.first, DIRECT_VALUE_PADDING.second));
-        ImGui::SetNextItemWidth(
-            std::max(2 * DIRECT_VALUE_PADDING.first +
-                         ImGui::CalcTextSize(direct_value.c_str()).x,
-                     40.f));
-        ImGui::InputText("", &direct_value, ImGuiInputTextFlags_CharsDecimal);
+
+        // Handle the value based on its type
+        if (value.type() == model::ValueType::NUMBER) {
+          // For number values
+          int num_value = value.get<int>();
+
+          std::string text_value = std::to_string(num_value);
+
+          ImGui::SetNextItemWidth(
+              std::max(40.f, ImGui::CalcTextSize(text_value.c_str()).x + 10.f));
+          if (ImGui::InputText("input", &text_value,
+                               ImGuiInputTextFlags_CharsDecimal)) {
+            // Update the value if it changed
+            model::Value new_value(model::ValueType::NUMBER);
+            new_value.set(std::stoi(text_value));
+            slot->set_value(new_value);
+          }
+        } else if (value.type() == model::ValueType::TEXT) {
+          // For text values
+          std::string text_value = value.get<std::string>();
+
+          ImGui::SetNextItemWidth(
+              std::max(40.f, ImGui::CalcTextSize(text_value.c_str()).x + 10.f));
+          if (ImGui::InputText("input", &text_value)) {
+            // Update the value if it changed
+            model::Value new_value(model::ValueType::TEXT);
+            new_value.set(text_value);
+            slot->set_value(new_value);
+          }
+        }
+
         ImGui::PopStyleVar();
         ImGui::PopID();
-        break;
+      }
+    } else if (auto* text = std::get_if<std::string>(&_parts[i])) {
+      ImGui::AlignTextToFramePadding();
+      ImGui::Text("%s", text->c_str());
     }
+
     ImGui::SameLine();
   }
 }

@@ -20,7 +20,7 @@ private:
 private:
   UIOptions& _options;
   std::shared_ptr<model::Script> _script;
-  std::unordered_map<model::IDPtr, std::shared_ptr<BlockView>> instances_views;
+  std::unordered_map<model::IDPtr, std::shared_ptr<BlockView>> _instances_views;
   common::EventDispatcher::TokenP _instance_add_tkn;
 };
 }  // namespace ui

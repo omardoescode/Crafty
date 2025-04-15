@@ -1,5 +1,6 @@
 #include "character_view.h"
 #include <algorithm>
+#include "asset.h"
 #include "imgui.h"
 #include "project_manager.h"
 #include "utils/images.h"
@@ -18,6 +19,7 @@ void CharacterView::draw() {
   float screen_y = world_y * res_y / mgr.world_resolution.second;
 
   wid *= res_x / mgr.world_resolution.first;
+
   hei = wid * out_height / out_width;
 
   ImGui::SetCursorPos(ImVec2(screen_x, screen_y));

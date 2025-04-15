@@ -2,6 +2,7 @@
 #include <cassert>
 #include "SDL3/SDL_opengl.h"
 #include "action_deferrer.h"
+#include "asset.h"
 #include "imgui.h"
 #include "project_manager.h"
 #include "ui_options.h"

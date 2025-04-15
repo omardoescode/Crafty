@@ -3,8 +3,8 @@
 #include <memory>
 #include "block/block_instance.h"
 #include "events/event_dispatcher.h"
-#include "events/events.h"
 #include "imgui.h"
+#include "model_events.h"
 #include "project_manager.h"
 #include "ui_options.h"
 

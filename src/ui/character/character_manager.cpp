@@ -5,8 +5,9 @@
 #include <memory>
 #include "character/character_miniview.h"
 #include "events/event_dispatcher.h"
-#include "events/events.h"
+#include "model_events.h"
 #include "project_manager.h"
+#include "ui_logger.h"
 #include "utils/file_utils.h"
 #include "utils/images.h"
 #include "utils/material_symbols.h"
@@ -19,6 +20,7 @@ CharacterManager::CharacterManager(UIOptions& options) : _options(options) {
         auto& chr = evt->character;
         _miniviews.emplace(chr->id(),
                            std::make_shared<CharacterMiniView>(_options, chr));
+        ui_logger().info("Added a new miniview for {}", chr->name());
       }));
 
   _tkns.emplace_back(
@@ -47,6 +49,9 @@ void CharacterManager::draw() {
   ImGui::PushFont(_options.get_font(_options.ICONS_FONT_MEDIUM));
   if (ImGui::Button(ICON_MD_ADD)) {
     handle_add_click();
+  }
+  if (ImGui::Button(ICON_MD_PLAY)) {
+    // TODO:
   }
   ImGui::PopFont();
   ImGui::EndGroup();

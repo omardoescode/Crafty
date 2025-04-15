@@ -2,8 +2,8 @@
 #include <unistd.h>
 #include <memory>
 #include "events/event_dispatcher.h"
-#include "events/events.h"
 #include "imgui.h"
+#include "model_events.h"
 #include "project_manager.h"
 #include "ui_options.h"
 
@@ -15,10 +15,12 @@ ScriptView::ScriptView(UIOptions& options,
                        std::shared_ptr<model::Script> script)
     : _options(options), _script(script) {
   // 1. Create views for the current instances
-  for (const auto& block_id : _script->blocks()) {
-    auto instance = mgr.project()->instances_store().get_entity(block_id);
-    instances_views[block_id] =
-        std::make_shared<BlockView>(_options, instance, false);
+  for (const auto& block_id_w : _script->blocks()) {
+    if (auto block_id = block_id_w.lock()) {
+      auto instance = mgr.project()->instances_store().get_entity(block_id);
+      _instances_views[block_id] =
+          std::make_shared<BlockView>(_options, instance, false);
+    }
   }
 
   // 2. TODO: Subscribe to instanceAddedToScript event
@@ -27,7 +29,7 @@ ScriptView::ScriptView(UIOptions& options,
           [this](
               std::shared_ptr<model::events::onBlockInstanceAddToScript> evt) {
             if (evt->script->id() != _script->id()) return;
-            instances_views[evt->instance->id()] =
+            _instances_views[evt->instance->id()] =
                 std::make_shared<BlockView>(_options, evt->instance, false);
           });
 }
@@ -43,9 +45,10 @@ void ScriptView::draw() {
   // 1. Draw the scripts
   const auto& block_ids = _script->blocks();
   for (int i = 0; i < block_ids.size(); i++) {
-    const auto& block_id = block_ids[i];
+    const auto& block_id = block_ids[i].lock();
+    if (!block_id) continue;
     ImGui::PushID(i);
-    instances_views[block_id]->draw();
+    _instances_views[block_id]->draw();
     ImGui::PopID();
 
     ImGui::PushID(i);
