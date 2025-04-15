@@ -10,6 +10,9 @@ public:
 
   IDPtr id() const;
 
+  bool operator==(const Identifiable& rhs) const;
+  bool operator<(const Identifiable& rhs) const;
+
 private:
   IDPtr _id;
 };
