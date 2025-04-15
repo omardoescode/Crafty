@@ -52,6 +52,12 @@ public:
    */
   bool has_body() const;
 
+  /**
+   * @brief retrieve the unique id of the definition
+   * @return returns the data id
+   */
+  const std::string& data_id() const;
+
 private:
   std::string _name;
   std::string _category;

@@ -1,5 +1,6 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
+#include <memory>
 #include "action_deferrer.h"
 #include "backends/imgui_impl_opengl3.h"
 #include "backends/imgui_impl_sdl3.h"
@@ -7,10 +8,12 @@
 #include "editor/block_canvas.h"
 #include "editor/block_picker.h"
 #include "imgui.h"
+#include "logic/lua_interpreter.h"
 #include "project_manager.h"
 #include "stage/stage.h"
 #include "ui/editor/block_category_panel.h"
 #include "ui/main_menu_bar.h"
+#include "ui_options.h"
 #include "utils/material_symbols.h"
 
 #if defined(IMGUI_IMPL_OPENGL_ES2)
@@ -20,7 +23,9 @@
 #endif
 
 int main(int args, char **argv) {
-  ui::UIOptions options(args, argv);
+  std::unique_ptr<logic::Interpreter> interpreter =
+      std::make_unique<logic::LuaInterpreter>();
+  ui::UIOptions options(args, argv, std::move(interpreter));
 
   // Initialize SDL3
   if (!SDL_Init(SDL_INIT_VIDEO)) {

@@ -2,8 +2,12 @@
 #include <imgui.h>
 #include <filesystem>
 #include <map>
+#include <memory>
 #include <string>
 #include "character.h"
+#include "events/event_dispatcher.h"
+#include "interpreter.h"
+
 namespace ui {
 class UIOptions {
 public:
@@ -28,7 +32,8 @@ public:
    * Initialize the various variables
    * TODO: Load Future Layout from a file
    */
-  UIOptions(int args, char** argv);
+  UIOptions(int args, char** argv,
+            std::unique_ptr<logic::Interpreter> Interpter);
 
   // App State
   const bool& running() const;
@@ -62,6 +67,8 @@ public:
   void set_stage_width(float);
   std::pair<float, float> stage_cords() const;
 
+  void run();
+
 private:
   bool _running;
   std::string _current_cateogry = "motion";  // WARN: for debugging for now
@@ -71,5 +78,7 @@ private:
   std::filesystem::path _path_name;
   std::shared_ptr<model::Character> _current_character;
   float _stage_width;
+  std::unique_ptr<logic::Interpreter> _interpreter;
+  common::EventDispatcher::TokenP remove_default_category_tkn;
 };
 }  // namespace ui

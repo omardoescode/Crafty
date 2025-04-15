@@ -29,6 +29,8 @@ public:
    */
   const Value& value() const;
 
+  const InputSlotDef& def() const;
+
 private:
   Value _value;
   const InputSlotDef& _slot_def;

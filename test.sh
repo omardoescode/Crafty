@@ -1,1 +1,1 @@
-cmake --build ./build --target tests && cd build/bin && ../tests && cd ../..
+cmake --build ./build/Debug --target tests && cd build/Debug && ./tests && cd ../..

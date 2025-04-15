@@ -1,17 +1,22 @@
 #include "stage.h"
 #include <SDL3/SDL_render.h>
-#include "events/events.h"
+#include "events/event_dispatcher.h"
 #include "imgui.h"
+#include "model_events.h"
+#include "ui_logger.h"
 
+static auto& dispatcher = common::EventDispatcher::instance();
 namespace ui {
 Stage::Stage(UIOptions& options, SDL_Renderer* renderer) : _options(options) {
-  auto& dispatcher = common::EventDispatcher::instance();
   on_character_created_token =
       dispatcher.subscribe<model::events::onCharacterCreated>(
           [this](std::shared_ptr<model::events::onCharacterCreated> evt) {
             auto& chr = evt->character;
             _characters_views.emplace(
                 chr->id(), std::make_shared<CharacterView>(_options, chr));
+
+            ui_logger().info("Added a new character for {} on stage",
+                             chr->name());
           });
   before_character_deleted_token =
       dispatcher.subscribe<model::events::beforeCharacterDeleted>(
@@ -20,6 +25,7 @@ Stage::Stage(UIOptions& options, SDL_Renderer* renderer) : _options(options) {
             auto itr = _characters_views.find(chr->id());
             assert(itr != _characters_views.end());
             _characters_views.erase(itr);
+            ui_logger().info("Removing character {} from stage", chr->name());
           });
 }
 

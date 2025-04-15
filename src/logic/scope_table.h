@@ -42,6 +42,11 @@ public:
    */
   model::Value& lookup_variable(const std::string& label);
 
+  /**
+   * @brief Add a variable to the global environment
+   */
+  void add_variable_global(const std::string& label, model::Value value);
+
 private:
   std::shared_ptr<ScopeTable> _parent_scope;
   std::map<std::string, model::Value> _table;

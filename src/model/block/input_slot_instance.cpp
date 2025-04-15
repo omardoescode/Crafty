@@ -22,4 +22,6 @@ void InputSlotInstance::disconnect_block() {
 bool InputSlotInstance::has_block() const { return _block_connected; }
 
 const Value& InputSlotInstance::value() const { return _value; }
+
+const InputSlotDef& InputSlotInstance::def() const { return _slot_def; }
 }  // namespace model

@@ -9,11 +9,14 @@ set(GIT_VERBOSE false)
 # Set directory paths
 set(UI_DIR ${CMAKE_SOURCE_DIR}/src/ui) 
 set(MODEL_DIR ${CMAKE_SOURCE_DIR}/src/model)
+set(LOGIC_DIR ${CMAKE_SOURCE_DIR}/src/logic)
 set(THIRDPARTY_DIR ${CMAKE_SOURCE_DIR}/src/thirdparty) 
 set(COMMON_DIR ${CMAKE_SOURCE_DIR}/src/common) 
 
 # Get opengl from system
 find_package(OpenGL REQUIRED)
+
+find_package(Lua REQUIRED)
 
 # Import FetchContent
 include(FetchContent)
@@ -63,6 +66,16 @@ set(NFD_BUILD_TESTS OFF CACHE BOOL "Disable tests")
 set(NFD_PORTAL OFF CACHE BOOL "Disable Flatpak portal (Linux)")
 FetchContent_MakeAvailable(nfd)
 
+# Fetching SOL2
+FetchContent_Declare(
+  sol2
+  GIT_REPOSITORY https://github.com/ThePhD/sol2
+  GIT_TAG        main
+  GIT_PROGRESS ${GIT_VERBOSE}
+)
+message(STATUS "Fetching sol2 ...")
+FetchContent_MakeAvailable(sol2)
+
 # Fetch GTest
 FetchContent_Declare(
   googletest
@@ -88,6 +101,10 @@ add_library(model
   ${MODEL_DIR}/block/block_instance.cpp
   ${MODEL_DIR}/block/block_definition.cpp
   ${MODEL_DIR}/block/json_block_storage.cpp
+  ${MODEL_DIR}/block/input_slot.cpp
+  ${MODEL_DIR}/block/value.cpp
+  ${MODEL_DIR}/block/value_type.cpp
+  ${MODEL_DIR}/block/input_slot_instance.cpp
 
 
   # identity/id
@@ -102,6 +119,9 @@ add_library(model
 
   # Serialization
   ${MODEL_DIR}/serialization/serializable.cpp
+
+  # error
+  ${MODEL_DIR}/error/type_mismatch.cpp
 
   ${MODEL_DIR}/project.cpp
   ${MODEL_DIR}/project_manager.cpp
@@ -139,6 +159,18 @@ add_library(imgui_sdl
 target_include_directories(imgui_sdl PUBLIC ${imgui_SOURCE_DIR})
 target_link_libraries(imgui_sdl PUBLIC SDL3::SDL3 OpenGL::GL)
 
+# Build a library for logic
+add_library(logic
+  ${LOGIC_DIR}/logic_logger.cpp 
+  ${LOGIC_DIR}/scope_table.cpp
+  ${LOGIC_DIR}/lua_interpreter.cpp 
+
+  # error
+  ${LOGIC_DIR}/error/value_not_found.cpp
+)
+target_link_libraries(logic PUBLIC common model sol2::sol2 ${LUA_LIBRARIES})
+target_include_directories(logic PUBLIC ${LOGIC_DIR} ${COMMON_DIR})
+
 # Build a library for ui
 add_library(ui
   ${UI_DIR}/ui_options.cpp 
@@ -162,8 +194,8 @@ add_library(ui
   ${UI_DIR}/utils/file_utils.cpp
   ${UI_DIR}/utils/platform.cpp
 )
-target_link_libraries(ui PUBLIC common imgui_sdl model nfd)
-target_include_directories(ui PUBLIC ${UI_DIR} ${THIRDPARTY_DIR} ${COMMON_DIR})
+target_link_libraries(ui PUBLIC common imgui_sdl model nfd logic)
+target_include_directories(ui PUBLIC ${UI_DIR} ${THIRDPARTY_DIR} ${COMMON_DIR} ${LOGIC_DIR})
 
 add_executable(crafty src/main.cpp)
 target_link_libraries(crafty PUBLIC ui)
@@ -173,18 +205,18 @@ enable_testing()
 
 add_executable(tests 
   tests/ModelLayerTests.cpp 
-  # tests/CommonLayerTests.cpp
+  tests/CommonLayerTests.cpp
   # tests/UILayerTests.cpp
 )
 target_link_libraries(tests GTest::gtest_main 
   model 
   common 
-  ui
+  # ui
 )
 target_include_directories(tests PRIVATE 
   ${MODEL_DIR}
   ${COMMON_DIR}
-  ${UI_DIR}
+  # ${UI_DIR}
 )
 include(GoogleTest)
 gtest_discover_tests(tests)
@@ -193,5 +225,6 @@ gtest_discover_tests(tests)
 message("Copying assets and data")
 file(COPY assets DESTINATION ${CMAKE_BINARY_DIR})
 file(COPY data DESTINATION ${CMAKE_BINARY_DIR})
+file(COPY lua DESTINATION ${CMAKE_BINARY_DIR})
 file(COPY builtin DESTINATION ${CMAKE_BINARY_DIR})
 message("Finishing copying")

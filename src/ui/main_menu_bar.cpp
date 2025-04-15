@@ -31,6 +31,8 @@ void MainMenuBar::draw() {
       ImGui::EndMenu();
     }
     if (ImGui::BeginMenu("Project")) {
+      if (ImGui::MenuItem("Run", "<F5>")) {
+      }
       ImGui::EndMenu();
     }
     if (ImGui::BeginMenu("Help")) {

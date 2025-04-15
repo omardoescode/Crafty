@@ -2,19 +2,27 @@
 #include <filesystem>
 #include <memory>
 #include "events/event_dispatcher.h"
-#include "events/events.h"
+#include "model_events.h"
+#include "project_manager.h"
 #include "utils/platform.h"
+static auto& mgr = model::ProjectManager::instance();
 namespace ui {
-UIOptions::UIOptions(int args, char** argv)
-    : _running{true}, _args(args), _argv(argv) {
+UIOptions::UIOptions(int args, char** argv,
+                     std::unique_ptr<logic::Interpreter> interpreter)
+    : _running{true},
+      _args(args),
+      _argv(argv),
+      _stage_width(RIGHT_SIDEBAR_WIDTH),
+      _interpreter(std::move(interpreter)) {
   _path_name = get_executable_path().parent_path();
 
   auto& dispatcher = common::EventDispatcher::instance();
-  auto tkn = dispatcher.subscribe<model::events::beforeCharacterDeleted>(
-      [this](std::shared_ptr<model::events::beforeCharacterDeleted> evt) {
-        auto& chr = evt->character;
-        if (chr == _current_character) _current_character = nullptr;
-      });
+  remove_default_category_tkn =
+      dispatcher.subscribe<model::events::beforeCharacterDeleted>(
+          [this](std::shared_ptr<model::events::beforeCharacterDeleted> evt) {
+            auto& chr = evt->character;
+            if (chr == _current_character) _current_character = nullptr;
+          });
 }
 const bool& UIOptions::running() const { return _running; }
 void UIOptions::close() { _running = false; }
@@ -52,5 +60,11 @@ void UIOptions::set_current_character(
 void UIOptions::set_stage_width(float width) { _stage_width = width; }
 std::pair<float, float> UIOptions::stage_cords() const {
   return {_stage_width, _stage_width / STAGE_ASPECT};
+}
+
+void UIOptions::run() {
+  mgr.project()->script_store().foreach (
+      [this](auto script) { _interpreter->register_script(script); });
+  _interpreter->execute();
 }
 }  // namespace ui

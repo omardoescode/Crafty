@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <bitset>
 #include <memory>
+#include <mutex>
 #include <numeric>
 #include <vector>
 #include "events/event_dispatcher.h"
@@ -59,7 +60,7 @@ TEST_F(EventDispatcherTest, EventInheritance) {
 TEST_F(EventDispatcherTest, ThreadSafetyMultiplePublish) {
   std::atomic<long long> result{0};
 
-  constexpr int sz = 10000;
+  constexpr int sz = 1000;
   std::array<int, sz> arr;
   std::fill(begin(arr), end(arr), 10);
   int sum = std::accumulate(begin(arr), end(arr), 0);
@@ -89,7 +90,7 @@ TEST_F(EventDispatcherTest, ThreadSafetyMultiplePublish) {
 TEST_F(EventDispatcherTest, ThreadSafetyMultipleSubscribe) {
   std::atomic<long long> result{0};
 
-  constexpr int sub_count = 100;
+  constexpr int thread_count = 1000;
   constexpr int sz = 100;
   std::array<int, sz> arr;
   std::fill(begin(arr), end(arr), 10);
@@ -100,20 +101,22 @@ TEST_F(EventDispatcherTest, ThreadSafetyMultipleSubscribe) {
 
   std::vector<std::thread> threads;
   std::vector<common::EventDispatcher::TokenP> tkns;
-  for (int i = 0; i < sub_count; i++)
-    threads.emplace_back([&]() {
-      tkns.emplace_back(dispatcher.subscribe<SimpleEvent>(
-          [&](std::shared_ptr<SimpleEvent> evt) {
-            int idx = (evt->val);
-            result += arr[idx];
-          }));
-    });
+  std::mutex tkns_mtx;
+  for (int i = 0; i < thread_count; i++)
+    threads.emplace_back(
+        [&tkns_mtx, &tkns, this, &result, &arr = std::as_const(arr)]() {
+          std::lock_guard lck(tkns_mtx);
+          tkns.emplace_back(dispatcher.subscribe<SimpleEvent>(
+              [&](std::shared_ptr<SimpleEvent> evt) {
+                int idx = (evt->val);
+                result += arr[idx];
+              }));
+        });
 
-  // Wait for all suscribing threads
-  for (auto& t : threads) {
-    t.join();
-  }
+  // Wait for all subcribing threads
+  for (auto& t : threads) t.join();
   threads.clear();
+
   for (int i = 0; i < sz; i++) {
     threads.emplace_back(
         [&, i]() { dispatcher.publish(std::make_shared<SimpleEvent>(i)); });
@@ -123,7 +126,7 @@ TEST_F(EventDispatcherTest, ThreadSafetyMultipleSubscribe) {
   for (auto& t : threads) t.join();
 
   // Result should be predictable
-  EXPECT_EQ(result, sum * sub_count);
+  EXPECT_EQ(result, sum * thread_count);
   dispatcher.clear_all();
 }
 

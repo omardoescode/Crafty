@@ -150,13 +150,13 @@ void BlockView::draw_parts() {
         // Handle the value based on its type
         if (value.type() == model::ValueType::NUMBER) {
           // For number values
-          int num_value = value.get<int>();
+          int num_value = int(value);
 
           std::string text_value = std::to_string(num_value);
 
           ImGui::SetNextItemWidth(
               std::max(40.f, ImGui::CalcTextSize(text_value.c_str()).x + 10.f));
-          if (ImGui::InputText("input", &text_value,
+          if (ImGui::InputText("", &text_value,
                                ImGuiInputTextFlags_CharsDecimal)) {
             // Update the value if it changed
             model::Value new_value(model::ValueType::NUMBER);
@@ -165,11 +165,11 @@ void BlockView::draw_parts() {
           }
         } else if (value.type() == model::ValueType::TEXT) {
           // For text values
-          std::string text_value = value.get<std::string>();
+          std::string text_value = std::string(value);
 
           ImGui::SetNextItemWidth(
               std::max(40.f, ImGui::CalcTextSize(text_value.c_str()).x + 10.f));
-          if (ImGui::InputText("input", &text_value)) {
+          if (ImGui::InputText("", &text_value)) {
             // Update the value if it changed
             model::Value new_value(model::ValueType::TEXT);
             new_value.set(text_value);

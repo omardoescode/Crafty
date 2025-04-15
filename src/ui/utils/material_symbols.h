@@ -8,3 +8,4 @@
 #define ICON_MD_SETTINGS "\uE8B8"
 #define ICON_MD_ADD "\ue145"
 #define ICON_MD_DELETE "\uE872"
+#define ICON_MD_PLAY "\uE037"

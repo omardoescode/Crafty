@@ -51,7 +51,7 @@ void CharacterManager::draw() {
     handle_add_click();
   }
   if (ImGui::Button(ICON_MD_PLAY)) {
-    // TODO:
+    _options.run();
   }
   ImGui::PopFont();
   ImGui::EndGroup();

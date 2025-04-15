@@ -25,4 +25,5 @@ const std::vector<InputSlotDef>& BlockDefinition::inputs() const {
 const OutputSlot& BlockDefinition::output() const { return _output; }
 bool BlockDefinition::has_body() const { return _has_body; }
 
+const std::string& BlockDefinition::data_id() const { return _data_id; }
 }  // namespace model
