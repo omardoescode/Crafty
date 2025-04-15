@@ -20,12 +20,17 @@ public:
   /*
    * @brief explicit constructor with rvalue
    */
-  explicit Value(ValueType);
+  Value(ValueType);
 
-  template <typename T>
-  T get() const {
-    return std::get<T>(_value);
-  }
+  // copy
+  Value(const Value&);
+  Value& operator=(const Value&);
+
+  /**
+   * @brief move constructor
+   */
+  Value(Value&&);
+  Value& operator=(Value&&);
 
   template <typename T>
   void set(T value) {
@@ -40,6 +45,18 @@ public:
    */
   ValueType type() const;
 
+  operator int() const {
+    if (_type != ValueType::NUMBER)
+      throw error::TypeMismatchError("Expected NUMBER type");
+    return std::get<int>(_value);
+  }
+
+  operator std::string() const {
+    if (_type != ValueType::TEXT)
+      throw error::TypeMismatchError("Expected NUMBER type");
+    return std::get<std::string>(_value);
+  }
+
 private:
   template <typename T>
   constexpr bool is_compatible_type() const {
@@ -47,9 +64,27 @@ private:
       case ValueType::NUMBER:
         return std::is_same_v<T, int>;
       case ValueType::TEXT:
-        return std::is_same_v<T, std::string>;
+        return std::is_same_v<T, std::string> || std::is_same_v<T, const char*>;
       default:
         return false;
+    }
+  }
+
+  template <typename T>
+  T get() const {
+    if (!is_compatible_type<T>()) {
+      throw error::TypeMismatchError("Type mismatch in Value::get");
+    }
+
+    switch (_type) {
+      case ValueType::NUMBER:
+        return std::get<int>(_value);
+      case ValueType::TEXT:
+        return std::get<std::string>(_value);
+      case ValueType::VOID:
+        throw error::TypeMismatchError("Cannot get value from VOID type");
+      default:
+        throw error::TypeMismatchError("Unknown value type");
     }
   }
 
