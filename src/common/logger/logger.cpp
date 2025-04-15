@@ -7,13 +7,15 @@ namespace common {
 Logger::Logger(std::string&& prefix, std::ostream& out, LogLevel lvl)
     : _prefix(std::move(prefix)), _level(lvl), _out(out) {
   std::lock_guard lck(get_mutex_for_stream(_out));
-  std::print(_out, "{} Logger Initialized\n", _prefix);
+  std::print(_out, "[{}] [{}] Logger Initialized\n", _prefix,
+             level_to_string(INFO));
 }
 
 Logger::Logger(const std::string& prefix, std::ostream& out, LogLevel lvl)
     : _prefix(prefix), _level(lvl), _out(out) {
   std::lock_guard lck(get_mutex_for_stream(_out));
-  std::print(_out, "{} Logger Initialized\n", _prefix);
+  std::print(_out, "[{}] [{}] Logger Initialized\n", _prefix,
+             level_to_string(INFO));
 }
 
 std::mutex& Logger::get_mutex_for_stream(std::ostream& stream) {
@@ -31,5 +33,4 @@ std::string Logger::level_to_string(Logger::LogLevel level) {
   static constexpr std::string_view levels[] = {"INFO", "WARN", "ERROR"};
   return std::string(levels[level]);
 }
-
 }  // namespace common

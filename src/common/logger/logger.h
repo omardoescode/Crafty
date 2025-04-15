@@ -2,12 +2,14 @@
 
 #include <unistd.h>
 #include <cstdio>
+#include <exception>
 #include <iostream>
 #include <mutex>
 #include <print>
 #include <stdexcept>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <utility>
 namespace common {
 class Logger {
@@ -28,10 +30,12 @@ public:
   void warn(std::string_view fmt, Args&&... args) {
     log(WARN, fmt, std::forward<Args>(args)...);
   }
-  template <typename... Args>
+  template <typename ErrorType = std::runtime_error, typename... Args>
   void error(std::string_view fmt, Args&&... args) {
+    static_assert(std::is_base_of<std::exception, ErrorType>());
+
     log(ERROR, fmt, std::forward<Args>(args)...);
-    throw std::runtime_error("An error occurred, check logger output");
+    throw ErrorType("An error occurred, check logger output");
   }
 
 private:
