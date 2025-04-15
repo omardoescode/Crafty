@@ -1,13 +1,14 @@
 #pragma once
 #include <cassert>
-#include <map>
 #include <memory>
 #include <mutex>
 #include <shared_mutex>
 #include <type_traits>
+#include <unordered_map>
 #include "id.h"
 #include "id_generator.h"
 #include "identity/identifiable.h"
+#include "model_logger.h"
 
 namespace model {
 template <typename Object>
@@ -17,7 +18,7 @@ public:
    * @brief Constructor for store
    * @param id_generator An ID generator for entities of type `Object`
    */
-  Store(std::unique_ptr<IDGenerator>);
+  explicit Store(std::unique_ptr<IDGenerator>);
 
   /**
    * @brief Create an entity of type `Object`
@@ -59,7 +60,7 @@ entity's id to remove
 
 private:
   IDGeneratorPtr _id_mgr;
-  std::map<IDPtr, std::shared_ptr<Object>> _store;
+  std::unordered_map<IDPtr, std::shared_ptr<Object>> _store;
   mutable std::shared_mutex _store_mtx;
 };
 
@@ -73,18 +74,22 @@ Store<Object>::Store(std::unique_ptr<IDGenerator> mgr)
 template <typename Object>
 bool Store<Object>::has_entity(IDPtr id) const {
   std::shared_lock lck(_store_mtx);
-  return _store.count(id);
+  return _store.count(id) != 0;
 }
 template <typename Object>
 std::shared_ptr<Object> Store<Object>::get_entity(IDPtr id) const {
   std::shared_lock lck(_store_mtx);
-  assert(has_entity(id));
-  return _store.at(id);
+  auto it = _store.find(id);
+  if (it != _store.end()) return it->second;
+  model_logger().warn("ID:{} is not found in store", id->to_string());
+  return nullptr;
 }
 
 template <typename Object>
 template <typename... T>
 std::shared_ptr<Object> Store<Object>::create_entity(T&&... args) {
+  static_assert(std::is_constructible_v<Object, IDPtr, T...>,
+                "Object must be constructible with IDPtr and provided args");
   std::unique_lock lck(_store_mtx);
   auto new_id = _id_mgr->generate_next();
   _store[new_id] =
@@ -100,8 +105,11 @@ void Store<Object>::remove_entity(IDPtr id) {
 
 template <typename Object>
 std::shared_ptr<Object> Store<Object>::get_entity(IDWPtr id_w) const {
-  auto id = id_w.lock();
-  if (!id) return nullptr;
-  return get_entity(id);
+  std::shared_lock lck(_store_mtx);
+  if (auto id = id_w.lock()) {
+    auto it = _store.find(id);
+    return it != _store.end() ? it->second : nullptr;
+  }
+  return nullptr;
 }
 }  // namespace model
