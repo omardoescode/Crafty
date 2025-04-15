@@ -1,6 +1,10 @@
 #include "json_block_storage.h"
+#include <exception>
 #include <stdexcept>
+#include <string>
 #include "block/block_definition.h"
+#include "block/value_type.h"
+#include "input_slot.h"
 #include "model_logger.h"
 #include "utils/json.h"
 
@@ -24,17 +28,30 @@ void JsonBlockStorage::load_definitions(const std::filesystem::path& path) {
     std::string category = element["name"].get<std::string>();
 
     for (auto& block : element.at("blocks")) {
+      // try {
       // Create Input Slots
-      std::vector<InputSlot> inputs;
-      for (auto& slot : block.at("inputs"))
-        inputs.emplace_back(
-            InputSlot{.label = slot.at("label"),
-                      .type = parse_type(slot.at("type")),
-                      .default_value = slot.at("default_value")});
+      std::vector<InputSlotDef> inputs;
+      for (auto& slot : block.at("inputs")) {
+        std::string type = slot.at("type");
+        Value value(to_value_type(type));
+        switch (value.type()) {
+          case ValueType::NUMBER:
+            value.set((int)slot.at("default_value"));
+            break;
+          case ValueType::TEXT:
+            value.set((std::string)slot.at("default_value"));
+            break;
+          default:
+            model_logger().error("Input slot of invalid type: {}",
+                                 static_cast<int>(value.type()));
+            break;
+        }
+        inputs.emplace_back(slot.at("label"), value);
+      }
 
       // Create the output slot
       OutputSlot output;
-      output.type = parse_type(block.at("output").at("type"));
+      output.type = to_value_type(block.at("output").at("type"));
 
       // Extract Other data
       std::string name = block.at("name");
@@ -51,6 +68,9 @@ void JsonBlockStorage::load_definitions(const std::filesystem::path& path) {
       // put the values in the maps
       _defs[id] = def;
       _category_defs[category].push_back(def);
+      // } catch (const std::exception& exx) {
+      //   model_logger().warn("Failed to load block");
+      // }
     }
 
     model_logger().info("Loaded {} block definitions of category {}",

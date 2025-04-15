@@ -4,26 +4,12 @@
 #include <string>
 #include <vector>
 #include "identity/identifiable.h"
+#include "input_slot.h"
 
 namespace model {
 
-enum class SlotType { Exec, Number, Boolean, String };
-
-/**
- * @brief Parse a string type and convert it to `SlotType` enum
- * @param type The type in string format
- * @return a SlotType
- */
-SlotType parse_type(std::string type);
-
-struct InputSlot {
-  std::string label;
-  SlotType type;
-  std::string default_value;
-};
-
 struct OutputSlot {
-  SlotType type;
+  ValueType type;
 };
 
 class BlockDefinition : public Identifiable {
@@ -37,8 +23,9 @@ public:
   };
 
   BlockDefinition(IDPtr id, std::string data_id, const std::string& name,
-                  const std::string& category, std::vector<InputSlot>&& inputs,
-                  OutputSlot output_slot, int options = 0);
+                  const std::string& category,
+                  std::vector<InputSlotDef>&& inputs, OutputSlot output_slot,
+                  int options = 0);
 
   /**
    * @brief Getter for name
@@ -53,7 +40,7 @@ public:
   /**
    * @brief Getter for input slots
    */
-  const std::vector<InputSlot>& inputs() const;
+  const std::vector<InputSlotDef>& inputs() const;
 
   /**
    * @brief Getter for output slot
@@ -68,7 +55,7 @@ public:
 private:
   std::string _name;
   std::string _category;
-  std::vector<InputSlot> _inputs;
+  std::vector<InputSlotDef> _inputs;
   OutputSlot _output;
   bool _has_body;
   std::string _data_id;

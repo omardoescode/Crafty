@@ -1,66 +1,70 @@
 [
   {
-    "name": "Motion",
+    "name": "motion",
     "blocks": [
       {
+        "id": "move_steps",
         "name": "move %0 steps",
         "has_body": false,
         "inputs": [
           {
             "label": "steps",
             "type": "Number",
-            "default_value": "100"
+            "default_value": 1
           }
         ],
         "output": {
-          "type": "Exec"
+          "type": "Void"
         }
       },
       {
+        "id": "go_to_x_y",
         "name": "go to %0 x %1 y",
         "has_body": false,
         "inputs": [
           {
             "label": "x",
             "type": "Number",
-            "default_value": "0"
+            "default_value": 0
           },
           {
             "label": "y",
             "type": "Number",
-            "default_value": "0"
+            "default_value": 0
           }
         ],
         "output": {
-          "type": "Exec"
+          "type": "Void"
         }
       },
       {
+        "id": "turn_clockwise",
         "name": "turn %0 clockwise",
         "has_body": false,
         "inputs": [
           {
             "label": "degrees",
             "type": "Number",
-            "default_value": "0"
+            "default_value": 0
           }
         ],
         "output": {
-          "type": "Exec"
+          "type": "Void"
         }
       },
       {
+        "id": "turn_anticlockwise",
         "name": "turn %0 anticlockwise",
         "has_body": false,
         "inputs": [
           {
             "label": "degrees",
             "type": "Number",
-            "default_value": "0"
+            "default_value": 0
           }
         ],
         "output": {
-          "type": "Exec"
+          "type": "Void"
         }
       }
     ]
