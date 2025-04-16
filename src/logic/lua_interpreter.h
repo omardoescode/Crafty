@@ -7,6 +7,7 @@
 #include <thread>
 #include "block/block_instance.h"
 #include "block/input_slot_instance.h"
+#include "character.h"
 #include "events/event_dispatcher.h"
 #include "interpreter.h"
 #include "scope_table.h"
@@ -38,7 +39,7 @@ public:
   void register_script(std::shared_ptr<model::Script> script) override;
 
   /**
-   * @brief
+   * @brief Execute the registered scripts
    */
   void execute() override;
 
@@ -59,9 +60,11 @@ private:
   void initialize_usertypes();
   void execute(std::shared_ptr<model::Script> script,
                std::shared_ptr<ScopeTable> current_table);
-  model::Value execute_block(std::shared_ptr<model::BlockInstance> instance,
+  model::Value execute_block(std::shared_ptr<model::Character> character,
+                             std::shared_ptr<model::BlockInstance> instance,
                              std::shared_ptr<ScopeTable> current_table);
   model::Value execute_input_slot(
+      std::shared_ptr<model::Character> character,
       std::shared_ptr<model::InputSlotInstance> instance,
       std::shared_ptr<ScopeTable> current_table);
 

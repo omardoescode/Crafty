@@ -11,12 +11,12 @@ void InputSlotInstance::set_value(Value value) { _value = value; }
 
 void InputSlotInstance::connect_block(IDPtr id) {
   _block_connected = true;
-  _id = id;
+  _block_id = id;
 }
 
 void InputSlotInstance::disconnect_block() {
   _block_connected = false;
-  _id = nullptr;
+  _block_id = nullptr;
 }
 
 bool InputSlotInstance::has_block() const { return _block_connected; }
@@ -24,4 +24,6 @@ bool InputSlotInstance::has_block() const { return _block_connected; }
 const Value& InputSlotInstance::value() const { return _value; }
 
 const InputSlotDef& InputSlotInstance::def() const { return _slot_def; }
+
+const IDPtr InputSlotInstance::block_id() const { return _block_id; }
 }  // namespace model

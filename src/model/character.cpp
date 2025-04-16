@@ -32,7 +32,7 @@ void Character::remove_script(IDPtr id) { remove_weak_ptr(_scripts, id); }
 bool Character::has_scripts() const { return !_scripts.empty(); }
 
 std::pair<float, float> Character::pos() const { return _pos; }
-void Character::set_pos(std::pair<float, float> new_pos) { _pos = new_pos; }
+void Character::set_pos(float x, float y) { _pos = {x, y}; }
 
 unsigned Character::current_texture_idx() const { return _current_texture_idx; }
 

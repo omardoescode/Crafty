@@ -45,7 +45,7 @@ void CharacterView::draw() {
     new_y = std::clamp(new_y, 0.0f, max_y);
 
     // Update character position
-    _character->set_pos({new_x, new_y});
+    _character->set_pos(new_x, new_y);
 
     // Reset drag delta (important for smooth dragging)
     ImGui::ResetMouseDragDelta(ImGuiMouseButton_Left);

@@ -70,24 +70,6 @@ private:
     }
   }
 
-  template <typename T>
-  T get() const {
-    if (!is_compatible_type<T>()) {
-      throw error::TypeMismatchError("Type mismatch in Value::get");
-    }
-
-    switch (_type) {
-      case ValueType::NUMBER:
-        return std::get<int>(_value);
-      case ValueType::TEXT:
-        return std::get<std::string>(_value);
-      case ValueType::VOID:
-        throw error::TypeMismatchError("Cannot get value from VOID type");
-      default:
-        throw error::TypeMismatchError("Unknown value type");
-    }
-  }
-
   StorageType _value;
   ValueType _type;
 };

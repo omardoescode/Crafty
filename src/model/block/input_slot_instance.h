@@ -31,10 +31,12 @@ public:
 
   const InputSlotDef& def() const;
 
+  const IDPtr block_id() const;
+
 private:
   Value _value;
   const InputSlotDef& _slot_def;
   bool _block_connected;
-  IDPtr _id;
+  IDPtr _block_id;
 };
 }  // namespace model

@@ -1,6 +1,5 @@
 #pragma once
 #include <vector>
-#include "project.h"
 #include "serialization/serializable.h"
 namespace model {
 class BlockInstance;
@@ -18,7 +17,7 @@ public:
   bool has_scripts() const;
 
   std::pair<float, float> pos() const;
-  void set_pos(std::pair<float, float>);
+  void set_pos(float x, float y);
 
   unsigned current_texture_idx() const;
 

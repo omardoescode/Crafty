@@ -15,7 +15,7 @@ namespace model {
 class BlockInstance : public Serializable {
 public:
   /**
-   * @breif Constructor
+   * @brief Constructor
    * @param id The id of this instance
    * @param def The definition of this block instance
    * @param serialize whether to serialize this or not
@@ -23,7 +23,7 @@ public:
   BlockInstance(IDPtr id, BlockDefPtr def, bool serialize = true);
 
   /**
-   * @breif Getter for definition
+   * @brief Getter for definition
    * @return A shared pointer to the definition
    */
   BlockDefPtr def() const;

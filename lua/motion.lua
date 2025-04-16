@@ -26,6 +26,13 @@ M.move_steps = function(ctx)
 	if message:type() == ValueType.TEXT then -- Using the registered ValueType enum
 		print("Text value:", message:tostring()) -- Using the tostring method
 	end
+
+	return Value(ValueType.VOID)
+end
+
+M.go_to_x_y = function(ctx)
+	ctx.character:set_pos(ctx.scope:lookup_variable("x"):tonumber(), ctx.scope:lookup_variable("y"):tonumber())
+	return Value(ValueType.VOID)
 end
 
 return M

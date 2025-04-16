@@ -8,6 +8,7 @@
 #include "block/input_slot_instance.h"
 #include "block/value.h"
 #include "block/value_type.h"
+#include "character.h"
 #include "events/event_dispatcher.h"
 #include "logic_logger.h"
 #include "model_events.h"
@@ -71,6 +72,9 @@ void LuaInterpreter::initialize_usertypes() {
       "tonumber", [](const model::Value& v) { return int(v); }, "tostring",
       [](const model::Value& v) { return std::string(v); });
 
+  _lua_state.new_usertype<model::Character>(
+      "Character", "set_pos", sol::protect(&model::Character::set_pos));
+
   // Register ScopeTable (existing code)
   _lua_state.new_usertype<ScopeTable>(
       "ScopeTable", "add_variable", &ScopeTable::add_variable,
@@ -105,25 +109,25 @@ void LuaInterpreter::execute(std::shared_ptr<model::Script> script,
   auto scope = std::make_shared<ScopeTable>(parent_table);
   static auto& instance_store = mgr.project()->instances_store();
   auto instances = script->blocks();
+  auto character = script->character();
   for (auto instance_w : instances) {
     auto instance_id = instance_w.lock();
     if (!instance_id) continue;
 
     auto instance = instance_store.get_entity(instance_id);
-    execute_block(instance, scope);
+    execute_block(character, instance, scope);
   }
 }
 
 model::Value LuaInterpreter::execute_block(
+    std::shared_ptr<model::Character> character,
     std::shared_ptr<model::BlockInstance> instance,
     std::shared_ptr<ScopeTable> current_table) {
   // Handle inputs
   for (std::shared_ptr<model::InputSlotInstance> input : instance->inputs()) {
-    if (input->has_block()) {
-      // TODO: TEST THIS PART
-      model::Value value = execute_input_slot(input, current_table);
-      current_table->add_variable(input->def().label(), value);
-    }
+    // TODO: TEST THIS PART
+    model::Value value = execute_input_slot(character, input, current_table);
+    current_table->add_variable(input->def().label(), value);
   }
 
   {
@@ -135,6 +139,7 @@ model::Value LuaInterpreter::execute_block(
     // Create the argument list
     sol::table block_ctx = _lua_state.create_table();
     block_ctx["scope"] = current_table.get();
+    block_ctx["character"] = character.get();
     // Execute the script in this environment
     try {
       sol::protected_function func =
@@ -145,19 +150,26 @@ model::Value LuaInterpreter::execute_block(
         sol::error err = result;
         logic_logger().error("Lua execution error: {}", err.what());
       }
+
+      return result;
     } catch (const sol::error& e) {
       logic_logger().error("Lua execution error: {}", e.what());
     }
   }
-
-  return model::Value(model::ValueType::VOID);
 }
 
 Interpreter::Status LuaInterpreter::status() { return _status; }
 
+// TODO:
 model::Value LuaInterpreter::execute_input_slot(
+    std::shared_ptr<model::Character> character,
     std::shared_ptr<model::InputSlotInstance> instance,
     std::shared_ptr<ScopeTable> current_table) {
-  return model::Value(model::ValueType::VOID);
+  if (instance->has_block()) {
+    auto block_id = instance->block_id();
+    auto block = mgr.project()->instances_store().get_entity(block_id);
+    return execute_block(character, block, current_table);
+  }
+  return instance->value();
 }
 }  // namespace logic
