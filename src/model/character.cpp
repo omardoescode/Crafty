@@ -12,7 +12,8 @@ Character::Character(IDPtr id, float x, float y, float width, bool serialize)
       _pos(x, y),
       _current_texture_idx(0),
       _name(id->to_string()),
-      _width(width) {}
+      _width(width),
+      _rotation(0) {}
 
 void Character::add_sprite(IDPtr id, int pos) {
   if (pos < 0 || pos > _sprites.size()) pos = _sprites.size();
@@ -34,25 +35,24 @@ bool Character::has_scripts() const { return !_scripts.empty(); }
 std::pair<float, float> Character::pos() const { return _pos; }
 void Character::set_pos(float x, float y) { _pos = {x, y}; }
 
-unsigned Character::current_texture_idx() const { return _current_texture_idx; }
+unsigned Character::current_spirte_idx() const { return _current_texture_idx; }
 
-IDPtr Character::current_texture() const {
+IDPtr Character::current_sprite() const {
   if (_sprites.empty()) return nullptr;
   auto result_w = _sprites[_current_texture_idx];
   if (auto result = result_w.lock()) return result;
-  model_logger().error(
+  throw model_logger().error(
       "There's no current implementation to changing current texture when a "
       "texture is removed");
-  return {};
 }
 
-void Character::set_current_texture_idx(size_t new_val) {
+void Character::set_current_sprite_idx(size_t new_val) {
   assert(new_val >= 0 && new_val < _sprites.size() &&
          "Invalid value for a texture index");
   _current_texture_idx = new_val;
 }
 
-void Character::next_texture() {
+void Character::next_sprite() {
   if (!has_sprites()) return;  // Guard against mod of 0
   _current_texture_idx++, _current_texture_idx %= _sprites.size();
 }
@@ -65,4 +65,11 @@ void Character::set_name(std::string&& name) { _name = std::move(name); }
 
 const float Character::width() const { return _width; }
 void Character::set_width(float width) { _width = width; }
+
+int Character::rotation() const { return _rotation; }
+
+void Character::set_rotation(int new_rotation) {
+  _rotation = new_rotation % 360;
+  if (_rotation < 0) _rotation += 360;
+}
 }  // namespace model

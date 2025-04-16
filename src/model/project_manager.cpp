@@ -135,7 +135,7 @@ std::shared_ptr<Character> ProjectManager::add_character(
 
 std::shared_ptr<Asset> ProjectManager::character_current_sprite(
     std::shared_ptr<Character> character) {
-  auto asset_id = character->current_texture();
+  auto asset_id = character->current_sprite();
   auto asset = _current_project->asset_store().get_entity(asset_id);
   return asset;
 }
