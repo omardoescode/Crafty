@@ -160,7 +160,7 @@ void BlockView::draw_parts() {
                                ImGuiInputTextFlags_CharsDecimal)) {
             // Update the value if it changed
             model::Value new_value(model::ValueType::NUMBER);
-            new_value.set(std::stoi(text_value));
+            new_value.set(text_value.empty() ? 0 : std::stoi(text_value));
             slot->set_value(new_value);
           }
         } else if (value.type() == model::ValueType::TEXT) {
