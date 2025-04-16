@@ -42,8 +42,8 @@ void JsonBlockStorage::load_definitions(const std::filesystem::path& path) {
             value.set((std::string)slot.at("default_value"));
             break;
           default:
-            model_logger().error("Input slot of invalid type: {}",
-                                 static_cast<int>(value.type()));
+            throw model_logger().error("Input slot of invalid type: {}",
+                                       static_cast<int>(value.type()));
             break;
         }
         inputs.emplace_back(slot.at("label"), value);

@@ -18,9 +18,12 @@ public:
 
   Logger(std::string&&, std::ostream& = std::cout, LogLevel = INFO);
   Logger(const std::string&, std::ostream& = std::cout, LogLevel = INFO);
+  ~Logger() { info("Logger {} Destructued", _prefix); }
 
   Logger(const Logger&) = delete;             // No copying
   Logger& operator=(const Logger&) = delete;  // No assignment
+  Logger(Logger&&) = delete;
+  Logger& operator=(Logger&&) = delete;
 
   template <typename... Args>
   void info(std::string_view fmt, Args&&... args) {
@@ -31,11 +34,11 @@ public:
     log(WARN, fmt, std::forward<Args>(args)...);
   }
   template <typename ErrorType = std::runtime_error, typename... Args>
-  void error(std::string_view fmt, Args&&... args) {
+  ErrorType error(std::string_view fmt, Args&&... args) {
     static_assert(std::is_base_of<std::exception, ErrorType>());
 
     log(ERROR, fmt, std::forward<Args>(args)...);
-    throw ErrorType("An error occurred, check logger output");
+    return ErrorType("An error occurred, check logger output");
   }
 
 private:

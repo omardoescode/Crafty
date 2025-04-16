@@ -14,7 +14,7 @@ Value::Value(ValueType type) : _type(type) {
     case ValueType::VOID:  // do nothing
       break;
     default:
-      model_logger().error("Failed to initilialize value");
+      throw model_logger().error("Failed to initilialize value");
   }
 }
 

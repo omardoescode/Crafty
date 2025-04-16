@@ -39,7 +39,7 @@ const std::vector<std::shared_ptr<InputSlotInstance>>& BlockInstance::inputs()
 void BlockInstance::set_input_slot_value(
     std::shared_ptr<InputSlotInstance> value, std::size_t idx) {
   if (idx < 0 || idx > _inputs.size())
-    return model_logger().error(
+    throw model_logger().error(
         "BlockInstance::set_input_slot_value - Invalid index={} given", idx);
   _inputs[idx] = value;
 }

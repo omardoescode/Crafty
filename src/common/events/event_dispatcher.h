@@ -119,7 +119,7 @@ public:
       try {
         handler.func(evt);
       } catch (const std::exception &) {
-        common_logger().error("Failed to run handler\n");
+        throw common_logger().error("Failed to run handler");
       }
     }
   }
