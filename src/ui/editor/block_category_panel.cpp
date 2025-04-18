@@ -11,8 +11,7 @@ void BlockCategoryPanel::draw() {
   auto lib = model::ProjectManager::instance().block_lib();
   auto categories = lib->categories();
 
-  if (ImGui::BeginTable("table", 2, ImGuiTableFlags_NoPadInnerX,
-                        ImVec2(0, 0))) {
+  if (ImGui::BeginTable("table", 2)) {
     for (auto& name : categories) {
       ImGui::TableNextColumn();
       if (ImGui::Button(name.c_str(),

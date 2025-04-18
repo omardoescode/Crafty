@@ -27,8 +27,8 @@ public:
   void draw();
 
 private:
-  constexpr static std::pair<float, float> PADDING = {2.f, 2.f};
-  constexpr static std::pair<float, float> DIRECT_VALUE_PADDING = {3.f, 3.f};
+  constexpr static std::pair<float, float> PADDING = {2, 2};
+  constexpr static std::pair<float, float> DIRECT_VALUE_PADDING = {3, 3};
   constexpr static float SLOT_X_MARGIN = 3.f;
   constexpr static float MIN_VIEW_HEIGHT = 20.f;
 

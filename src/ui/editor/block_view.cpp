@@ -154,8 +154,8 @@ void BlockView::draw_parts() {
 
           std::string text_value = std::to_string(num_value);
 
-          ImGui::SetNextItemWidth(
-              std::max(40.f, ImGui::CalcTextSize(text_value.c_str()).x + 10.f));
+          ImGui::SetNextItemWidth(ImGui::CalcTextSize(text_value.c_str()).x +
+                                  10.f);
           if (ImGui::InputText("", &text_value,
                                ImGuiInputTextFlags_CharsDecimal)) {
             // Update the value if it changed
@@ -167,8 +167,8 @@ void BlockView::draw_parts() {
           // For text values
           std::string text_value = std::string(value);
 
-          ImGui::SetNextItemWidth(
-              std::max(40.f, ImGui::CalcTextSize(text_value.c_str()).x + 10.f));
+          ImGui::SetNextItemWidth(ImGui::CalcTextSize(text_value.c_str()).x +
+                                  10.f);
           if (ImGui::InputText("", &text_value)) {
             // Update the value if it changed
             model::Value new_value(model::ValueType::TEXT);
