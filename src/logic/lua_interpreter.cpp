@@ -2,9 +2,13 @@
 #include <format>
 #include <memory>
 #include <mutex>
+#include <sol/forward.hpp>
 #include <sol/make_reference.hpp>
+#include <sol/protect.hpp>
 #include <sol/raii.hpp>
 #include <sol/table.hpp>
+#include <sol/variadic_args.hpp>
+#include <stdexcept>
 #include "block/input_slot_instance.h"
 #include "block/value.h"
 #include "block/value_type.h"
@@ -34,7 +38,7 @@ LuaInterpreter::~LuaInterpreter() {
 void LuaInterpreter::initialize_state() {
   logic_logger().info("Initializing State");
   std::lock_guard lck(_lua_state_mtx);
-  _lua_state.open_libraries(sol::lib::base, sol::lib::package);
+  _lua_state.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math);
 
   // Initialize Categories
   auto& mgr = model::ProjectManager::instance();
@@ -48,6 +52,23 @@ void LuaInterpreter::initialize_state() {
 }
 
 void LuaInterpreter::initialize_usertypes() {
+  _lua_state["debug_args"] = [](sol::variadic_args va) {
+    std::cout << "Number of arguments: " << va.size() << std::endl;
+    int idx = 0;
+    for (auto&& v : va) {
+      std::cout << "Arg " << idx++ << ": ";
+      if (v.is<int>())
+        std::cout << "int" << std::endl;
+      else if (v.is<double>())
+        std::cout << "double" << std::endl;
+      else if (v.is<std::string>())
+        std::cout << "string" << std::endl;
+      else if (v.is<sol::table>())
+        std::cout << "table" << std::endl;
+      else
+        std::cout << "unknown" << std::endl;
+    }
+  };
   // First register ValueType enum
   _lua_state.new_enum<model::ValueType>("ValueType",
                                         {{"NUMBER", model::ValueType::NUMBER},
@@ -73,9 +94,12 @@ void LuaInterpreter::initialize_usertypes() {
       [](const model::Value& v) { return std::string(v); });
 
   _lua_state.new_usertype<model::Character>(
-      "Character", "set_pos", sol::protect(&model::Character::set_pos));
+      "Character", "pos", sol::protect(&model::Character::pos), "set_pos",
+      sol::protect(&model::Character::set_pos), "set_rotation",
+      sol::protect(&model::Character::set_rotation), "rotation",
+      sol::protect(&model::Character::rotation));
 
-  // Register ScopeTable (existing code)
+  // Register ScopeTable
   _lua_state.new_usertype<ScopeTable>(
       "ScopeTable", "add_variable", &ScopeTable::add_variable,
       "add_variable_global", &ScopeTable::add_variable_global,
@@ -93,13 +117,16 @@ void LuaInterpreter::execute() {
   ctx->thread = std::thread([&, this]() {
     std::lock_guard lck(_scripts_mtx);
     for (auto& script : _scripts) {
+      // TODO: Execute scripts in parallel
       execute(script, _global_ctx);
     }
 
-    // clear scripts
+    // clear all scripts reference, a script still has a valid shared reference
+    // anyway
     _scripts.clear();
 
     // Change state
+    // TODO: Wait? until all finished?
     ctx->is_running = false;
   });
 }
@@ -148,14 +175,16 @@ model::Value LuaInterpreter::execute_block(
 
       if (!result.valid()) {
         sol::error err = result;
-        logic_logger().error("Lua execution error: {}", err.what());
+        throw logic_logger().error("Lua execution error: {}", err.what());
       }
 
       return result;
     } catch (const sol::error& e) {
-      logic_logger().error("Lua execution error: {}", e.what());
+      throw logic_logger().error("Lua execution error: {}", e.what());
     }
   }
+
+  throw std::runtime_error("It shouldn't make it here?");
 }
 
 Interpreter::Status LuaInterpreter::status() { return _status; }

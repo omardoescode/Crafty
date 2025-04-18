@@ -66,6 +66,69 @@
         "output": {
           "type": "Void"
         }
+      },
+      {
+        "id": "point_direction",
+        "name": "Point to direction %0",
+        "has_body": false,
+        "inputs": [
+          {
+            "label": "degrees",
+            "type": "Number",
+            "default_value": 0
+          }
+        ],
+        "output": {
+          "type": "Void"
+        }
+      },
+      {
+        "id": "set_x",
+        "name": "Set x to %0",
+        "has_body": false,
+        "inputs": [
+          {
+            "label": "x",
+            "type": "Number",
+            "default_value": 1
+          }
+        ],
+        "output": {
+          "type": "Void"
+        }
+      },
+      {
+        "id": "set_y",
+        "name": "Set y to %0",
+        "has_body": false,
+        "inputs": [
+          {
+            "label": "y",
+            "type": "Number",
+            "default_value": 1
+          }
+        ],
+        "output": {
+          "type": "Void"
+        }
+      },
+      {
+        "id": "x",
+        "name": "x position",
+        "has_body": false,
+        "inputs": [],
+        "output": {
+          "type": "Number"
+        }
+      },
+      {
+        "id": "y",
+        "name": "y position",
+        "has_body": false,
+        "inputs": [],
+        "output": {
+          "type": "Number"
+        }
       }
     ]
   }

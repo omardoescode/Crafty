@@ -6,7 +6,7 @@ class BlockInstance;
 
 class Character : public Serializable {
 public:
-  Character(IDPtr id, float x, float y, float width, bool serialize = true);
+  Character(IDPtr id, int x, int y, float width, bool serialize = true);
 
   /**
    * @brief Add a sprite id to the character
@@ -52,14 +52,13 @@ public:
    * @brief Retrieve the current positon
    * @return a pair of x and y values that dictate position in world coordinates
    */
-  std::pair<float, float> pos() const;
+  std::pair<int, int> pos() const;
 
   /**
    * @brief Set a new position for the character
-   * @param x The x coordinate in world coordinates
-   * @param y The y coordinate in world coordinates
+   * @param pos The (x,y) coordinates in world coordinates
    */
-  void set_pos(float x, float y);
+  void set_pos(std::pair<int, int> pos);
 
   /**
    * @brief Get the current sprite index in the sprite list
@@ -143,7 +142,7 @@ public:
 private:
   std::vector<IDWPtr> _sprites;
   std::vector<IDWPtr> _scripts;
-  std::pair<float, float> _pos;
+  std::pair<int, int> _pos;
   size_t _current_texture_idx;
   std::string _name;
   // The height is evaluated by multiplying the width by the ratio of height to

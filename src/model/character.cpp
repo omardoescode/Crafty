@@ -7,7 +7,7 @@
 
 namespace model {
 
-Character::Character(IDPtr id, float x, float y, float width, bool serialize)
+Character::Character(IDPtr id, int x, int y, float width, bool serialize)
     : Serializable(id, serialize),
       _pos(x, y),
       _current_texture_idx(0),
@@ -32,8 +32,8 @@ void Character::remove_script(IDPtr id) { remove_weak_ptr(_scripts, id); }
 
 bool Character::has_scripts() const { return !_scripts.empty(); }
 
-std::pair<float, float> Character::pos() const { return _pos; }
-void Character::set_pos(float x, float y) { _pos = {x, y}; }
+std::pair<int, int> Character::pos() const { return _pos; }
+void Character::set_pos(std::pair<int, int> pos) { _pos = pos; }
 
 unsigned Character::current_spirte_idx() const { return _current_texture_idx; }
 

@@ -23,7 +23,6 @@ void ScopeTable::add_variable(const std::string& label, model::Value value) {
     logic_logger().warn("{} variable has been overwriteen", label);
   } else {
     _table.insert({label, model::Value(value)});
-    logic_logger().warn("{} variable has been inserted", label);
   }
 }
 

@@ -50,6 +50,7 @@ void CharacterManager::draw() {
   if (ImGui::Button(ICON_MD_ADD)) {
     handle_add_click();
   }
+  ImGui::SameLine();
   if (ImGui::Button(ICON_MD_PLAY)) {
     _options.run();
   }
