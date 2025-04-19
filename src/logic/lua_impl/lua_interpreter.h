@@ -53,23 +53,23 @@ private:
   struct ThreadContext {
     std::thread thread;
     std::atomic<bool> is_running = std::atomic{true};
-    std::weak_ptr<model::Script> script;
+    std::mutex mtx;
+    std::shared_ptr<model::Script> script;
+    sol::state _lua_state;
   };
 
-  void initialize_state();
-  void initialize_usertypes();
-  void execute(std::shared_ptr<model::Script> script,
-               std::shared_ptr<ScopeTable> current_table);
-  model::Value execute_block(std::shared_ptr<model::Character> character,
+  void initialize_state(sol::state& state);
+  void initialize_usertypes(sol::state& state);
+  void execute(const std::unique_ptr<ThreadContext>& context,
+               std::shared_ptr<ScopeTable> parent_table);
+  model::Value execute_block(sol::state& state,
+                             std::shared_ptr<model::Character> character,
                              std::shared_ptr<model::BlockInstance> instance,
                              std::shared_ptr<ScopeTable> current_table);
   model::Value execute_input_slot(
-      std::shared_ptr<model::Character> character,
+      sol::state& state, std::shared_ptr<model::Character> character,
       std::shared_ptr<model::InputSlotInstance> instance,
       std::shared_ptr<ScopeTable> current_table);
-
-  sol::state _lua_state;
-  std::mutex _lua_state_mtx;
 
   std::set<std::shared_ptr<model::Script>> _scripts;
   std::mutex _scripts_mtx;
@@ -78,7 +78,6 @@ private:
   std::mutex _status_mtx;
 
   std::list<std::unique_ptr<ThreadContext>> _threads;
-  std::mutex _threads_mutex;
 
   std::shared_ptr<ScopeTable> _global_ctx;
   common::EventDispatcher::TokenP add_script_tkn;

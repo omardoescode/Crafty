@@ -25,8 +25,6 @@ static auto& mgr = model::ProjectManager::instance();
 namespace logic {
 LuaInterpreter::LuaInterpreter()
     : _status(IDLE), _global_ctx(std::make_shared<ScopeTable>()) {
-  initialize_state();
-  initialize_usertypes();
   remove_script_tkn = dispatcher.subscribe<model::events::beforeScriptDeleted>(
       [this](auto evt) { _scripts.erase(evt->script); });
 }
@@ -35,10 +33,9 @@ LuaInterpreter::~LuaInterpreter() {
   for (auto& thr : _threads) thr->thread.join();
 }
 
-void LuaInterpreter::initialize_state() {
+void LuaInterpreter::initialize_state(sol::state& state) {
   logic_logger().info("Initializing State");
-  std::lock_guard lck(_lua_state_mtx);
-  _lua_state.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math);
+  state.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math);
 
   // Initialize Categories
   auto& mgr = model::ProjectManager::instance();
@@ -46,13 +43,13 @@ void LuaInterpreter::initialize_state() {
   std::string fmt = "lua/{}.lua";
   for (auto& category : categories) {
     std::string file_path = std::vformat(fmt, std::make_format_args(category));
-    _lua_state.require_file(category, file_path);
+    state.require_file(category, file_path);
     logic_logger().info("Lua Module {} initialized", file_path);
   }
 }
 
-void LuaInterpreter::initialize_usertypes() {
-  _lua_state["debug_args"] = [](sol::variadic_args va) {
+void LuaInterpreter::initialize_usertypes(sol::state& state) {
+  state["debug_args"] = [](sol::variadic_args va) {
     std::cout << "Number of arguments: " << va.size() << std::endl;
     int idx = 0;
     for (auto&& v : va) {
@@ -70,13 +67,13 @@ void LuaInterpreter::initialize_usertypes() {
     }
   };
   // First register ValueType enum
-  _lua_state.new_enum<model::ValueType>("ValueType",
-                                        {{"NUMBER", model::ValueType::NUMBER},
-                                         {"TEXT", model::ValueType::TEXT},
-                                         {"VOID", model::ValueType::VOID}});
+  state.new_enum<model::ValueType>("ValueType",
+                                   {{"NUMBER", model::ValueType::NUMBER},
+                                    {"TEXT", model::ValueType::TEXT},
+                                    {"VOID", model::ValueType::VOID}});
 
   // Then register Value class
-  _lua_state.new_usertype<model::Value>(
+  state.new_usertype<model::Value>(
       "Value",
       // Constructors
       sol::call_constructor,
@@ -93,14 +90,14 @@ void LuaInterpreter::initialize_usertypes() {
       "tonumber", [](const model::Value& v) { return int(v); }, "tostring",
       [](const model::Value& v) { return std::string(v); });
 
-  _lua_state.new_usertype<model::Character>(
+  state.new_usertype<model::Character>(
       "Character", "pos", sol::protect(&model::Character::pos), "set_pos",
       sol::protect(&model::Character::set_pos), "set_rotation",
       sol::protect(&model::Character::set_rotation), "rotation",
       sol::protect(&model::Character::rotation));
 
   // Register ScopeTable
-  _lua_state.new_usertype<ScopeTable>(
+  state.new_usertype<ScopeTable>(
       "ScopeTable", "add_variable", &ScopeTable::add_variable,
       "add_variable_global", &ScopeTable::add_variable_global,
       "lookup_variable", &ScopeTable::lookup_variable);
@@ -115,10 +112,13 @@ void LuaInterpreter::execute() {
   auto& ctx = _threads.back();
 
   ctx->thread = std::thread([&, this]() {
-    std::lock_guard lck(_scripts_mtx);
+    std::lock_guard lck(ctx->mtx);
     for (auto& script : _scripts) {
       // TODO: Execute scripts in parallel
-      execute(script, _global_ctx);
+      _threads.emplace_back(std::make_unique<ThreadContext>());
+      auto& ctx = _threads.back();
+      ctx->script = script;
+      ctx->thread = std::thread([&, this]() { execute(ctx, _global_ctx); });
     }
 
     // clear all scripts reference, a script still has a valid shared reference
@@ -131,10 +131,14 @@ void LuaInterpreter::execute() {
   });
 }
 
-void LuaInterpreter::execute(std::shared_ptr<model::Script> script,
+void LuaInterpreter::execute(const std::unique_ptr<ThreadContext>& context,
                              std::shared_ptr<ScopeTable> parent_table) {
   auto scope = std::make_shared<ScopeTable>(parent_table);
   static auto& instance_store = mgr.project()->instances_store();
+  auto& script = context->script;
+  auto& lua_state = context->_lua_state;
+  initialize_state(lua_state);
+  initialize_usertypes(lua_state);
   auto instances = script->blocks();
   auto character = script->character();
   for (auto instance_w : instances) {
@@ -142,35 +146,34 @@ void LuaInterpreter::execute(std::shared_ptr<model::Script> script,
     if (!instance_id) continue;
 
     auto instance = instance_store.get_entity(instance_id);
-    execute_block(character, instance, scope);
+    execute_block(lua_state, character, instance, scope);
   }
 }
 
 model::Value LuaInterpreter::execute_block(
-    std::shared_ptr<model::Character> character,
+    sol::state& state, std::shared_ptr<model::Character> character,
     std::shared_ptr<model::BlockInstance> instance,
     std::shared_ptr<ScopeTable> current_table) {
   // Handle inputs
   for (std::shared_ptr<model::InputSlotInstance> input : instance->inputs()) {
     // TODO: TEST THIS PART
-    model::Value value = execute_input_slot(character, input, current_table);
+    model::Value value =
+        execute_input_slot(state, character, input, current_table);
     current_table->add_variable(input->def().label(), value);
   }
 
   {
-    std::unique_lock lck(_lua_state_mtx);
-
     // Create a new Lua environment for this execution
-    sol::environment env(_lua_state, sol::create, _lua_state.globals());
+    sol::environment env(state, sol::create, state.globals());
 
     // Create the argument list
-    sol::table block_ctx = _lua_state.create_table();
+    sol::table block_ctx = state.create_table();
     block_ctx["scope"] = current_table.get();
     block_ctx["character"] = character.get();
     // Execute the script in this environment
     try {
       sol::protected_function func =
-          _lua_state[instance->def()->category()][instance->def()->data_id()];
+          state[instance->def()->category()][instance->def()->data_id()];
       auto result = func(block_ctx);
 
       if (!result.valid()) {
@@ -189,15 +192,14 @@ model::Value LuaInterpreter::execute_block(
 
 Interpreter::Status LuaInterpreter::status() { return _status; }
 
-// TODO:
 model::Value LuaInterpreter::execute_input_slot(
-    std::shared_ptr<model::Character> character,
+    sol::state& state, std::shared_ptr<model::Character> character,
     std::shared_ptr<model::InputSlotInstance> instance,
     std::shared_ptr<ScopeTable> current_table) {
   if (instance->has_block()) {
     auto block_id = instance->block_id();
     auto block = mgr.project()->instances_store().get_entity(block_id);
-    return execute_block(character, block, current_table);
+    return execute_block(state, character, block, current_table);
   }
   return instance->value();
 }

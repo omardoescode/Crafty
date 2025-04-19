@@ -163,7 +163,9 @@ target_link_libraries(imgui_sdl PUBLIC SDL3::SDL3 OpenGL::GL)
 add_library(logic
   ${LOGIC_DIR}/logic_logger.cpp 
   ${LOGIC_DIR}/scope_table.cpp
-  ${LOGIC_DIR}/lua_interpreter.cpp 
+
+  # Lua Implementation
+  ${LOGIC_DIR}/lua_impl/lua_interpreter.cpp 
 
   # error
   ${LOGIC_DIR}/error/value_not_found.cpp
@@ -206,17 +208,20 @@ enable_testing()
 add_executable(tests 
   tests/ModelLayerTests.cpp 
   tests/CommonLayerTests.cpp
-  # tests/UILayerTests.cpp
+  tests/UILayerTests.cpp
+  tests/LogicLayerTests.cpp
 )
 target_link_libraries(tests GTest::gtest_main 
   model 
   common 
-  # ui
+  logic
+  ui
 )
 target_include_directories(tests PRIVATE 
   ${MODEL_DIR}
   ${COMMON_DIR}
-  # ${UI_DIR}
+  ${LOGIC_DIR}
+  ${UI_DIR}
 )
 include(GoogleTest)
 gtest_discover_tests(tests)
