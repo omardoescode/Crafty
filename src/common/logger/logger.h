@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <cstdio>
 #include <exception>
+#include <format>
 #include <iostream>
 #include <mutex>
 #include <print>
@@ -14,11 +15,10 @@
 namespace common {
 class Logger {
 public:
-  enum LogLevel { INFO = 0, WARN = 1, ERROR = 2 };
+  enum LogLevel { INFO = 0, WARN = 1, ERROR = 2, DISABLE = 3 };
 
   Logger(std::string&&, std::ostream& = std::cout, LogLevel = INFO);
   Logger(const std::string&, std::ostream& = std::cout, LogLevel = INFO);
-  ~Logger() { info("Logger {} Destructued", _prefix); }
 
   Logger(const Logger&) = delete;             // No copying
   Logger& operator=(const Logger&) = delete;  // No assignment
@@ -26,15 +26,15 @@ public:
   Logger& operator=(Logger&&) = delete;
 
   template <typename... Args>
-  void info(std::string_view fmt, Args&&... args) {
+  void info(std::format_string<Args...> fmt, Args&&... args) {
     log(INFO, fmt, std::forward<Args>(args)...);
   }
   template <typename... Args>
-  void warn(std::string_view fmt, Args&&... args) {
+  void warn(std::format_string<Args...> fmt, Args&&... args) {
     log(WARN, fmt, std::forward<Args>(args)...);
   }
   template <typename ErrorType = std::runtime_error, typename... Args>
-  ErrorType error(std::string_view fmt, Args&&... args) {
+  ErrorType error(std::format_string<Args...> fmt, Args&&... args) {
     static_assert(std::is_base_of<std::exception, ErrorType>());
 
     log(ERROR, fmt, std::forward<Args>(args)...);
@@ -43,12 +43,17 @@ public:
 
 private:
   template <typename... Args>
-  void log(LogLevel level, std::string_view fmt, Args&&... args) {
-    auto log_message = std::vformat(fmt, std::make_format_args(args...));
-    if (level >= _level) {
-      std::lock_guard lck(get_mutex_for_stream(_out));
-      std::print(_out, "[{}] [{}] {}\n", _prefix, level_to_string(level),
-                 log_message);
+  void log(LogLevel level, std::format_string<Args...> fmt, Args&&... args) {
+    try {
+      auto log_message = std::format(fmt, std::forward<Args>(args)...);
+      if (level >= _level) {
+        std::lock_guard lck(get_mutex_for_stream(_out));
+        std::print(_out, "[{}] [{}] {}\n", _prefix, level_to_string(level),
+                   log_message);
+      }
+    } catch (std::format_error& err) {
+      std::lock_guard lck(get_mutex_for_stream(std::cerr));
+      std::print(std::cerr, "[Logger] Format error: {}\n", err.what());
     }
   }
 

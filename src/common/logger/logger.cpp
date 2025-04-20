@@ -17,8 +17,8 @@ Logger::Logger(const std::string& prefix, std::ostream& out, LogLevel lvl)
 std::mutex& Logger::get_mutex_for_stream(std::ostream& stream) {
   static std::mutex map_mutex;
   static std::map<std::ostream*, std::unique_ptr<std::mutex>> stream_mutexes;
-
   std::lock_guard<std::mutex> lock(map_mutex);
+
   auto& mutex_ptr = stream_mutexes[&stream];
   if (!mutex_ptr) {
     mutex_ptr = std::make_unique<std::mutex>();
