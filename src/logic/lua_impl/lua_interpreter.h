@@ -1,19 +1,19 @@
 #pragma once
-#include <list>
 #include <memory>
 #include <mutex>
 #include <set>
 #include <sol/sol.hpp>
-#include <thread>
 #include "block/block_instance.h"
 #include "block/input_slot_instance.h"
 #include "character.h"
 #include "events/event_dispatcher.h"
 #include "interpreter.h"
+#include "lua_state_manager.h"
 #include "scope_table.h"
 #include "script.h"
+#include "thread_pool.h"
 
-namespace logic {
+namespace logic::lua {
 /**
  * @brief A interpreter that uses LUA language
  *
@@ -29,8 +29,14 @@ namespace logic {
  */
 class LuaInterpreter : public Interpreter {
 public:
-  LuaInterpreter();
-  ~LuaInterpreter();
+  /**
+   * @brief Default Constructor
+   * @param module_path_fmt A format string used to get the path of the
+   * categories, with arguments
+   *  1. category name
+   * @param pool_size The maximum number of possible threads going together
+   */
+  LuaInterpreter(std::string module_path_fmt);
 
   /**
    * @brief Register a script to be run in the next execution
@@ -50,24 +56,16 @@ public:
   Status status() override;
 
 private:
-  struct ThreadContext {
-    std::thread thread;
-    std::atomic<bool> is_running = std::atomic{true};
-    std::mutex mtx;
-    std::shared_ptr<model::Script> script;
-    sol::state _lua_state;
-  };
-
-  void initialize_state(sol::state& state);
-  void initialize_usertypes(sol::state& state);
-  void execute(const std::unique_ptr<ThreadContext>& context,
-               std::shared_ptr<ScopeTable> parent_table);
-  model::Value execute_block(sol::state& state,
+  model::Value execute_block(std::shared_ptr<LuaStateManager> state_mgr,
                              std::shared_ptr<model::Character> character,
                              std::shared_ptr<model::BlockInstance> instance,
                              std::shared_ptr<ScopeTable> current_table);
+  void execute(std::shared_ptr<LuaStateManager> state_mgr,
+               std::shared_ptr<model::Script> script,
+               std::shared_ptr<ScopeTable> parent_table);
   model::Value execute_input_slot(
-      sol::state& state, std::shared_ptr<model::Character> character,
+      std::shared_ptr<LuaStateManager> mgr,
+      std::shared_ptr<model::Character> character,
       std::shared_ptr<model::InputSlotInstance> instance,
       std::shared_ptr<ScopeTable> current_table);
 
@@ -77,10 +75,10 @@ private:
   Status _status;
   std::mutex _status_mtx;
 
-  std::list<std::unique_ptr<ThreadContext>> _threads;
-
   std::shared_ptr<ScopeTable> _global_ctx;
   common::EventDispatcher::TokenP add_script_tkn;
   common::EventDispatcher::TokenP remove_script_tkn;
+
+  std::shared_ptr<ThreadPool> _thread_pool;
 };
-}  // namespace logic
+}  // namespace logic::lua

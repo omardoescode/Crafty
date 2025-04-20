@@ -1,6 +1,7 @@
 #include "lua_module_cache.h"
 #include <filesystem>
 #include <fstream>
+#include <mutex>
 #include <shared_mutex>
 #include "logic_logger.h"
 #include "model_logger.h"
@@ -20,7 +21,9 @@ void LuaModuleCache::load_module(const std::string& category,
   }
 
   if (!std::filesystem::exists(path))
-    throw logic_logger().error("Failed to initialize module {}", category);
+    throw logic_logger().error(
+        "Failed to initialize module {}: Invalid Path {}", category,
+        path.string());
 
   std::ifstream file(path);
   {
@@ -30,12 +33,14 @@ void LuaModuleCache::load_module(const std::string& category,
   }
 }
 
-const std::string& LuaModuleCache::get_module(const std::string& category) {
+const std::string& LuaModuleCache::get_module(
+    const std::string& category) const {
   std::shared_lock lck(_modules_mtx);
   auto itr = _modules.find(category);
-  if (itr == _modules.end()) {
-    throw model_logger().error("Module {} Not initialized yet");
-  }
+  if (itr == _modules.end())
+    throw model_logger().error(
+        "Module {} Not initialized yet",
+        category);  // Man, I have been debugging a lot for his lol
 
   return itr->second;
 }

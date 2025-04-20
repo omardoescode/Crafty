@@ -8,7 +8,7 @@
 #include "editor/block_canvas.h"
 #include "editor/block_picker.h"
 #include "imgui.h"
-#include "logic/lua_interpreter.h"
+#include "logic/lua_impl/lua_interpreter.h"
 #include "project_manager.h"
 #include "stage/stage.h"
 #include "ui/editor/block_category_panel.h"
@@ -24,7 +24,7 @@
 
 int main(int args, char **argv) {
   std::unique_ptr<logic::Interpreter> interpreter =
-      std::make_unique<logic::LuaInterpreter>();
+      std::make_unique<logic::lua::LuaInterpreter>("lua/{}.lua");
   ui::UIOptions options(args, argv, std::move(interpreter));
 
   // Initialize SDL3

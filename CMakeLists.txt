@@ -166,6 +166,9 @@ add_library(logic
 
   # Lua Implementation
   ${LOGIC_DIR}/lua_impl/lua_interpreter.cpp 
+  ${LOGIC_DIR}/lua_impl/lua_module_cache.cpp 
+  ${LOGIC_DIR}/lua_impl/lua_state_manager.cpp 
+  ${LOGIC_DIR}/lua_impl/thread_pool.cpp
 
   # error
   ${LOGIC_DIR}/error/value_not_found.cpp

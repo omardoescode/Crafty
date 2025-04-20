@@ -7,13 +7,12 @@
 namespace logic::lua {
 class LuaModuleCache {
 public:
-  // remove copying
   LuaModuleCache(const LuaModuleCache&) = delete;
   LuaModuleCache& operator=(const LuaModuleCache&) = delete;
 
   /**
-   * @brief Get luaModuleCache Instance
-   * @return Get the singleton instance
+   * @brief Get singleton instance
+   * @return returns the singleton instance
    */
   static LuaModuleCache& instance();
 
@@ -31,12 +30,10 @@ public:
    * @param category Category name
    * @return string containing all module content
    */
-  const std::string& get_module(const std::string& category);
+  const std::string& get_module(const std::string& category) const;
 
 private:
-  // Private Constructor
   LuaModuleCache() = default;
-
   std::unordered_map<std::string, std::string> _modules;
   mutable std::shared_mutex _modules_mtx;
 };
