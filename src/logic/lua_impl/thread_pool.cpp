@@ -1,6 +1,5 @@
 #include "thread_pool.h"
 #include <mutex>
-#include "logic_logger.h"
 #include "lua_impl/lua_module_cache.h"
 
 namespace logic::lua {

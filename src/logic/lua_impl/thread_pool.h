@@ -26,8 +26,6 @@ public:
   struct ThreadContext {
     std::thread thread;
     std::shared_ptr<LuaStateManager> mgr;
-    ~ThreadContext() { logic_logger().info("HELLO?"); }
-    ThreadContext() { logic_logger().info("Thread Context Created"); }
   };
 
   /**

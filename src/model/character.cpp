@@ -1,5 +1,4 @@
 #include "character.h"
-#include <algorithm>
 #include <cassert>
 #include "identity/id.h"
 #include "model_logger.h"

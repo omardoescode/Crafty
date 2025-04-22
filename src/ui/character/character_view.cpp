@@ -3,6 +3,7 @@
 #include "asset.h"
 #include "imgui.h"
 #include "project_manager.h"
+#include "ui_logger.h"
 #include "utils/images.h"
 auto& mgr = model::ProjectManager::instance();
 namespace ui {
@@ -54,8 +55,11 @@ void CharacterView::draw() {
     ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
   }
 
-  ImGui::SetCursorPos(ImVec2(screen_x, screen_y));
-  ImGui::Image((ImTextureID)(intptr_t)out_texture, ImVec2(wid, hei));
+  ImVec2 top_left = ImGui::GetItemRectMin();
+  ImVec2 center = ImVec2(top_left.x + wid * 0.5f, top_left.y + hei * 0.5f);
+
+  ImageRotated((ImTextureID)(intptr_t)out_texture, center, ImVec2(wid, hei),
+               _character->rotation());
 }
 
 void CharacterView::load_texture_once() {
@@ -65,6 +69,12 @@ void CharacterView::load_texture_once() {
   auto path = asset->get_path().c_str();
   bool res = LoadTextureFromFile(path, &out_texture, &out_width, &out_height);
 
-  assert(res && "Failed to load texture");
+  if (!res) {
+    throw ui_logger().error("Failed to load texture from path: {}",
+                            path);  // TODO: Handle better
+  } else {
+    ui_logger().info("Texture loaded: id={}, w={}, h={}", out_texture,
+                     out_width, out_height);
+  }
 }
 }  // namespace ui

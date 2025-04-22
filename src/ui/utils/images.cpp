@@ -1,9 +1,12 @@
 // Necessary definitions for sbt_images
 
+#include <cmath>
+#include "imgui.h"
+#include "ui_logger.h"
 #define _CRT_SECURE_NO_WARNINGS
 #define STB_IMAGE_IMPLEMENTATION
+#include <math.h>
 #include "images.h"
-#include "imgui.h"
 #include "stb_image.h"
 // Simple helper function to load an image into a OpenGL texture with common
 // settings
@@ -56,4 +59,29 @@ bool LoadTextureFromFile(const char* file_name, GLuint* out_texture,
                                    out_height);
   IM_FREE(file_data);
   return ret;
+}
+
+static inline ImVec2 operator+(const ImVec2& lhs, const ImVec2& rhs) {
+  return ImVec2(lhs.x + rhs.x, lhs.y + rhs.y);
+}
+static inline ImVec2 ImRotate(const ImVec2& v, float cos_a, float sin_a) {
+  return ImVec2(v.x * cos_a - v.y * sin_a, v.x * sin_a + v.y * cos_a);
+}
+
+void ImageRotated(ImTextureID tex_id, ImVec2 center, ImVec2 size, float angle) {
+  assert(tex_id != 0);
+  ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+  float cos_a = cosf(angle * M_PI / 180);
+  float sin_a = -sinf(angle * M_PI / 180);  // Change angle direction
+  ImVec2 pos[4] = {
+      center + ImRotate(ImVec2(-size.x * 0.5f, -size.y * 0.5f), cos_a, sin_a),
+      center + ImRotate(ImVec2(+size.x * 0.5f, -size.y * 0.5f), cos_a, sin_a),
+      center + ImRotate(ImVec2(+size.x * 0.5f, +size.y * 0.5f), cos_a, sin_a),
+      center + ImRotate(ImVec2(-size.x * 0.5f, +size.y * 0.5f), cos_a, sin_a)};
+  ImVec2 uvs[4] = {ImVec2(0.0f, 0.0f), ImVec2(1.0f, 0.0f), ImVec2(1.0f, 1.0f),
+                   ImVec2(0.0f, 1.0f)};
+
+  draw_list->AddImageQuad(tex_id, pos[0], pos[1], pos[2], pos[3], uvs[0],
+                          uvs[1], uvs[2], uvs[3], IM_COL32_WHITE);
 }

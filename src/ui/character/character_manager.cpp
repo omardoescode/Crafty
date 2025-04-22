@@ -32,7 +32,7 @@ CharacterManager::CharacterManager(UIOptions& options) : _options(options) {
             _miniviews.erase(itr);
           }));
 
-  upload_char(std::filesystem::path("./builtin/cat.png"));
+  upload_char(std::filesystem::path("./builtin/dog.png"));  // TODO: FOR TESTING
 }
 CharacterManager::~CharacterManager() {}
 void CharacterManager::draw() {
