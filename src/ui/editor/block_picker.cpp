@@ -6,7 +6,10 @@
 #include "ui_options.h"
 
 namespace ui {
-BlockPicker::BlockPicker(UIOptions& options) : _options(options) {}
+BlockPicker::BlockPicker(UIOptions& options) : _options(options) {
+  auto mgr = model::ProjectManager::instance().block_lib();
+  for (auto& category : mgr->categories()) fetch_category_instances(category);
+}
 
 void BlockPicker::fetch_category_instances(const std::string& category_name) {
   auto& mgr = model::ProjectManager::instance();
@@ -23,10 +26,6 @@ void BlockPicker::fetch_category_instances(const std::string& category_name) {
 
 void BlockPicker::draw() {
   auto& cur_category = _options.current_category();
-  // Ensure we have the category instances
-  if (_views_per_category.count(cur_category) == 0) {
-    fetch_category_instances(cur_category);
-  }
 
   // Draw
   auto& views = _views_per_category[cur_category];

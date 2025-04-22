@@ -1,5 +1,4 @@
 #include "block_definition.h"
-#include <stdexcept>
 #include "identity/id.h"
 
 namespace model {
@@ -15,6 +14,7 @@ BlockDefinition::BlockDefinition(IDPtr id, std::string data_id,
       _inputs(inputs),
       _output(output_slot) {
   if (options & BLOCKDEF_HASBODY) _has_body = true;
+  if (options & BLOCKDEF_STARTER) _is_starter = true;
 }
 
 const std::string& BlockDefinition::name() const { return _name; }
@@ -26,4 +26,6 @@ const OutputSlot& BlockDefinition::output() const { return _output; }
 bool BlockDefinition::has_body() const { return _has_body; }
 
 const std::string& BlockDefinition::data_id() const { return _data_id; }
+
+bool BlockDefinition::is_starter() const { return _is_starter; }
 }  // namespace model

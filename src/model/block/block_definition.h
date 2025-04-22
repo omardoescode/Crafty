@@ -20,6 +20,7 @@ public:
   enum options {
     BLOCKDEF_DEFAULT = 0,
     BLOCKDEF_HASBODY = 1,
+    BLOCKDEF_STARTER = 2,
   };
 
   BlockDefinition(IDPtr id, std::string data_id, const std::string& name,
@@ -58,13 +59,20 @@ public:
    */
   const std::string& data_id() const;
 
+  /**
+   * @brief Check if the defintion is of a starter block
+   * @return returns `true` if of a starter block
+   */
+  bool is_starter() const;
+
 private:
   std::string _name;
   std::string _category;
   std::vector<InputSlotDef> _inputs;
   OutputSlot _output;
-  bool _has_body;
   std::string _data_id;
+  bool _has_body;
+  bool _is_starter;
 };
 
 /**

@@ -5,7 +5,6 @@
       {
         "id": "move_steps",
         "name": "move %0 steps",
-        "has_body": false,
         "inputs": [
           {
             "label": "steps",
@@ -20,7 +19,6 @@
       {
         "id": "go_to_x_y",
         "name": "go to %0 x %1 y",
-        "has_body": false,
         "inputs": [
           {
             "label": "x",
@@ -40,7 +38,6 @@
       {
         "id": "turn_clockwise",
         "name": "turn %0 clockwise",
-        "has_body": false,
         "inputs": [
           {
             "label": "degrees",
@@ -55,7 +52,6 @@
       {
         "id": "turn_anticlockwise",
         "name": "turn %0 anticlockwise",
-        "has_body": false,
         "inputs": [
           {
             "label": "degrees",
@@ -70,7 +66,6 @@
       {
         "id": "point_direction",
         "name": "Point to direction %0",
-        "has_body": false,
         "inputs": [
           {
             "label": "degrees",
@@ -85,7 +80,6 @@
       {
         "id": "set_x",
         "name": "Set x to %0",
-        "has_body": false,
         "inputs": [
           {
             "label": "x",
@@ -100,7 +94,6 @@
       {
         "id": "set_y",
         "name": "Set y to %0",
-        "has_body": false,
         "inputs": [
           {
             "label": "y",
@@ -115,7 +108,6 @@
       {
         "id": "x",
         "name": "x position",
-        "has_body": false,
         "inputs": [],
         "output": {
           "type": "Number"
@@ -124,7 +116,6 @@
       {
         "id": "y",
         "name": "y position",
-        "has_body": false,
         "inputs": [],
         "output": {
           "type": "Number"
@@ -138,7 +129,6 @@
       {
         "id": "set_string",
         "name": "Set string %0 to %1",
-        "has_body": false,
         "inputs": [
           {
             "label": "variable",
@@ -158,7 +148,6 @@
       {
         "id": "set_number",
         "name": "Set number %0 to %1",
-        "has_body": false,
         "inputs": [
           {
             "label": "variable",
@@ -178,7 +167,6 @@
       {
         "id": "set_string_global",
         "name": "Set global string %0 to %1",
-        "has_body": false,
         "inputs": [
           {
             "label": "variable",
@@ -198,7 +186,6 @@
       {
         "id": "set_number_global",
         "name": "Set global number %0 to %1",
-        "has_body": false,
         "inputs": [
           {
             "label": "variable",
@@ -214,6 +201,18 @@
         "output": {
           "type": "Void"
         }
+      }
+    ]
+  },
+  {
+    "name": "control",
+    "blocks": [
+      {
+        "id": "program_run",
+        "name": "when run is clicked",
+        "inputs": [],
+        "output": { "type": "Void" },
+        "starter": true
       }
     ]
   }

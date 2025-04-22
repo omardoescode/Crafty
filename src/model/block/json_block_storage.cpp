@@ -56,9 +56,13 @@ void JsonBlockStorage::load_definitions(const std::filesystem::path& path) {
       // Extract Other data
       std::string name = block.at("name");
       std::string data_id = block.at("id");
-      bool has_body = block.at("has_body");
+
+      // Check for optional data
       int options = BlockDefinition::BLOCKDEF_DEFAULT;
-      if (has_body) options |= BlockDefinition::BLOCKDEF_HASBODY;
+      if (block.contains("has_body") && block["has_body"].is_boolean())
+        options |= BlockDefinition::BLOCKDEF_HASBODY;
+      if (block.contains("starter") && block["starter"].is_boolean())
+        options |= BlockDefinition::BLOCKDEF_STARTER;
 
       // Create the ID and the the block definition
       IDPtr id = _id_generator->generate_next();
