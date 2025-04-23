@@ -1,16 +1,13 @@
 #include "block_view.h"
-#include <algorithm>
 #include <cstring>
 #include <memory>
 #include <regex>
-#include <sstream>
 #include <string>
 #include <variant>
 #include "block/block_instance.h"
 #include "block/input_slot_instance.h"
 #include "block/value.h"
 #include "block/value_type.h"
-#include "identity/id.h"
 #include "imgui.h"
 #include "misc/cpp/imgui_stdlib.h"
 #include "ui_options.h"
@@ -85,8 +82,7 @@ void BlockView::draw() {
   auto before_draw = ImGui::GetCursorScreenPos();
 
   ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(40, 40, 40, 255));
-  ImGui::BeginChild(_block_instance->def()->id()->to_string().c_str(),
-                    ImVec2(0, 0),
+  ImGui::BeginChild("", ImVec2(0, 0),
                     ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_AutoResizeY);
 
   // Handle Drag and Drop
@@ -121,7 +117,11 @@ void BlockView::handle_drag() {
   if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
     ImGui::SetDragDropPayload("BlockInstance", &_block_instance,
                               sizeof(_block_instance));
-    draw();  // draw the same thing over, bro this is genius xD
+    ImGui::PushID(0);  // TODO: FIND A BETTER SOLUTION THAT DOING AN IMPOSSIBLE
+                       // POINTER, THIS IS SO COUPLED
+    draw();  // draw the same thing over, bro this is genius xD. I no longer
+             // think so xD
+    ImGui::PopID();
     ImGui::EndDragDropSource();
   }
   ImGui::PopStyleVar(2);
@@ -142,7 +142,7 @@ void BlockView::draw_parts() {
         // Get the current value from the slot
         const model::Value& value = slot->value();
 
-        ImGui::PushID(i);
+        ImGui::PushID(slot.get());
         ImGui::PushStyleVar(
             ImGuiStyleVar_FramePadding,
             ImVec2(DIRECT_VALUE_PADDING.first, DIRECT_VALUE_PADDING.second));

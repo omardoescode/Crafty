@@ -1,6 +1,5 @@
 #include "character_miniview.h"
 #include <cassert>
-#include "SDL3/SDL_opengl.h"
 #include "action_deferrer.h"
 #include "asset.h"
 #include "imgui.h"
@@ -29,8 +28,6 @@ void CharacterMiniView::draw() {
   const ImU32 color = IM_COL32(128, 128, 128, 255);
   const ImU32 active_color = IM_COL32(255, 200, 100, 255);
   const ImU32 hovered_color = IM_COL32(192, 192, 192, 255);
-
-  ImGui::PushID(_character->id()->to_string().c_str());  // Ensure unique ID
 
   // Use fixed card size for the invisible button
   ImGui::InvisibleButton("character_card", ImVec2(CARD_WIDTH, CARD_HEIGHT));
@@ -82,14 +79,13 @@ void CharacterMiniView::draw() {
 
   ImGui::SetCursorScreenPos(
       ImVec2(image_top_left.x + CARD_WIDTH, image_top_left.y + CARD_HEIGHT));
-  ImGui::PopID();
 }
 
 void CharacterMiniView::load_texture_once() {
   if (out_texture) return;
 
   auto& mgr = model::ProjectManager::instance();
-  auto asset = mgr.character_current_sprite(_character);
+  auto asset = _character->current_sprite();
   bool res = LoadTextureFromFile(asset->get_path().c_str(), &out_texture,
                                  &out_width, &out_height);
 
@@ -112,8 +108,8 @@ void CharacterMiniView::draw_context_menu() {
     if (ImGui::MenuItem("Delete")) {
       // Use the action deferrer to delete
       ActionDeferrer::instance().defer([this]() {
-        auto& dfr = model::ProjectManager::instance();
-        dfr.remove_character(_character->id());
+        auto prj = model::ProjectManager::instance().project();
+        prj->remove_character(_character);
       });
     }
     ImGui::EndPopup();

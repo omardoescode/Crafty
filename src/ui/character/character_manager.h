@@ -4,9 +4,9 @@
 #include <memory>
 #include <mutex>
 #include <unordered_map>
+#include "character.h"
 #include "character/character_miniview.h"
 #include "events/event_dispatcher.h"
-#include "identity/id.h"
 #include "ui_options.h"
 namespace ui {
 class CharacterManager {
@@ -24,7 +24,7 @@ private:
 
 private:
   UIOptions& _options;
-  std::unordered_map<model::IDPtr, std::shared_ptr<CharacterMiniView>>
+  std::unordered_map<model::Character*, std::shared_ptr<CharacterMiniView>>
       _miniviews;
   // std::unordered_map<std::remove_const_t<std::remove_reference_t<
   //                        decltype(std::declval<model::Character>().id())>>,

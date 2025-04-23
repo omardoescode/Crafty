@@ -17,7 +17,10 @@ struct beforeCharacterDeleted : public common::EventBase {
 };
 struct onScriptCreated : public common::EventBase {
   std::shared_ptr<Script> script;
-  onScriptCreated(std::shared_ptr<Script> script) : script{script} {}
+  std::shared_ptr<Character> character;
+  onScriptCreated(std::shared_ptr<Character> character,
+                  std::shared_ptr<Script> script)
+      : script{script}, character(character) {}
 };
 struct beforeScriptDeleted : public common::EventBase {
   std::shared_ptr<Script> script;

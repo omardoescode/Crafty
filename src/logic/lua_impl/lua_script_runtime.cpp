@@ -1,4 +1,5 @@
 #include "lua_script_runtime.h"
+#include <memory>
 #include <sol/forward.hpp>
 #include "block/input_slot_instance.h"
 #include "character.h"
@@ -8,26 +9,21 @@
 
 static auto& mgr = model::ProjectManager::instance();
 namespace logic::lua {
-LuaScriptRuntime::LuaScriptRuntime(std::shared_ptr<model::Script> script,
+LuaScriptRuntime::LuaScriptRuntime(std::shared_ptr<model::Character> character,
+                                   std::shared_ptr<model::Script> script,
                                    std::shared_ptr<LuaStateManager> state_mgr,
                                    std::shared_ptr<ScopeTable> scope)
-    : _state_mgr(state_mgr), _scope(scope), _script(script) {
-  _character = script->character();
-}
+    : _state_mgr(state_mgr),
+      _scope(scope),
+      _script(script),
+      _character(character) {}
 
 void LuaScriptRuntime::execute() {
   assert(_script && "Invalid Script");
-  auto& instance_store = mgr.project()->instances_store();
-
   auto instances = _script->blocks();
-  auto character = _script->character();
 
   // Execute The scripts
-  for (auto instance_w : instances) {
-    auto instance_id = instance_w.lock();
-    assert(instance_id && "Invalid Instance ID");
-
-    auto instance = instance_store.get_entity(instance_id);
+  for (auto instance : instances) {
     execute_block(instance);
   }
 }
@@ -43,7 +39,7 @@ model::Value LuaScriptRuntime::execute_block(
   auto context = prepare_context_table();
 
   sol::protected_function func =
-      state[instance->def()->category()][instance->def()->data_id()];
+      state[instance->def()->category()][instance->def()->id()];
   auto result = func(context);
 
   if (!result.valid()) {
@@ -55,11 +51,8 @@ model::Value LuaScriptRuntime::execute_block(
 
 model::Value LuaScriptRuntime::execute_input_slot(
     std::shared_ptr<model::InputSlotInstance> instance) {
-  auto& instance_store = mgr.project()->instances_store();
   if (instance->has_block()) {
-    auto block_id = instance->block_id();
-    auto block = instance_store.get_entity(block_id);
-    return execute_block(block);
+    return execute_block(instance->block());
   }
   return instance->value();
 }

@@ -1,6 +1,6 @@
 #pragma once
+#include "block/block_instance.h"
 #include "block/input_slot.h"
-#include "identity/id.h"
 
 namespace model {
 
@@ -18,7 +18,7 @@ public:
   InputSlotInstance(const InputSlotDef& slot_def);
 
   void set_value(Value value);
-  void connect_block(IDPtr id);
+  void connect_block(std::shared_ptr<BlockInstance> instance);
   void disconnect_block();
 
   bool has_block() const;
@@ -31,12 +31,12 @@ public:
 
   const InputSlotDef& def() const;
 
-  const IDPtr block_id() const;
+  const std::shared_ptr<BlockInstance> block() const;
 
 private:
   Value _value;
   const InputSlotDef& _slot_def;
   bool _block_connected;
-  IDPtr _block_id;
+  std::shared_ptr<BlockInstance> _block;
 };
 }  // namespace model

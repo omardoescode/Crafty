@@ -4,7 +4,6 @@
 #include <memory>
 #include <variant>
 #include "block/block_instance.h"
-#include "imgui.h"
 #include "ui_options.h"
 
 namespace ui {

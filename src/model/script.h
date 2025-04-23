@@ -1,39 +1,31 @@
 #pragma once
 #include <memory>
 #include <vector>
-#include "project.h"
 #include "serialization/serializable.h"
 
 namespace model {
-class Project;
-class Character;
 class BlockInstance;
 
 class Script : public Serializable {
 public:
-  Script(const IDPtr id, std::shared_ptr<Character> character, float x, float y,
-         bool serialize = true);
+  Script(float x = 0, float y = 0);
 
   /**
    * Add a block instance to the script
-   * @return the new script position
+   * @return the new script position. -1 if the instance is not added because
+   * the instance is of a starter definition in a position not equal to 0
+   * because starters cannot be inserted except at the beginning
    */
-  int add_block_instance(IDPtr id, int pos = -1);
-  void remove_block_instance(IDPtr id);
+  int add_block_instance(std::shared_ptr<BlockInstance> instance, int pos = -1);
+  void remove_block_instance(std::shared_ptr<BlockInstance> instance);
   bool has_block_instances() const;
-
-  /**
-   * @brief Return the character that this script is executing on
-   */
-  std::shared_ptr<Character> character();
 
   const std::pair<float, float> pos() const;
 
-  const std::vector<IDWPtr>& blocks() const;
+  const std::vector<std::shared_ptr<BlockInstance>>& blocks() const;
 
 private:
-  std::vector<IDWPtr> _blocks;
+  std::vector<std::shared_ptr<BlockInstance>> _blocks;
   std::pair<float, float> _pos;
-  std::shared_ptr<Character> _character;
 };
 }  // namespace model

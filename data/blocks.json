@@ -42,7 +42,7 @@
           {
             "label": "degrees",
             "type": "Number",
-            "default_value": 0
+            "default_value": 90
           }
         ],
         "output": {
@@ -56,7 +56,7 @@
           {
             "label": "degrees",
             "type": "Number",
-            "default_value": 0
+            "default_value": 90
           }
         ],
         "output": {
@@ -70,7 +70,7 @@
           {
             "label": "degrees",
             "type": "Number",
-            "default_value": 0
+            "default_value": 180
           }
         ],
         "output": {
@@ -84,7 +84,7 @@
           {
             "label": "x",
             "type": "Number",
-            "default_value": 1
+            "default_value": 0
           }
         ],
         "output": {
@@ -98,7 +98,7 @@
           {
             "label": "y",
             "type": "Number",
-            "default_value": 1
+            "default_value": 0
           }
         ],
         "output": {
@@ -208,7 +208,7 @@
     "name": "control",
     "blocks": [
       {
-        "id": "program_run",
+        "id": "run_clicked",
         "name": "when run is clicked",
         "inputs": [],
         "output": { "type": "Void" },

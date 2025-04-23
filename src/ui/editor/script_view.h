@@ -3,7 +3,6 @@
 #include <unordered_map>
 #include "editor/block_view.h"
 #include "events/event_dispatcher.h"
-#include "identity/id.h"
 #include "script.h"
 #include "ui_options.h"
 namespace ui {
@@ -20,7 +19,8 @@ private:
 private:
   UIOptions& _options;
   std::shared_ptr<model::Script> _script;
-  std::unordered_map<model::IDPtr, std::shared_ptr<BlockView>> _instances_views;
+  std::unordered_map<model::BlockInstance*, std::shared_ptr<BlockView>>
+      _instances_views;
   common::EventDispatcher::TokenP _instance_add_tkn;
 };
 }  // namespace ui

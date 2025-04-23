@@ -1,4 +1,5 @@
 #include "block_picker.h"
+#include <memory>
 #include "block/block_library.h"
 #include "imgui.h"
 #include "project_manager.h"
@@ -16,7 +17,8 @@ void BlockPicker::fetch_category_instances(const std::string& category_name) {
   auto block_definitions = mgr.block_lib()->category_blocks(category_name);
 
   for (auto& block_def : block_definitions) {
-    BlockView view(_options, mgr.create_dummy_instance(block_def), true);
+    BlockView view(_options, std::make_shared<model::BlockInstance>(block_def),
+                   true);
     _views_per_category[category_name].push_back(view);
   }
 

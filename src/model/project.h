@@ -1,29 +1,31 @@
 #pragma once
 
 #include <memory>
-#include "identity/store.h"
+#include <vector>
+#include "character.h"
 
-#include "block/block_instance.h"
 namespace model {
-class Character;
-class Asset;
-class BlockInstance;
-class Script;
 class Project {
 public:
-  Project(std::unique_ptr<Store<Character>>, std::unique_ptr<Store<Script>>,
-          std::unique_ptr<Store<Asset>>, std::unique_ptr<Store<BlockInstance>>);
+  Project(const std::string& name,
+          std::vector<std::shared_ptr<Character>> character_list = {});
 
-  Store<Character>& char_store() const;
-  Store<Script>& script_store() const;
-  Store<Asset>& asset_store() const;
-  Store<BlockInstance>& instances_store() const;
+  const std::vector<std::shared_ptr<Character>>& characters() const;
+
+  void add_character(std::shared_ptr<Character> chr);
+  void remove_character(std::shared_ptr<Character> chr);
+
+  const std::string& name() const;
+  void set_name(const std::string& new_name);
+
+  void mark_dirty();
+  void mark_undirty();
+  bool is_dirty() const;
 
 private:
-  std::unique_ptr<Store<Character>> _char_store;
-  std::unique_ptr<Store<Script>> _script_store;
-  std::unique_ptr<Store<Asset>> _asset_store;
-  std::unique_ptr<Store<BlockInstance>> _instances_store;
+  std::vector<std::shared_ptr<Character>> _character_list;
+  std::string _name;
+  bool _is_dirty;
 };
 
 /**

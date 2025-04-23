@@ -1,14 +1,11 @@
 #include "block_definition.h"
-#include "identity/id.h"
 
 namespace model {
-BlockDefinition::BlockDefinition(IDPtr id, std::string data_id,
-                                 const std::string& name,
+BlockDefinition::BlockDefinition(std::string data_id, const std::string& name,
                                  const std::string& category,
                                  std::vector<InputSlotDef>&& inputs,
                                  OutputSlot output_slot, int options)
-    : Identifiable(id),
-      _data_id(data_id),
+    : _id(data_id),
       _name(name),
       _category(category),
       _inputs(inputs),
@@ -25,7 +22,7 @@ const std::vector<InputSlotDef>& BlockDefinition::inputs() const {
 const OutputSlot& BlockDefinition::output() const { return _output; }
 bool BlockDefinition::has_body() const { return _has_body; }
 
-const std::string& BlockDefinition::data_id() const { return _data_id; }
+const std::string& BlockDefinition::id() const { return _id; }
 
 bool BlockDefinition::is_starter() const { return _is_starter; }
 }  // namespace model

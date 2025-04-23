@@ -2,24 +2,25 @@
 #include <cassert>
 
 namespace model {
-Project::Project(std::unique_ptr<Store<Character>> char_store,
-                 std::unique_ptr<Store<Script>> script_store,
-                 std::unique_ptr<Store<Asset>> asset_store,
-                 std::unique_ptr<Store<BlockInstance>> instances_store)
-    : _char_store(std::move(char_store)),
-      _script_store(std::move(script_store)),
-      _asset_store(std::move(asset_store)),
-      _instances_store(std::move(instances_store)) {
-  assert(_char_store);
-  assert(_script_store);
-  assert(_asset_store);
-  assert(_instances_store);
+Project::Project(const std::string& name,
+                 std::vector<std::shared_ptr<Character>> character_list)
+    : _character_list(character_list), _name(name), _is_dirty(false) {}
+
+const std::vector<std::shared_ptr<Character>>& Project::characters() const {
+  return _character_list;
 }
 
-Store<Character>& Project::char_store() const { return *_char_store; }
-Store<Script>& Project::script_store() const { return *_script_store; }
-Store<Asset>& Project::asset_store() const { return *_asset_store; }
-Store<BlockInstance>& Project::instances_store() const {
-  return *_instances_store;
+const std::string& Project::name() const { return _name; }
+void Project::set_name(const std::string& new_name) { _name = new_name; }
+
+void Project::mark_dirty() { _is_dirty = true; }
+void Project::mark_undirty() { _is_dirty = false; }
+bool Project::is_dirty() const { return _is_dirty; }
+
+void Project::add_character(std::shared_ptr<Character> chr) {
+  _character_list.push_back(chr);
+}
+void Project::remove_character(std::shared_ptr<Character> chr) {
+  _character_list.push_back(chr);
 }
 }  // namespace model

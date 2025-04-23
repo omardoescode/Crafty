@@ -1,7 +1,5 @@
 #include <map>
 #include "block/block_library.h"
-#include "identity/id.h"
-#include "identity/id_generator.h"
 namespace model {
 class JsonBlockStorage : public BlockStorage {
 public:
@@ -10,20 +8,13 @@ public:
    * @param id_generator A unique pointer to an ID generator used for block
    * definitions
    */
-  JsonBlockStorage(IDGeneratorPtr id_generator);
+  JsonBlockStorage();
 
   /**
    * @brief Load Definitions from a specified path to a JSON file
    * @param path The path has a json file that has
    */
   void load_definitions(const std::filesystem::path& path) override;
-
-  /**
-   * @brief Retrieve a block definition by the ID
-   * @param id A unique pointer to an ID
-   * @return A shared pointer to the block definition
-   */
-  BlockDefPtr get_definition_by_id(const IDPtr& id) const override;
 
   /**
    * @brief Retrieve all the block definitions in the specified category
@@ -40,9 +31,15 @@ public:
    */
   std::vector<std::string> categories() const override;
 
+  /**
+   * @brief Retrieve a block definition by the ID
+   * @param id A definition id
+   * @return A shared pointer to the block definition
+   */
+  BlockDefPtr get_definition_by_id(std::string id) const override;
+
 private:
-  std::map<IDPtr, BlockDefPtr> _defs;
+  std::map<std::string, BlockDefPtr> _defs;
   std::map<std::string, std::vector<BlockDefPtr>> _category_defs;
-  IDGeneratorPtr _id_generator;
 };
 }  // namespace model

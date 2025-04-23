@@ -3,7 +3,6 @@
 #include <unordered_map>
 #include "character/character_view.h"
 #include "events/event_dispatcher.h"
-#include "identity/id.h"
 #include "ui_options.h"
 
 namespace ui {
@@ -18,7 +17,7 @@ private:
   common::EventDispatcher::TokenP before_character_deleted_token;
 
   // Model
-  std::unordered_map<model::IDPtr, std::shared_ptr<CharacterView>>
+  std::unordered_map<model::Character*, std::shared_ptr<CharacterView>>
       _characters_views;
 };
 }  // namespace ui

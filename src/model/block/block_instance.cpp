@@ -1,14 +1,13 @@
 #include "block_instance.h"
 #include <cassert>
+#include <memory>
 #include "block/block_instance.h"
-#include "identity/id.h"
+#include "input_slot_instance.h"
 #include "model_logger.h"
 #include "script.h"
-#include "serialization/serializable.h"
 
 namespace model {
-BlockInstance::BlockInstance(IDPtr id, BlockDefPtr def, bool serialize)
-    : Serializable(id, serialize), _def(def) {
+BlockInstance::BlockInstance(BlockDefPtr def) : _def(def) {
   // Initialize Input Instances
   for (const InputSlotDef& inp_def : def->inputs()) {
     _inputs.push_back(std::make_shared<InputSlotInstance>(inp_def));
@@ -19,17 +18,9 @@ std::shared_ptr<const BlockDefinition> BlockInstance::def() const {
   return _def;
 }
 
-bool BlockInstance::has_body() const {
-  auto res = _body.lock();
-  return !!res;
-}
+bool BlockInstance::has_body() const { return !!_body; }
 
-IDWPtr BlockInstance::body() {
-  if (auto res = _body.lock()) {
-    return res;
-  }
-  return IDWPtr();
-}
+std::shared_ptr<Script> BlockInstance::body() { return _body; }
 
 const std::vector<std::shared_ptr<InputSlotInstance>>& BlockInstance::inputs()
     const {

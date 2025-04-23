@@ -4,23 +4,21 @@
 #include <vector>
 #include "block/block_definition.h"
 #include "block/block_library.h"
-#include "block/input_slot_instance.h"
+#include "script.h"
 #include "serialization/serializable.h"
 
 namespace model {
+class InputSlotInstance;
 /**
  * @brief a block in a script that is executable when running the game
- * A block instanceis identified by a unique ID.
  */
 class BlockInstance : public Serializable {
 public:
   /**
    * @brief Constructor
-   * @param id The id of this instance
    * @param def The definition of this block instance
-   * @param serialize whether to serialize this or not
    */
-  BlockInstance(IDPtr id, BlockDefPtr def, bool serialize = true);
+  BlockInstance(BlockDefPtr def);
 
   /**
    * @brief Getter for definition
@@ -35,11 +33,12 @@ public:
    * definiton accepts a body or not
    */
   bool has_body() const;
+
   /**
    * @brief Getter for body if the block instance accepts a body
-   * @return a weak pointer to the body ID
+   * @return The script body
    */
-  IDWPtr body();
+  std::shared_ptr<Script> body();
 
   /**
    * @brief Getter for inputs
@@ -58,6 +57,6 @@ public:
 private:
   std::shared_ptr<const BlockDefinition> _def;
   std::vector<std::shared_ptr<InputSlotInstance>> _inputs;
-  IDWPtr _body;
+  std::shared_ptr<Script> _body;
 };
 }  // namespace model

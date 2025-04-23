@@ -1,33 +1,51 @@
 #include "character.h"
+#include <algorithm>
 #include <cassert>
-#include "identity/id.h"
-#include "model_logger.h"
-#include "project.h"
 
 namespace model {
 
-Character::Character(IDPtr id, int x, int y, float width, bool serialize)
-    : Serializable(id, serialize),
-      _pos(x, y),
+Character::Character(const std::string& name, int x, int y, float width)
+    : _pos(x, y),
       _current_texture_idx(0),
-      _name(id->to_string()),
+      _name(name),
+      _width(width),
+      _rotation(0) {}
+Character::Character(std::string&& name, int x, int y, float width)
+    : _pos(x, y),
+      _current_texture_idx(0),
+      _name(std::move(name)),
       _width(width),
       _rotation(0) {}
 
-void Character::add_sprite(IDPtr id, int pos) {
+void Character::add_sprite(std::shared_ptr<Asset> sprite, int pos) {
   if (pos < 0 || pos > _sprites.size()) pos = _sprites.size();
-  _sprites.insert(_sprites.begin() + pos, id);
+  _sprites.insert(_sprites.begin() + pos, sprite);
 }
 
-void Character::remove_sprite(IDPtr id) { remove_weak_ptr(_sprites, id); }
+void Character::remove_sprite(std::shared_ptr<Asset> asset) {
+  assert(_sprites.size() > 1 &&
+         "Cannot remove the last asset. Remove the character instead");
+
+  auto it = std::find(_sprites.begin(), _sprites.end(), asset);
+  if (it != _sprites.end()) {
+    int idx = it - _sprites.begin();
+    bool is_current = idx == _current_texture_idx;
+    _sprites.erase(it);
+
+    if (is_current) _current_texture_idx = 0;  // Set to the first one
+  }
+}
 bool Character::has_sprites() const { return !_sprites.empty(); }
 
-void Character::add_script(IDPtr id, int pos) {
+void Character::add_script(std::shared_ptr<Script> script, int pos) {
   if (pos < 0 || pos > _scripts.size()) pos = _scripts.size();
-  _scripts.insert(_scripts.begin() + pos, id);
+  _scripts.insert(_scripts.begin() + pos, script);
 }
 
-void Character::remove_script(IDPtr id) { remove_weak_ptr(_scripts, id); }
+void Character::remove_script(std::shared_ptr<Script> script) {
+  _scripts.erase(std::remove(_scripts.begin(), _scripts.end(), script),
+                 _scripts.end());
+}
 
 bool Character::has_scripts() const { return !_scripts.empty(); }
 
@@ -36,13 +54,11 @@ void Character::set_pos(std::pair<int, int> pos) { _pos = pos; }
 
 unsigned Character::current_spirte_idx() const { return _current_texture_idx; }
 
-IDPtr Character::current_sprite() const {
+std::shared_ptr<Asset> Character::current_sprite() const {
   if (_sprites.empty()) return nullptr;
-  auto result_w = _sprites[_current_texture_idx];
-  if (auto result = result_w.lock()) return result;
-  throw model_logger().error(
-      "There's no current implementation to changing current texture when a "
-      "texture is removed");
+  auto result = _sprites[_current_texture_idx];
+
+  return result;
 }
 
 void Character::set_current_sprite_idx(size_t new_val) {
@@ -52,12 +68,17 @@ void Character::set_current_sprite_idx(size_t new_val) {
 }
 
 void Character::next_sprite() {
-  if (!has_sprites()) return;  // Guard against mod of 0
+  // Note: Assuming the invariant that there be always be sprites at any moment,
+  // there mustn't be any problem with mode 0 (_sprites.size=0)
   _current_texture_idx++, _current_texture_idx %= _sprites.size();
 }
 
-const std::vector<IDWPtr>& Character::scripts() const { return _scripts; }
-const std::vector<IDWPtr>& Character::sprites() const { return _sprites; }
+const std::vector<std::shared_ptr<Script>>& Character::scripts() const {
+  return _scripts;
+}
+const std::vector<std::shared_ptr<Asset>>& Character::sprites() const {
+  return _sprites;
+}
 const std::string Character::name() const { return _name; }
 void Character::set_name(const std::string& name) { _name = name; }
 void Character::set_name(std::string&& name) { _name = std::move(name); }

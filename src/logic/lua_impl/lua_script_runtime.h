@@ -3,6 +3,7 @@
 #include "block/block_instance.h"
 #include "block/input_slot_instance.h"
 #include "block/value.h"
+#include "character.h"
 #include "lua_impl/lua_state_manager.h"
 #include "scope_table.h"
 #include "script.h"
@@ -14,11 +15,13 @@ class LuaScriptRuntime {
 public:
   /**
    * @brief Constructor
+   * @param character The character the script is working on
    * @param script A shared pointer to the script to execute
    * @param scope The scope to put variables on.
    * @note The scope must be new one to avoid inconsistencies
    */
-  LuaScriptRuntime(std::shared_ptr<model::Script> script,
+  LuaScriptRuntime(std::shared_ptr<model::Character> character,
+                   std::shared_ptr<model::Script> script,
                    std::shared_ptr<LuaStateManager> state_mgr,
                    std::shared_ptr<ScopeTable> scope);
 

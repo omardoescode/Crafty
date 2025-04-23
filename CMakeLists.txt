@@ -106,19 +106,9 @@ add_library(model
   ${MODEL_DIR}/block/value_type.cpp
   ${MODEL_DIR}/block/input_slot_instance.cpp
 
-
-  # identity/id
-  ${MODEL_DIR}/identity/id.cpp
-  ${MODEL_DIR}/identity/prefixed_id_generator.cpp
-  ${MODEL_DIR}/identity/string_id.cpp
-  ${MODEL_DIR}/identity/identifiable.cpp
-
   # utils
   ${MODEL_DIR}/utils/fs.cpp
   ${MODEL_DIR}/utils/json.cpp
-
-  # Serialization
-  ${MODEL_DIR}/serialization/serializable.cpp
 
   # error
   ${MODEL_DIR}/error/type_mismatch.cpp

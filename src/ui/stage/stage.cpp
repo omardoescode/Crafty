@@ -13,7 +13,7 @@ Stage::Stage(UIOptions& options, SDL_Renderer* renderer) : _options(options) {
           [this](std::shared_ptr<model::events::onCharacterCreated> evt) {
             auto& chr = evt->character;
             _characters_views.emplace(
-                chr->id(), std::make_shared<CharacterView>(_options, chr));
+                chr.get(), std::make_shared<CharacterView>(_options, chr));
 
             ui_logger().info("Added a new character for {} on stage",
                              chr->name());
@@ -22,7 +22,7 @@ Stage::Stage(UIOptions& options, SDL_Renderer* renderer) : _options(options) {
       dispatcher.subscribe<model::events::beforeCharacterDeleted>(
           [this](std::shared_ptr<model::events::beforeCharacterDeleted> evt) {
             auto& chr = evt->character;
-            auto itr = _characters_views.find(chr->id());
+            auto itr = _characters_views.find(chr.get());
             assert(itr != _characters_views.end());
             _characters_views.erase(itr);
             ui_logger().info("Removing character {} from stage", chr->name());
@@ -45,7 +45,9 @@ void Stage::draw() {
 
   // Draw The characters
   for (auto& [id, chr_vw] : _characters_views) {
+    ImGui::PushID(id);
     chr_vw->draw();
+    ImGui::PopID();
   }
 }
 }  // namespace ui

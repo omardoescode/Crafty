@@ -2,7 +2,6 @@
 #include <memory>
 #include <vector>
 #include "block_definition.h"
-#include "identity/id.h"
 
 namespace model {
 class BlockStorage {
@@ -17,10 +16,10 @@ public:
 
   /**
    * @brief Retrieve a block definition by the ID
-   * @param id A unique pointer to an ID
+   * @param id A definition id
    * @return A shared pointer to the block definition
    */
-  virtual BlockDefPtr get_definition_by_id(const IDPtr& id) const = 0;
+  virtual BlockDefPtr get_definition_by_id(std::string id) const = 0;
 
   /**
    * @brief Retrieve all the block definitions in the specified category

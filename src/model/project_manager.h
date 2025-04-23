@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <memory>
 #include "block/block_definition.h"
-#include "identity/id.h"
+#include "block/block_library.h"
 #include "project.h"
 namespace model {
 class ProjectManager {
@@ -51,7 +51,8 @@ public:
    * @brief Copy an asset from `file_path` to folder `copy_folder` and then
    * initiate this asset to asset_store
    */
-  std::shared_ptr<Asset> add_asset(std::filesystem::path file_path,
+  std::shared_ptr<Asset> add_asset(std::shared_ptr<Character> character,
+                                   std::filesystem::path file_path,
                                    std::filesystem::path copy_folder);
 
   /**
@@ -59,43 +60,16 @@ public:
    * to create an instance of in the script and place at position (x, y)
    */
   std::shared_ptr<Script> add_script(std::shared_ptr<Character> chr,
-                                     std::shared_ptr<const BlockDefinition> def,
-                                     float x, float y);
+                                     BlockDefPtr def, float x, float y);
 
   /**
    * @brief Create a block instance and add it to a script
-   * @param id The script id to add this block to
+   * @param script The script to add this block to
    * @param definition The block definition to create an instance of
    * @param position The position to insert the instance at
    */
-  void add_block_to_existing_script(IDPtr script_id, BlockDefPtr definition,
-                                    int position);
-
-  /**
-   * @brief remove a character by using the id
-   */
-  void remove_character(IDPtr id);
-
-  /**
-   * @brief remove an asset by using the id
-   */
-  void remove_asset(IDPtr);
-
-  /**
-   * @brief remove a script by using the id
-   */
-  void remove_script(IDPtr);
-
-  /**
-   * @brief remove a block instance by using the id
-   */
-  void remove_block_instance(IDPtr);
-
-  /**
-   * @brief Get the Character sprite
-   */
-  std::shared_ptr<Asset> character_current_sprite(
-      std::shared_ptr<Character> character);
+  void add_block_to_existing_script(std::shared_ptr<Script> script,
+                                    BlockDefPtr definition, int position);
 
   bool has_project() const;
   std::shared_ptr<Project> project() const;
@@ -104,11 +78,6 @@ public:
    * @brief Getter for block library
    */
   std::shared_ptr<BlockLibrary> block_lib() const;
-
-  /**
-   * @brief Generate a dummy block instance
-   */
-  std::shared_ptr<BlockInstance> create_dummy_instance(BlockDefPtr def);
 
 private:
   ProjectManager();

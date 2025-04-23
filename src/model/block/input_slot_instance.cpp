@@ -9,14 +9,14 @@ InputSlotInstance::InputSlotInstance(const InputSlotDef& slot_def)
 
 void InputSlotInstance::set_value(Value value) { _value = value; }
 
-void InputSlotInstance::connect_block(IDPtr id) {
+void InputSlotInstance::connect_block(std::shared_ptr<BlockInstance> instance) {
   _block_connected = true;
-  _block_id = id;
+  _block = instance;
 }
 
 void InputSlotInstance::disconnect_block() {
   _block_connected = false;
-  _block_id = nullptr;
+  _block = nullptr;
 }
 
 bool InputSlotInstance::has_block() const { return _block_connected; }
@@ -25,5 +25,7 @@ const Value& InputSlotInstance::value() const { return _value; }
 
 const InputSlotDef& InputSlotInstance::def() const { return _slot_def; }
 
-const IDPtr InputSlotInstance::block_id() const { return _block_id; }
+const std::shared_ptr<BlockInstance> InputSlotInstance::block() const {
+  return _block;
+}
 }  // namespace model

@@ -3,7 +3,6 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include "identity/identifiable.h"
 #include "input_slot.h"
 
 namespace model {
@@ -12,7 +11,7 @@ struct OutputSlot {
   ValueType type;
 };
 
-class BlockDefinition : public Identifiable {
+class BlockDefinition {
 public:
   /**
    * @brief Options for BlockDefinition Initialization
@@ -23,7 +22,7 @@ public:
     BLOCKDEF_STARTER = 2,
   };
 
-  BlockDefinition(IDPtr id, std::string data_id, const std::string& name,
+  BlockDefinition(std::string id, const std::string& name,
                   const std::string& category,
                   std::vector<InputSlotDef>&& inputs, OutputSlot output_slot,
                   int options = 0);
@@ -57,7 +56,7 @@ public:
    * @brief retrieve the unique id of the definition
    * @return returns the data id
    */
-  const std::string& data_id() const;
+  const std::string& id() const;
 
   /**
    * @brief Check if the defintion is of a starter block
@@ -70,7 +69,7 @@ private:
   std::string _category;
   std::vector<InputSlotDef> _inputs;
   OutputSlot _output;
-  std::string _data_id;
+  std::string _id;
   bool _has_body;
   bool _is_starter;
 };

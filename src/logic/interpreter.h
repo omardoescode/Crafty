@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include "character.h"
 #include "script.h"
 namespace logic {
 class Interpreter {
@@ -20,7 +21,8 @@ public:
    *
    * @note The script will be removed after post execution
    */
-  virtual void register_script(std::shared_ptr<model::Script> script) = 0;
+  virtual void register_script(std::shared_ptr<model::Character> chr,
+                               std::shared_ptr<model::Script> script) = 0;
 
   /**
    * @brief Execute The registered scripts so far

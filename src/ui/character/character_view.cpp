@@ -65,16 +65,13 @@ void CharacterView::draw() {
 void CharacterView::load_texture_once() {
   if (out_texture) return;
 
-  auto asset = mgr.character_current_sprite(_character);
+  auto asset = _character->current_sprite();
   auto path = asset->get_path().c_str();
   bool res = LoadTextureFromFile(path, &out_texture, &out_width, &out_height);
 
   if (!res) {
     throw ui_logger().error("Failed to load texture from path: {}",
                             path);  // TODO: Handle better
-  } else {
-    ui_logger().info("Texture loaded: id={}, w={}, h={}", out_texture,
-                     out_width, out_height);
   }
 }
 }  // namespace ui

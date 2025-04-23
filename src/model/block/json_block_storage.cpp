@@ -10,8 +10,7 @@
 
 namespace model {
 
-JsonBlockStorage::JsonBlockStorage(IDGeneratorPtr id_generator)
-    : _id_generator(std::move(id_generator)) {}
+JsonBlockStorage::JsonBlockStorage() {}
 
 void JsonBlockStorage::load_definitions(const std::filesystem::path& path) {
   // Parse The file
@@ -55,7 +54,7 @@ void JsonBlockStorage::load_definitions(const std::filesystem::path& path) {
 
       // Extract Other data
       std::string name = block.at("name");
-      std::string data_id = block.at("id");
+      std::string id = block.at("id");
 
       // Check for optional data
       int options = BlockDefinition::BLOCKDEF_DEFAULT;
@@ -65,12 +64,11 @@ void JsonBlockStorage::load_definitions(const std::filesystem::path& path) {
         options |= BlockDefinition::BLOCKDEF_STARTER;
 
       // Create the ID and the the block definition
-      IDPtr id = _id_generator->generate_next();
       BlockDefPtr def = std::make_shared<BlockDefinition>(
-          id, data_id, name, category, std::move(inputs), std::move(output));
+          id, name, category, std::move(inputs), std::move(output));
 
       // put the values in the maps
-      _defs[id] = def;
+      _defs.emplace(id, def);
       _category_defs[category].push_back(def);
       // } catch (const std::exception& exx) {
       //   model_logger().warn("Failed to load block");
@@ -91,7 +89,7 @@ std::vector<std::string> JsonBlockStorage::categories() const {
   return categories;
 }
 
-BlockDefPtr JsonBlockStorage::get_definition_by_id(const IDPtr& id) const {
+BlockDefPtr JsonBlockStorage::get_definition_by_id(std::string id) const {
   return _defs.at(id);
 }
 std::vector<BlockDefPtr> JsonBlockStorage::get_definitions_by_category(

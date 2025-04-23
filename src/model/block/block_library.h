@@ -3,7 +3,6 @@
 #include <memory>
 #include <vector>
 #include "block_storage.h"
-#include "identity/id.h"
 
 /**
  * @brief a Facade for Block Storage, an interface for handling blocks
@@ -41,13 +40,6 @@ public:
    * @return  A vector of the blocks of this category
    */
   std::vector<BlockDefPtr> category_blocks(const std::string& category) const;
-
-  /**
-   * @brief Get a block by its id
-   * @param id The Block definition ID
-   * @return a pointer to the block definition
-   */
-  BlockDefPtr get_block_definition_by_id(IDPtr id) const;
 
 private:
   std::unique_ptr<BlockStorage> _storage;

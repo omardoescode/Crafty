@@ -2,9 +2,9 @@
 
 #include <memory>
 #include <unordered_map>
+#include "character.h"
 #include "editor/script_view.h"
 #include "events/event_dispatcher.h"
-#include "identity/id.h"
 #include "ui_options.h"
 
 namespace ui {
@@ -19,7 +19,8 @@ private:
 private:
   UIOptions& _options;
   // A Map from a character scripts to the character scripts
-  std::unordered_map<model::IDPtr, std::vector<std::shared_ptr<ScriptView>>>
+  std::unordered_map<model::Character*,
+                     std::vector<std::shared_ptr<ScriptView>>>
       _script_views;
   std::vector<common::EventDispatcher::TokenP> _tkns;
 };

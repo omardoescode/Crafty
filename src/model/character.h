@@ -1,4 +1,8 @@
 #pragma once
+#include <asset.h>
+#include <script.h>
+#include <memory>
+#include <string>
 #include <vector>
 #include "serialization/serializable.h"
 namespace model {
@@ -6,21 +10,20 @@ class BlockInstance;
 
 class Character : public Serializable {
 public:
-  Character(IDPtr id, int x, int y, float width, bool serialize = true);
+  Character(const std::string& name, int x, int y, float width);
+  Character(std::string&& name, int x, int y, float width);
 
   /**
    * @brief Add a sprite id to the character
-   * @param id The ID to add to sprite list
+   * @param sprite The asset to add
    * @param pos The position in sprite list
-   * @note No checks to the validity of the ID
    */
-  void add_sprite(IDPtr id, int pos = -1);
+  void add_sprite(std::shared_ptr<Asset> sprite, int pos = -1);
 
   /**
-   * @brief Remove a specific sprite id
-   * @note No checks to the validity of the ID
+   * @brief Remove a specific sprite
    */
-  void remove_sprite(IDPtr id);
+  void remove_sprite(std::shared_ptr<Asset> asset);
 
   /**
    * @brief check if the character has any sprites
@@ -30,17 +33,15 @@ public:
 
   /**
    * @brief add a script to the script list
-   * @param id the ID to add to script list
+   * @param script The script to add
    * @param pos The position in script list
-   * @note No checks to the validity of teh ID
    */
-  void add_script(IDPtr id, int pos = -1);
+  void add_script(std::shared_ptr<Script> script, int pos = -1);
 
   /**
-   * @brief remove a specified script ID
-   * @param id The id to remove
+   * @brief remove a specified script
    */
-  void remove_script(IDPtr id);
+  void remove_script(std::shared_ptr<Script> script);
 
   /**
    * @brief Check if the character has any scripts
@@ -68,10 +69,9 @@ public:
 
   /**
    * @brief Retrieve the current texture
-   * @return A shared pointer to the texture ID if exists or nullptr if there is
-   * no current texture
+   * @return A shared pointer to the current sprite
    */
-  IDPtr current_sprite() const;
+  std::shared_ptr<Asset> current_sprite() const;
 
   /**
    * @brief Change the current sprite by changing the index
@@ -87,15 +87,15 @@ public:
 
   /**
    * @brief Retrieve scripts
-   * @return a vector of weak pointers to scripts
+   * @return a vector of to scripts
    */
-  const std::vector<IDWPtr>& scripts() const;
+  const std::vector<std::shared_ptr<Script>>& scripts() const;
 
   /**
    * @brief Retrieve sprites
-   * @return a vector of weak pointers to sprites
+   * @return a vector of sprites
    */
-  const std::vector<IDWPtr>& sprites() const;
+  const std::vector<std::shared_ptr<Asset>>& sprites() const;
 
   /**
    * @brief Retrieve name
@@ -140,8 +140,8 @@ public:
   void set_rotation(int new_rotation);
 
 private:
-  std::vector<IDWPtr> _sprites;
-  std::vector<IDWPtr> _scripts;
+  std::vector<std::shared_ptr<Asset>> _sprites;
+  std::vector<std::shared_ptr<Script>> _scripts;
   std::pair<int, int> _pos;
   size_t _current_texture_idx;
   std::string _name;

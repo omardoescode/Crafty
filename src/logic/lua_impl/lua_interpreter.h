@@ -3,6 +3,7 @@
 #include <mutex>
 #include <set>
 #include <sol/sol.hpp>
+#include "character.h"
 #include "events/event_dispatcher.h"
 #include "interpreter.h"
 #include "scope_table.h"
@@ -36,9 +37,11 @@ public:
 
   /**
    * @brief Register a script to be run in the next execution
+   * @param chr The Character to run the script on
    * @param script A weak pointer to the script
    */
-  void register_script(std::shared_ptr<model::Script> script) override;
+  void register_script(std::shared_ptr<model::Character> chr,
+                       std::shared_ptr<model::Script> script) override;
 
   /**
    * @brief Execute the registered scripts
@@ -48,11 +51,12 @@ public:
   /**
    * @brief getter for status
    */
-
   Status status() override;
 
 private:
-  std::set<std::shared_ptr<model::Script>> _scripts;
+  std::vector<std::pair<std::shared_ptr<model::Character>,
+                        std::shared_ptr<model::Script>>>
+      _scripts_ctx;
   std::mutex _scripts_mtx;
 
   Status _status;

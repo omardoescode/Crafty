@@ -13,7 +13,7 @@ BlockCanvas::BlockCanvas(UIOptions& options) : _options(options) {
   auto& dispatcher = common::EventDispatcher::instance();
   _tkns.emplace_back(dispatcher.subscribe<model::events::onScriptCreated>(
       [this](std::shared_ptr<model::events::onScriptCreated> evt) {
-        _script_views[evt->script->character()->id()].push_back(
+        _script_views[evt->character.get()].push_back(
             std::make_shared<ScriptView>(_options, evt->script));
       }));
 }
@@ -64,9 +64,15 @@ void BlockCanvas::draw() {
   // 2. Draw the scripts if any
   if (_options.current_character()) {
     auto& current_character_scripts =
-        _script_views[_options.current_character()->id()];
-    for (auto& script : current_character_scripts) {
-      script->draw();
+        _script_views[_options.current_character().get()];
+    for (auto& chr :
+         model::ProjectManager::instance().project()->characters()) {
+      auto& scripts = _script_views[chr.get()];
+      for (auto script : scripts) {
+        ImGui::PushID(script.get());
+        script->draw();
+        ImGui::PopID();
+      }
     }
   }
 

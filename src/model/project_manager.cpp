@@ -4,11 +4,12 @@
 #include <memory>
 #include <random>
 #include "asset.h"
+#include "block/block_definition.h"
+#include "block/block_instance.h"
 #include "block/block_library.h"
 #include "block/json_block_storage.h"
 #include "character.h"
 #include "events/event_dispatcher.h"
-#include "identity/prefixed_id_generator.h"
 #include "model_events.h"
 #include "model_logger.h"
 #include "utils/fs.h"
@@ -22,11 +23,10 @@ auto& dispatcher = common::EventDispatcher::instance();
 namespace model {
 ProjectManager::ProjectManager() : _current_project(nullptr) {
   // ID generator for storage
-  IDGeneratorPtr storage_id_gen = std::make_unique<PrefixedIDGenerator>("def");
   BlockLibrary::Config config;
   config.block_file_path = "./data/blocks.json";
   _block_lib = std::make_shared<BlockLibrary>(
-      std::make_unique<JsonBlockStorage>(std::move(storage_id_gen)), config);
+      std::make_unique<JsonBlockStorage>(), config);
 
   model_logger().info("Project Manager Initialized");
 }
@@ -38,22 +38,7 @@ ProjectManager& ProjectManager::instance() {
 
 void ProjectManager::create() {
   assert(!_current_project && "There is a project already");
-  auto char_mgr_id = std::make_unique<PrefixedIDGenerator>("char");
-  auto char_store = std::make_unique<Store<Character>>(std::move(char_mgr_id));
-
-  auto script_mgr_id = std::make_unique<PrefixedIDGenerator>("script");
-  auto script_store = std::make_unique<Store<Script>>(std::move(script_mgr_id));
-
-  auto asset_mgr_id = std::make_unique<PrefixedIDGenerator>("asset");
-  auto asset_store = std::make_unique<Store<Asset>>(std::move(asset_mgr_id));
-
-  auto instances_mgr_id = std::make_unique<PrefixedIDGenerator>("instances");
-  auto instances_store =
-      std::make_unique<Store<BlockInstance>>(std::move(instances_mgr_id));
-
-  _current_project = std::make_shared<Project>(
-      std::move(char_store), std::move(script_store), std::move(asset_store),
-      std::move(instances_store));
+  _current_project = std::make_shared<Project>("Untitled");
 }
 
 void ProjectManager::save() {
@@ -85,8 +70,10 @@ std::string getCurrentTimestamp() {
   ss << std::put_time(std::localtime(&now_c), "%Y%m%d%H%M%S");
   return ss.str();
 }
-std::shared_ptr<Asset> ProjectManager::add_asset(fs::path file_path,
-                                                 fs::path copy_folder) {
+
+std::shared_ptr<Asset> ProjectManager::add_asset(
+    std::shared_ptr<Character> character, std::filesystem::path file_path,
+    std::filesystem::path copy_folder) {
   assert(_current_project && "There's no current project");
   assert(fs::exists(file_path) && "File path doesn't exist");
   assert(fs::exists(copy_folder) && "Copy folder doesn't exist");
@@ -99,8 +86,9 @@ std::shared_ptr<Asset> ProjectManager::add_asset(fs::path file_path,
   fs::copy(file_path, destination);
 
   // Create a new entity
-  std::shared_ptr<Asset> new_asset =
-      _current_project->asset_store().create_entity(destination.string());
+  auto new_asset = std::make_shared<Asset>(destination);
+
+  character->add_sprite(new_asset);
   return new_asset;
 }
 
@@ -121,113 +109,54 @@ std::shared_ptr<Character> ProjectManager::add_character(
   std::uniform_int_distribution<int> y_pos_gen(
       y_margin, world_resolution.second - y_margin);
 
-  std::shared_ptr<Asset> new_asset = add_asset(file_path, copy_folder);
-  std::shared_ptr<Character> new_char =
-      _current_project->char_store().create_entity(
-          x_pos_gen(gen), y_pos_gen(gen),
-          100);  // TODO: Refactor this magic number
-  new_char->add_sprite(new_asset->id());
+  auto new_char =  // TODO: FIND a solution to the name problem? an injected
+                   // solution is preferable
+      std::make_shared<Character>("Name??", x_pos_gen(gen), y_pos_gen(gen),
+                                  100);  // TODO: Refactor this magic number
+  std::shared_ptr<Asset> new_asset =
+      add_asset(new_char, file_path, copy_folder);
+  new_char->add_sprite(new_asset);
+
+  _current_project->add_character(new_char);
 
   dispatcher.publish(std::make_shared<events::onCharacterCreated>(new_char));
 
   return new_char;
 }
 
-std::shared_ptr<Asset> ProjectManager::character_current_sprite(
-    std::shared_ptr<Character> character) {
-  auto asset_id = character->current_sprite();
-  auto asset = _current_project->asset_store().get_entity(asset_id);
-  return asset;
-}
-
-void ProjectManager::remove_character(IDPtr character_id) {
-  auto chr = _current_project->char_store().get_entity(character_id);
-  auto& dispatcher = common::EventDispatcher::instance();
-  dispatcher.publish(std::make_shared<events::beforeCharacterDeleted>(chr));
-
-  // remove all sprites & scripts
-  for (auto& sprite_w : chr->sprites()) {
-    if (auto sprite = sprite_w.lock()) remove_asset(sprite);
-  }
-  for (auto& script_w : chr->scripts()) {
-    if (auto script = script_w.lock()) remove_script(script);
-  }
-
-  _current_project->char_store().remove_entity(character_id);
-
-  // The remaining reference is in this scope only, which will be deleted
-  // before this
-  assert(chr.use_count() == 1 &&
-         "There are still remaining references to this object");
-}
-
-void ProjectManager::remove_asset(IDPtr asset_id) {
-  _current_project->asset_store().remove_entity(asset_id);
-}
-
-void ProjectManager::remove_script(IDPtr id) {
-  // TODO: Create this method
-  // auto scr = _current_project->script_store().get_entity(script_id);
-  // for (auto& blk : scr->blocks()) remove_block_instance(blk);
-  // _current_project->script_store().remove_entity(script_id);
-}
-
-void ProjectManager::remove_block_instance(IDPtr instance_id) {
-  auto blk = _current_project->instances_store().get_entity(instance_id);
-
-  // if has body, remove it
-  if (blk->has_body()) {
-    if (auto body = blk->body().lock()) remove_block_instance(body);
-  }
-
-  // remove
-  _current_project->instances_store().remove_entity(instance_id);
-}
-
 std::shared_ptr<Script> ProjectManager::add_script(
-    std::shared_ptr<Character> chr, std::shared_ptr<const BlockDefinition> def,
-    float x, float y) {
-  assert(_current_project && "No current project");
-  std::shared_ptr<Script> script =
-      _current_project->script_store().create_entity(chr, x, y);
-  std::shared_ptr<BlockInstance> instance =
-      _current_project->instances_store().create_entity(def);
+    std::shared_ptr<Character> chr, BlockDefPtr def, float x, float y) {
+  auto script = std::make_shared<Script>(x, y);
+  auto instance = std::make_shared<BlockInstance>(def);
 
-  script->add_block_instance(instance->id());
-  chr->add_script(script->id());
-  dispatcher.publish(std::make_shared<events::onScriptCreated>(script));
+  script->add_block_instance(instance);
+  chr->add_script(script);
+  dispatcher.publish(std::make_shared<events::onScriptCreated>(chr, script));
 
-  // model_logger("Script Created at x=" + std::to_string(x) +
-  //              " and y=" + std::to_string(y));
   return script;
 }
 
 void ProjectManager::add_block_to_existing_script(
-    IDPtr script_id, std::shared_ptr<const BlockDefinition> definition,
-    int position) {
+    std::shared_ptr<Script> script, BlockDefPtr def, int position) {
   // Make sure it's not a starter
   // NOTE: The only was is to create a script with it. nothing else
-  if (definition->is_starter()) return;
+  // TODO: MOVE FROM HERE
+  if (def->is_starter()) return;
 
   // Get Script
-  auto script = _current_project->script_store().get_entity(script_id);
 
   // Create the instance first and publish it
-  auto instance = _current_project->instances_store().create_entity(definition);
+  auto instance = std::make_shared<BlockInstance>(def);
 
-  int final_position = script->add_block_instance(instance->id(), position);
+  int final_position = script->add_block_instance(instance, position);
 
-  // Publish the event
-  dispatcher.publish(std::make_shared<events::onBlockInstanceAddToScript>(
-      script, instance, final_position));
+  if (final_position != -1)
+    // Publish the event
+    dispatcher.publish(std::make_shared<events::onBlockInstanceAddToScript>(
+        script, instance, final_position));
 }
 
 std::shared_ptr<BlockLibrary> ProjectManager::block_lib() const {
   return _block_lib;
-}
-
-std::shared_ptr<BlockInstance> ProjectManager::create_dummy_instance(
-    BlockDefPtr def) {
-  return _current_project->instances_store().create_entity(def, false);
 }
 }  // namespace model

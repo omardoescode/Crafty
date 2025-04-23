@@ -18,7 +18,7 @@ CharacterManager::CharacterManager(UIOptions& options) : _options(options) {
   _tkns.emplace_back(dispatcher.subscribe<model::events::onCharacterCreated>(
       [this](std::shared_ptr<model::events::onCharacterCreated> evt) {
         auto& chr = evt->character;
-        _miniviews.emplace(chr->id(),
+        _miniviews.emplace(chr.get(),
                            std::make_shared<CharacterMiniView>(_options, chr));
         ui_logger().info("Added a new miniview for {}", chr->name());
       }));
@@ -27,7 +27,7 @@ CharacterManager::CharacterManager(UIOptions& options) : _options(options) {
       dispatcher.subscribe<model::events::beforeCharacterDeleted>(
           [this](std::shared_ptr<model::events::beforeCharacterDeleted> evt) {
             auto& chr = evt->character;
-            auto itr = _miniviews.find(chr->id());
+            auto itr = _miniviews.find(chr.get());
             assert(itr != _miniviews.end());
             _miniviews.erase(itr);
           }));

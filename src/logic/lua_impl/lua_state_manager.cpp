@@ -35,6 +35,9 @@ void LuaStateManager::initialize(LuaModuleCache& module_cache) {
         std::cout << "unknown" << std::endl;
     }
   };
+
+  _state["script_start"] = []() { std::cout << "HELLO??" << std::endl; };
+
   // First register ValueType enum
   _state.new_enum<model::ValueType>("ValueType",
                                     {{"NUMBER", model::ValueType::NUMBER},

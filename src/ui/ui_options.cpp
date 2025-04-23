@@ -63,8 +63,11 @@ std::pair<float, float> UIOptions::stage_cords() const {
 }
 
 void UIOptions::run() {
-  mgr.project()->script_store().foreach (
-      [this](auto script) { _interpreter->register_script(script); });
+  // Register all scripts
+  auto& chrs = mgr.project()->characters();
+  for (auto& chr : chrs)
+    for (auto& script : chr->scripts())
+      _interpreter->register_script(chr, script);
   _interpreter->execute();
 }
 }  // namespace ui

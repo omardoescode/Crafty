@@ -28,8 +28,4 @@ std::vector<BlockDefPtr> BlockLibrary::category_blocks(
     const std::string& category) const {
   return _storage->get_definitions_by_category(category);
 }
-
-BlockDefPtr BlockLibrary::get_block_definition_by_id(IDPtr id) const {
-  return _storage->get_definition_by_id(id);
-}
 }  // namespace model

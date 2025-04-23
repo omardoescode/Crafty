@@ -1,26 +1,33 @@
 #include "script.h"
 #include <algorithm>
 #include <cassert>
+#include "block/block_instance.h"
 #include "character.h"
-#include "identity/id.h"
-#include "project.h"
+#include "model_logger.h"
 
 namespace model {
-Script::Script(IDPtr id, std::shared_ptr<Character> character, float x, float y,
-               bool serialize)
-    : Serializable(id, serialize), _character(character), _pos(x, y) {}
+Script::Script(float x, float y) : _pos(x, y) {}
 
-int Script::add_block_instance(IDPtr id, int pos) {
+int Script::add_block_instance(std::shared_ptr<BlockInstance> instance,
+                               int pos) {
   pos = std::clamp(pos, 0, static_cast<int>(_blocks.size()));
-  _blocks.insert(_blocks.begin() + pos, id);
+
+  // We cannot add a starter except to the beginning
+  if (instance->def()->is_starter() && pos != 0) return -1;
+
+  _blocks.insert(_blocks.begin() + pos, instance);
+  model_logger().info("Added a block instance to script");
   return pos;
 }
 
-void Script::remove_block_instance(IDPtr id) { remove_weak_ptr(_blocks, id); }
+void Script::remove_block_instance(std::shared_ptr<BlockInstance> instance) {
+  _blocks.erase(std::remove(_blocks.begin(), _blocks.end(), instance),
+                _blocks.end());
+}
 bool Script::has_block_instances() const { return !_blocks.empty(); }
 const std::pair<float, float> Script::pos() const { return _pos; }
 
-const std::vector<IDWPtr>& Script::blocks() const { return _blocks; }
-
-std::shared_ptr<Character> Script::character() { return _character; }
+const std::vector<std::shared_ptr<BlockInstance>>& Script::blocks() const {
+  return _blocks;
+}
 }  // namespace model

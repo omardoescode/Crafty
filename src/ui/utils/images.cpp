@@ -58,6 +58,9 @@ bool LoadTextureFromFile(const char* file_name, GLuint* out_texture,
   bool ret = LoadTextureFromMemory(file_data, file_size, out_texture, out_width,
                                    out_height);
   IM_FREE(file_data);
+
+  ui_logger().info("Texture loaded: id={}, w={}, h={}", *out_texture,
+                   *out_width, *out_height);
   return ret;
 }
 
