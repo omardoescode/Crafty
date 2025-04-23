@@ -168,6 +168,7 @@ add_library(logic
   ${LOGIC_DIR}/lua_impl/lua_interpreter.cpp 
   ${LOGIC_DIR}/lua_impl/lua_module_cache.cpp 
   ${LOGIC_DIR}/lua_impl/lua_state_manager.cpp 
+  ${LOGIC_DIR}/lua_impl/lua_script_runtime.cpp
   ${LOGIC_DIR}/lua_impl/thread_pool.cpp
 
   # error

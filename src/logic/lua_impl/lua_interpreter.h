@@ -3,12 +3,8 @@
 #include <mutex>
 #include <set>
 #include <sol/sol.hpp>
-#include "block/block_instance.h"
-#include "block/input_slot_instance.h"
-#include "character.h"
 #include "events/event_dispatcher.h"
 #include "interpreter.h"
-#include "lua_state_manager.h"
 #include "scope_table.h"
 #include "script.h"
 #include "thread_pool.h"
@@ -56,19 +52,6 @@ public:
   Status status() override;
 
 private:
-  model::Value execute_block(std::shared_ptr<LuaStateManager> state_mgr,
-                             std::shared_ptr<model::Character> character,
-                             std::shared_ptr<model::BlockInstance> instance,
-                             std::shared_ptr<ScopeTable> current_table);
-  void execute(std::shared_ptr<LuaStateManager> state_mgr,
-               std::shared_ptr<model::Script> script,
-               std::shared_ptr<ScopeTable> parent_table);
-  model::Value execute_input_slot(
-      std::shared_ptr<LuaStateManager> mgr,
-      std::shared_ptr<model::Character> character,
-      std::shared_ptr<model::InputSlotInstance> instance,
-      std::shared_ptr<ScopeTable> current_table);
-
   std::set<std::shared_ptr<model::Script>> _scripts;
   std::mutex _scripts_mtx;
 

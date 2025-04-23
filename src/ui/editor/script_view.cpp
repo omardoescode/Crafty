@@ -23,7 +23,7 @@ ScriptView::ScriptView(UIOptions& options,
     }
   }
 
-  // 2. TODO: Subscribe to instanceAddedToScript event
+  // 2. Add a subscriber to add future blocks
   _instance_add_tkn =
       dispatcher.subscribe<model::events::onBlockInstanceAddToScript>(
           [this](

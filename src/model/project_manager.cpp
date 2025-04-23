@@ -205,6 +205,11 @@ std::shared_ptr<Script> ProjectManager::add_script(
 void ProjectManager::add_block_to_existing_script(
     IDPtr script_id, std::shared_ptr<const BlockDefinition> definition,
     int position) {
+  // Make sure it's not a starter
+  // NOTE: The only was is to create a script with it. nothing else
+  if (definition->is_starter()) return;
+
+  // Get Script
   auto script = _current_project->script_store().get_entity(script_id);
 
   // Create the instance first and publish it
