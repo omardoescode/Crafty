@@ -66,8 +66,10 @@ void CharacterManager::draw() {
   num_columns = std::max(1, num_columns);  // Ensure at least 1 column
   ImGui::Columns(num_columns, NULL, false);
   for (auto& [id, mv] : _miniviews) {
+    ImGui::PushID(id);
     mv->draw();
     ImGui::NextColumn();
+    ImGui::PopID();
   }
   ImGui::EndChild();
 
