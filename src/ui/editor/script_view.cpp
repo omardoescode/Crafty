@@ -23,8 +23,7 @@ ScriptView::ScriptView(UIOptions& options,
   // 2. Add a subscriber to add future blocks
   _instance_add_tkn =
       dispatcher.subscribe<model::events::onBlockInstanceAddToScript>(
-          [this](
-              std::shared_ptr<model::events::onBlockInstanceAddToScript> evt) {
+          [this](auto evt) {
             if (evt->script != _script) return;
             _instances_views[evt->instance.get()] =
                 std::make_shared<BlockView>(_options, evt->instance, false);

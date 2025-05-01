@@ -62,14 +62,6 @@ bool ProjectManager::has_project() const { return !!_current_project; }
 std::shared_ptr<Project> ProjectManager::project() const {
   return _current_project;
 }
-std::string getCurrentTimestamp() {
-  auto now = std::chrono::system_clock::now();
-  std::time_t now_c = std::chrono::system_clock::to_time_t(now);
-
-  std::stringstream ss;
-  ss << std::put_time(std::localtime(&now_c), "%Y%m%d%H%M%S");
-  return ss.str();
-}
 
 std::shared_ptr<Asset> ProjectManager::add_asset(
     std::shared_ptr<Character> character, std::filesystem::path file_path,
@@ -111,7 +103,7 @@ std::shared_ptr<Character> ProjectManager::add_character(
 
   auto new_char =  // TODO: FIND a solution to the name problem? an injected
                    // solution is preferable
-      std::make_shared<Character>("Name??", x_pos_gen(gen), y_pos_gen(gen),
+      std::make_shared<Character>("Untitled", x_pos_gen(gen), y_pos_gen(gen),
                                   100);  // TODO: Refactor this magic number
   std::shared_ptr<Asset> new_asset =
       add_asset(new_char, file_path, copy_folder);

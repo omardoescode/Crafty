@@ -8,10 +8,22 @@
 #include <mutex>
 #include <queue>
 #include <sol/sol.hpp>
-#include "logic_logger.h"
 #include "lua_impl/lua_state_manager.h"
 
 namespace logic::lua {
+
+/**
+ * @brief thread information
+ */
+struct ThreadContext {
+  std::thread thread;
+  std::shared_ptr<LuaStateManager> mgr;
+
+  std::mutex cv_mutex;
+  std::condition_variable cv;
+  bool event_received = false;
+  sol::table event_data;
+};
 
 class ThreadPool {
 public:
@@ -21,18 +33,10 @@ public:
   typedef std::function<void(std::shared_ptr<LuaStateManager>)> ThreadFunction;
 
   /**
-   * @brief thread information
-   */
-  struct ThreadContext {
-    std::thread thread;
-    std::shared_ptr<LuaStateManager> mgr;
-  };
-
-  /**
    * @brief Constructor
    * @param size_t pool_size
    */
-  ThreadPool(std::size_t pool_size = 4);
+  ThreadPool(std::size_t pool_size);
 
   ~ThreadPool();
 

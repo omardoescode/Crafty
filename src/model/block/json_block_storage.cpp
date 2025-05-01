@@ -65,7 +65,7 @@ void JsonBlockStorage::load_definitions(const std::filesystem::path& path) {
 
       // Create the ID and the the block definition
       BlockDefPtr def = std::make_shared<BlockDefinition>(
-          id, name, category, std::move(inputs), std::move(output));
+          id, name, category, std::move(inputs), std::move(output), options);
 
       // put the values in the maps
       _defs.emplace(id, def);

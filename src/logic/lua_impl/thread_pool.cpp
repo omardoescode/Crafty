@@ -11,6 +11,8 @@ ThreadPool::ThreadPool(std::size_t pool_size) : _stop(false) {
     ctx.thread = std::thread([&ctx, this]() {
       auto& cache = LuaModuleCache::instance();
       ctx.mgr = std::make_shared<LuaStateManager>();
+      ctx.mgr->state().registry()["thread_context"] =
+          &ctx;  // Store thread context in registry
       ctx.mgr->initialize(cache);
       while (true) {
         ThreadFunction task;

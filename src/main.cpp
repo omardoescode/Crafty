@@ -1,5 +1,6 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
+#include <format>
 #include <memory>
 #include "action_deferrer.h"
 #include "backends/imgui_impl_opengl3.h"
@@ -23,8 +24,9 @@
 #endif
 
 int main(int args, char **argv) {
+  std::format_string<std::string &> lua_path = "lua/{}.lua";
   std::unique_ptr<logic::Interpreter> interpreter =
-      std::make_unique<logic::lua::LuaInterpreter>("lua/{}.lua");
+      std::make_unique<logic::lua::LuaInterpreter>(lua_path);
   ui::UIOptions options(args, argv, std::move(interpreter));
 
   // Initialize SDL3
@@ -201,6 +203,15 @@ int main(int args, char **argv) {
     character_mgr.draw();
 
     ImGui::EndChild();
+
+    if (ImGui::Button("Hello")) ImGui::OpenPopup("test");
+
+    if (ImGui::BeginPopupModal("test", NULL,
+                               ImGuiWindowFlags_AlwaysAutoResize)) {
+      ImGui::SeparatorText("Aquarium");
+      ImGui::Text("HELLO??");
+      ImGui::EndPopup();
+    }
 
     ImGui::End();
 

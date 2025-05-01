@@ -16,20 +16,15 @@ public:
   virtual ~Interpreter() = default;
 
   /**
-   * @brief Register a script to be run in the next execution
-   * @param script A weak pointer to the script
-   *
-   * @note The script will be removed after post execution
+   * @brief Execute The registered scripts so far
    */
-  virtual void register_script(std::shared_ptr<model::Character> chr,
-                               std::shared_ptr<model::Script> script) = 0;
+  virtual void execute(
+      const std::vector<std::shared_ptr<model::Character>>& chrs) = 0;
 
   /**
-   * @brief Execute The registered scripts so far
-   *
-   * @note All the scripts will be removed post execution
+   * @brief Terminate the interpreter current execution
    */
-  virtual void execute() = 0;
+  virtual void terminate() = 0;
 
   /**
    * @brief getter for status

@@ -2,6 +2,7 @@
 #include <filesystem>
 #include <memory>
 #include "events/event_dispatcher.h"
+#include "interpreter.h"
 #include "model_events.h"
 #include "project_manager.h"
 #include "utils/platform.h"
@@ -65,9 +66,9 @@ std::pair<float, float> UIOptions::stage_cords() const {
 void UIOptions::run() {
   // Register all scripts
   auto& chrs = mgr.project()->characters();
-  for (auto& chr : chrs)
-    for (auto& script : chr->scripts())
-      _interpreter->register_script(chr, script);
-  _interpreter->execute();
+  _interpreter->execute(chrs);
+}
+bool UIOptions::interpreter_running() const {
+  return _interpreter->status() == logic::Interpreter::RUNNING;
 }
 }  // namespace ui

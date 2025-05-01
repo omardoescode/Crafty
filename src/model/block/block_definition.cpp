@@ -10,8 +10,8 @@ BlockDefinition::BlockDefinition(std::string data_id, const std::string& name,
       _category(category),
       _inputs(inputs),
       _output(output_slot) {
-  if (options & BLOCKDEF_HASBODY) _has_body = true;
-  if (options & BLOCKDEF_STARTER) _is_starter = true;
+  _has_body = options & BLOCKDEF_HASBODY;
+  _is_starter = options & BLOCKDEF_STARTER;
 }
 
 const std::string& BlockDefinition::name() const { return _name; }

@@ -5,6 +5,7 @@
 #include <memory>
 #include "character/character_miniview.h"
 #include "events/event_dispatcher.h"
+#include "interpreter.h"
 #include "model_events.h"
 #include "project_manager.h"
 #include "ui_logger.h"
@@ -51,7 +52,9 @@ void CharacterManager::draw() {
     handle_add_click();
   }
   ImGui::SameLine();
-  if (ImGui::Button(ICON_MD_PLAY)) {
+
+  if (ImGui::Button(_options.interpreter_running() ? ICON_MD_DELETE
+                                                   : ICON_MD_PLAY)) {
     _options.run();
   }
   ImGui::PopFont();

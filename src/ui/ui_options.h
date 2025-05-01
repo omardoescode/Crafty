@@ -68,6 +68,7 @@ public:
   std::pair<float, float> stage_cords() const;
 
   void run();
+  bool interpreter_running() const;
 
 private:
   bool _running;

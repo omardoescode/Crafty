@@ -1,9 +1,11 @@
 #include "character_miniview.h"
 #include <cassert>
 #include "action_deferrer.h"
-#include "asset.h"
 #include "imgui.h"
+#include "imgui_internal.h"
+#include "imgui_stdlib.h"
 #include "project_manager.h"
+#include "ui_logger.h"
 #include "ui_options.h"
 #include "utils/images.h"
 
@@ -93,12 +95,16 @@ void CharacterMiniView::load_texture_once() {
 }
 
 void CharacterMiniView::draw_context_menu() {
-  if (ImGui::BeginPopupContextItem()) {
+  // true only in case the rename modal is to be open but not opened yet
+  static bool rename_modal_popup = false;
+
+  if (ImGui::BeginPopupContextItem("hello?")) {
     if (ImGui::MenuItem("Set as Current"))
       _options.set_current_character(_character);
 
     if (ImGui::MenuItem("Rename")) {
-      // Use the action deferrer to rename
+      rename_modal_popup = true;
+      ui_logger().info("Rename Modal Openning...");
     }
 
     if (ImGui::MenuItem("Duplicate")) {
@@ -111,6 +117,40 @@ void CharacterMiniView::draw_context_menu() {
         auto prj = model::ProjectManager::instance().project();
         prj->remove_character(_character);
       });
+    }
+    ImGui::EndPopup();
+  }
+
+  if (rename_modal_popup) {
+    ImGui::OpenPopup("rename");
+    rename_modal_popup = false;
+  }
+  if (ImGui::BeginPopupModal("rename", NULL,
+                             ImGuiWindowFlags_AlwaysAutoResize)) {
+    ImGui::SeparatorText("Rename Character");
+    static std::string name;
+    if (ImGui::IsWindowAppearing()) {
+      name = _character->name();
+    }
+    ImGui::InputText("##rename", &name);
+
+    bool disabled = name.empty();
+    if (disabled) {
+      ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+      ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+    }
+    if (ImGui::Button("Save & Cancel", ImVec2(0, 0))) {
+      _character->set_name(name);
+      ImGui::CloseCurrentPopup();
+    }
+    if (disabled) {
+      ImGui::PopItemFlag();
+      ImGui::PopStyleVar();
+    }
+    ImGui::SetItemDefaultFocus();
+    ImGui::SameLine();
+    if (ImGui::Button("Cancel")) {
+      ImGui::CloseCurrentPopup();
     }
     ImGui::EndPopup();
   }

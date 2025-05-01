@@ -90,6 +90,8 @@ public:
                   if (auto downcast = std::dynamic_pointer_cast<EventType>(evt))
                     handler(downcast);
                 }});
+
+    _count.fetch_add(1);
     return std::make_unique<Token>(instance(), event_type, id);
   }
 
@@ -153,6 +155,7 @@ private:
   std::unordered_map<std::type_index, std::vector<Handler>> _handlers;
   std::shared_mutex _mtx;
   std::atomic<HandlerId> _next_id;
+  std::atomic_int _count;
 
   friend class Token;
 };

@@ -1,13 +1,12 @@
 #pragma once
 #include <memory>
 #include <mutex>
-#include <set>
 #include <sol/sol.hpp>
+#include <vector>
 #include "character.h"
 #include "events/event_dispatcher.h"
 #include "interpreter.h"
 #include "scope_table.h"
-#include "script.h"
 #include "thread_pool.h"
 
 namespace logic::lua {
@@ -33,20 +32,18 @@ public:
    *  1. category name
    * @param pool_size The maximum number of possible threads going together
    */
-  LuaInterpreter(std::string module_path_fmt);
-
-  /**
-   * @brief Register a script to be run in the next execution
-   * @param chr The Character to run the script on
-   * @param script A weak pointer to the script
-   */
-  void register_script(std::shared_ptr<model::Character> chr,
-                       std::shared_ptr<model::Script> script) override;
+  LuaInterpreter(std::format_string<std::string&> module_path_fmt);
 
   /**
    * @brief Execute the registered scripts
+   * @param chrs A list of all characters in the game
    */
-  void execute() override;
+  void execute(const std::vector<std::shared_ptr<model::Character>>&) override;
+
+  /**
+   * @brief Terminate the interpreter current execution
+   */
+  void terminate() override;
 
   /**
    * @brief getter for status
@@ -54,18 +51,9 @@ public:
   Status status() override;
 
 private:
-  std::vector<std::pair<std::shared_ptr<model::Character>,
-                        std::shared_ptr<model::Script>>>
-      _scripts_ctx;
-  std::mutex _scripts_mtx;
-
-  Status _status;
-  std::mutex _status_mtx;
+  std::atomic<Status> _status;
 
   std::shared_ptr<ScopeTable> _global_ctx;
-  common::EventDispatcher::TokenP add_script_tkn;
-  common::EventDispatcher::TokenP remove_script_tkn;
-
   std::shared_ptr<ThreadPool> _thread_pool;
 };
 }  // namespace logic::lua

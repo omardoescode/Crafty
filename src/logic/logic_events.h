@@ -7,8 +7,8 @@ struct onScriptFinishedExecution : public common::EventBase {
   onScriptFinishedExecution(std::weak_ptr<model::Script> script)
       : script(script) {}
 };
-struct LuaEvent : public common::EventBase {
-  std::function<void(model::Script)> script;
-  LuaEvent(std::function<void(model::Script)> script) : script(script) {}
+struct LuaGameEvent : public common::EventBase {
+  std::string event_name;
+  LuaGameEvent(std::string event_name) : event_name(event_name) {}
 };
 };  // namespace logic::events

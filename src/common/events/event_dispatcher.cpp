@@ -3,7 +3,7 @@
 #include "common_logger.h"
 
 namespace common {
-EventDispatcher::EventDispatcher() : _next_id(0) {}
+EventDispatcher::EventDispatcher() : _next_id(0), _count(0) {}
 EventDispatcher &EventDispatcher::instance() {
   static EventDispatcher instance;
   return instance;
@@ -28,7 +28,9 @@ void EventDispatcher::unsubscribe(std::type_index event_type,
 
   evt_iterator->second.erase(handler_it);
 
-  common_logger().info("Handler has been removed");
+  _count.fetch_sub(1);
+  common_logger().info("Handler has been removed. Remaining are {} handlers",
+                       _count.load());
 }
 
 EventDispatcher::Token::Token(EventDispatcher &dispatcher, std::type_index idx,

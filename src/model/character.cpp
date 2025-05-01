@@ -1,6 +1,7 @@
 #include "character.h"
 #include <algorithm>
 #include <cassert>
+#include "model_logger.h"
 
 namespace model {
 
@@ -43,6 +44,7 @@ void Character::add_script(std::shared_ptr<Script> script, int pos) {
 }
 
 void Character::remove_script(std::shared_ptr<Script> script) {
+  model_logger().info("Removing A script");
   _scripts.erase(std::remove(_scripts.begin(), _scripts.end(), script),
                  _scripts.end());
 }

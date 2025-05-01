@@ -2,6 +2,7 @@
 #include <memory>
 #include <sol/forward.hpp>
 #include "block/input_slot_instance.h"
+#include "block/value_type.h"
 #include "character.h"
 #include "logic_logger.h"
 #include "lua_impl/lua_state_manager.h"
@@ -21,6 +22,10 @@ LuaScriptRuntime::LuaScriptRuntime(std::shared_ptr<model::Character> character,
 void LuaScriptRuntime::execute() {
   assert(_script && "Invalid Script");
   auto instances = _script->blocks();
+
+  // If the first one isn't a starter, don't execute
+  auto first = instances.front();
+  if (!first->def()->is_starter()) return;
 
   // Execute The scripts
   for (auto instance : instances) {
@@ -45,6 +50,9 @@ model::Value LuaScriptRuntime::execute_block(
   if (!result.valid()) {
     sol::error err = result;
     throw logic_logger().error("Lua execution error: {}", err.what());
+  }
+  if (static_cast<sol::object>(result).is<sol::nil_t>()) {
+    return model::Value(model::ValueType::VOID);
   }
   return result;
 }
