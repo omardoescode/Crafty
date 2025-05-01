@@ -1,5 +1,9 @@
 #include "project.h"
 #include <cassert>
+#include <memory>
+#include "events/event_dispatcher.h"
+#include "model_events.h"
+#include "model_logger.h"
 
 namespace model {
 Project::Project(const std::string& name,
@@ -21,6 +25,10 @@ void Project::add_character(std::shared_ptr<Character> chr) {
   _character_list.push_back(chr);
 }
 void Project::remove_character(std::shared_ptr<Character> chr) {
-  _character_list.push_back(chr);
+  auto& dispatcher = common::EventDispatcher::instance();
+  dispatcher.publish(std::make_shared<events::beforeCharacterDeleted>(chr));
+  _character_list.erase(
+      std::find(_character_list.begin(), _character_list.end(), chr));
+  model_logger().info("Removing Character {}", _name);
 }
 }  // namespace model

@@ -5,7 +5,6 @@
 #include <memory>
 #include "character/character_miniview.h"
 #include "events/event_dispatcher.h"
-#include "interpreter.h"
 #include "model_events.h"
 #include "project_manager.h"
 #include "ui_logger.h"
