@@ -14,7 +14,7 @@ public:
   void draw();
 
 private:
-  void handle_canvas_drop();
+  void handle_canvas_drop(ImVec2 canvas_p0);
 
 private:
   UIOptions& _options;
@@ -23,5 +23,6 @@ private:
                      std::vector<std::shared_ptr<ScriptView>>>
       _script_views;
   std::vector<common::EventDispatcher::TokenP> _tkns;
+  ImVec2 _offset;  // Pan offset
 };
 }  // namespace ui

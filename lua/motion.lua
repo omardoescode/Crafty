@@ -2,13 +2,11 @@ local maths = require("math")
 local M = {}
 M.args = {}
 
--- @field Value
--- @enum ValueType
 M.move_steps = function(ctx)
 	local chr = ctx.character
 	local scope = ctx.scope
 
-	local rotation = chr:rotation()
+	local rotation = -chr:rotation() * maths.pi / 180
 	local steps = scope:lookup_variable("steps"):tonumber()
 
 	local x, y = chr:pos()

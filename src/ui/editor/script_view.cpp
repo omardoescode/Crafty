@@ -29,9 +29,9 @@ ScriptView::ScriptView(UIOptions& options,
                 std::make_shared<BlockView>(_options, evt->instance, false);
           });
 }
-void ScriptView::draw() {
-  ImGui::SetCursorScreenPos(
-      ImVec2(_script->pos().first, _script->pos().second));
+void ScriptView::draw(ImVec2 relative_to) {
+  ImGui::SetCursorScreenPos(ImVec2(_script->pos().first + relative_to.x,
+                                   _script->pos().second + relative_to.y));
   ImGui::BeginChild("", ImVec2(0, 0),
                     ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AutoResizeX);
   ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 3));

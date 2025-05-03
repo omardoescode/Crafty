@@ -9,7 +9,7 @@ namespace ui {
 class ScriptView {
 public:
   ScriptView(UIOptions&, std::shared_ptr<model::Script>);
-  void draw();
+  void draw(ImVec2 relative_to);
 
 private:
   constexpr static float DRAG_BTN_HEIGHT = 16.f;
