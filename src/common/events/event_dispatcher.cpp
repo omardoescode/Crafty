@@ -26,11 +26,12 @@ void EventDispatcher::unsubscribe(std::type_index event_type,
 
   if (handler_it == evt_iterator->second.end()) return;
 
+  std::string debug_tag = std::move(handler_it->debug_tag);
   evt_iterator->second.erase(handler_it);
 
   _count.fetch_sub(1);
-  common_logger().info("Handler has been removed. Remaining are {} handlers",
-                       _count.load());
+  common_logger().info("Handler {} has been removed. Remaining are {} handlers",
+                       debug_tag, _count.load());
 }
 
 EventDispatcher::Token::Token(EventDispatcher &dispatcher, std::type_index idx,

@@ -73,7 +73,8 @@ public:
    */
   template <typename EventType>
   [[nodiscard]]
-  TokenP subscribe(std::function<void(std::shared_ptr<EventType>)> handler) {
+  TokenP subscribe(std::function<void(std::shared_ptr<EventType>)> handler_func,
+                   std::string &&debug = "") {
     static_assert(std::is_base_of<EventBase, EventType>::value,
                   "Event type must inherit from EventBase");
 
@@ -83,15 +84,27 @@ public:
     // Create a new id
     auto id = _next_id.fetch_add(1);
 
+    // Check for debug tag
+    static std::atomic _debug_counter = 0;
+    if (debug.empty())
+      debug = "debug_" + std::to_string(_debug_counter.fetch_add(1));
+
+    // Initiate the lock
     std::unique_lock<std::shared_mutex> lock(_mtx);
 
-    _handlers[event_type].emplace_back(
-        Handler{id, [handler](std::shared_ptr<EventBase> evt) {
-                  if (auto downcast = std::dynamic_pointer_cast<EventType>(evt))
-                    handler(downcast);
-                }});
+    Handler handler;
+    handler.id = id;
+    handler.func = [handler_func](std::shared_ptr<EventBase> evt) {
+      if (auto downcast = std::dynamic_pointer_cast<EventType>(evt))
+        handler_func(downcast);
+    };
+    handler.debug_tag = std::move(debug);
+
+    _handlers[event_type].emplace_back(std::move(handler));
 
     _count.fetch_add(1);
+
+    common_logger().info("Handler {} has been created", debug);
     return std::make_unique<Token>(instance(), event_type, id);
   }
 
@@ -143,6 +156,7 @@ public:
 private:
   struct Handler {
     HandlerId id;
+    std::string debug_tag;
     std::function<void(std::shared_ptr<EventBase>)> func;
   };
 
